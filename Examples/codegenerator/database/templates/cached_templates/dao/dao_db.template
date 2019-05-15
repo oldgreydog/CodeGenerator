@@ -208,7 +208,7 @@ public class <%className%>DAO_DB implements <%className%>DAO {
 <%text%>
 
 
-	<%customCode key=CustomLoaders commentCharacters="//"%>
+	<%customCode key=CustomLoaders openingCommentCharacters="//"%>
 
 
 	//*********************************
@@ -701,6 +701,6 @@ public class <%className%>DAO_DB implements <%className%>DAO {
 	}
 
 
-	<%customCode key=Miscellaneous commentCharacters="//"%>
+	<%customCode key=Miscellaneous openingCommentCharacters="//"%>
 }
 <%endtext%>

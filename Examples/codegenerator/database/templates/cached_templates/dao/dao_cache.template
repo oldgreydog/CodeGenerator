@@ -37,7 +37,7 @@ public class <%className%>DAO_Cache extends CacheDAO implements <%className%>DAO
 	// Data members
 
 
-	<%customCode key=CacheDataMembers commentCharacters="//"%>
+	<%customCode key=CacheDataMembers openingCommentCharacters="//"%>
 
 
 	//*********************************
@@ -49,13 +49,13 @@ public class <%className%>DAO_Cache extends CacheDAO implements <%className%>DAO
 	//*********************************
 	private void AddToCaches(<%className%> p_new<%className%>) {
 		try {
-			<%customCode key=AddToCaches commentCharacters="//"%>
+			<%customCode key=AddToCaches openingCommentCharacters="//"%>
 		}
 		catch (Exception t_error) {
 			Logger.LogError("<%className%>DAO_Cache.AddToCaches() failed with error: ", t_error);
 		}
 		finally {
-			<%customCode key=AddToCachesFinally commentCharacters="//"%>
+			<%customCode key=AddToCachesFinally openingCommentCharacters="//"%>
 		}
 	}
 
@@ -63,14 +63,14 @@ public class <%className%>DAO_Cache extends CacheDAO implements <%className%>DAO
 	//*********************************
 	private void DeleteFromCaches(<%className%> p_target<%className%>) {
 		try {
-			<%customCode key=DeleteFromCaches commentCharacters="//"%>
+			<%customCode key=DeleteFromCaches openingCommentCharacters="//"%>
 		}
 		catch (Exception t_error) {
 			Logger.LogError("<%className%>DAO_Cache.DeleteFromCaches() failed with error: ", t_error);
 			return;
 		}
 		finally {
-			<%customCode key=DeleteFromCachesFinally commentCharacters="//"%>
+			<%customCode key=DeleteFromCachesFinally openingCommentCharacters="//"%>
 		}
 	}
 
@@ -93,7 +93,7 @@ public class <%className%>DAO_Cache extends CacheDAO implements <%className%>DAO
 				// Recheck state because another thread might have acquired
 				//   write lock and changed state before we did.
 				if (!m_cacheIsValid) {
-					<%customCode key=LoadCacheClearCacheMaps commentCharacters="//"%>
+					<%customCode key=LoadCacheClearCacheMaps openingCommentCharacters="//"%>
 
 					// Now that we are supporting Mysql, we have to dynamically alter the query to make it work in MS SQL and Mysql.
 					String t_dbURL = ConfigManager.GetValue("defaultdb.url");
@@ -177,7 +177,7 @@ public class <%className%>DAO_Cache extends CacheDAO implements <%className%>DAO
 			}
 
 			LinkedList<<%className%>> t_results = new LinkedList<<%className%>>();
-			<%customCode key=LoadAll<%className%>CacheCode commentCharacters="//"%>
+			<%customCode key=LoadAll<%className%>CacheCode openingCommentCharacters="//"%>
 
 			return t_results;
 		}
@@ -212,7 +212,7 @@ public class <%className%>DAO_Cache extends CacheDAO implements <%className%>DAO
 			}
 
 			<%^className%> t_result = null;
-			<%customCode key=Load<%^className%>For<%name%> commentCharacters="//"%>
+			<%customCode key=Load<%^className%>For<%name%> openingCommentCharacters="//"%>
 
 			return t_result;
 		}
@@ -249,7 +249,7 @@ public class <%className%>DAO_Cache extends CacheDAO implements <%className%>DAO
 			}
 
 			LinkedList<<%^className%>> t_results = new LinkedList<<%^className%>>();
-			<%customCode key=LoadAll<%^className%>For<%name%> commentCharacters="//"%>
+			<%customCode key=LoadAll<%^className%>For<%name%> openingCommentCharacters="//"%>
 
 			return t_results;
 		}
@@ -266,7 +266,7 @@ public class <%className%>DAO_Cache extends CacheDAO implements <%className%>DAO
 <%text%>
 
 
-	<%customCode key=CustomLoaders commentCharacters="//"%>
+	<%customCode key=CustomLoaders openingCommentCharacters="//"%>
 
 
 	//*********************************
@@ -438,6 +438,6 @@ public class <%className%>DAO_Cache extends CacheDAO implements <%className%>DAO
 	}
 
 
-	<%customCode key=Miscellaneous commentCharacters="//"%>
+	<%customCode key=Miscellaneous openingCommentCharacters="//"%>
 }
 <%endtext%>

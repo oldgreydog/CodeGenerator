@@ -22,7 +22,7 @@ import coreutil.utils.*;
 
 public class <%className%> {
 
-	<%customCode key="Statics" commentCharacters="//"%>
+	<%customCode key="Statics" openingCommentCharacters="//"%>
 
 
 	// Data Members
@@ -34,7 +34,7 @@ public class <%className%> {
 <%endfor%>
 
 <%text%>
-	<%customCode key="ExtraMembers" commentCharacters="//"%>
+	<%customCode key="ExtraMembers" openingCommentCharacters="//"%>
 
 
 	//*********************************
@@ -108,7 +108,7 @@ public class <%className%> {
 <%endtext%>
 	<%endif%>
 <%text%>
-			<%customCode key=Validate<%name%> commentCharacters="//"%>
+			<%customCode key=Validate<%name%> openingCommentCharacters="//"%>
 		}
 		catch (Exception t_error) {
 			Logger.LogError("<%^className%>.Validate<%name%>() failed with error: ", t_error);
@@ -210,7 +210,7 @@ public class <%className%> {
 
 <%text%>
 
-	<%customCode key="ExtraMembersMutators" commentCharacters="//"%>
+	<%customCode key="ExtraMembersMutators" openingCommentCharacters="//"%>
 
 
 	//*********************************
@@ -396,7 +396,7 @@ public class <%className%> {
 <%text%>
 
 
-	<%customCode key=CustomLoaders commentCharacters="//"%>
+	<%customCode key=CustomLoaders openingCommentCharacters="//"%>
 
 
 	//===========================================
@@ -766,6 +766,6 @@ public class <%className%> {
 	}
 
 
-	<%customCode key=Miscellaneous commentCharacters="//"%>
+	<%customCode key=Miscellaneous openingCommentCharacters="//"%>
 }
 <%endtext%>

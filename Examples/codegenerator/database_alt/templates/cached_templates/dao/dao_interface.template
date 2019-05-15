@@ -38,7 +38,7 @@ public interface <%className%>DAO {
 
 
 <%text%>
-	<%customCode key=CustomLoaders commentCharacters="//"%>
+	<%customCode key=CustomLoaders openingCommentCharacters="//"%>
 
 	public LinkedList<<%className%>> Load<%className%>WithSQL(PreparedStatement p_preparedStatement, Connection p_dbConnection);
 
@@ -46,6 +46,6 @@ public interface <%className%>DAO {
 	public boolean Update<%className%>(<%className%> p_target<%className%>, Connection p_dbConnection);
 	public boolean Delete<%className%>(<%className%> p_target<%className%>, Connection p_dbConnection);
 
-	<%customCode key=Miscellaneous commentCharacters="//"%>
+	<%customCode key=Miscellaneous openingCommentCharacters="//"%>
 }
 <%endtext%>

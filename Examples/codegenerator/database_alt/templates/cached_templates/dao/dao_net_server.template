@@ -129,7 +129,7 @@ public class <%className%>DAO_NET_Server extends Request_Base {
 
 <%text%>
 
-			<%customCode key="ExecuteCustomLoaders" commentCharacters="//"%>
+			<%customCode key="ExecuteCustomLoaders" openingCommentCharacters="//"%>
 
 			else if (t_nextMessage.GetCommandString().equalsIgnoreCase("Create<%className%>")) {
 				if (!Create<%className%>(t_nextMessageInfo)) {
@@ -150,7 +150,7 @@ public class <%className%>DAO_NET_Server extends Request_Base {
 				}
 			}
 
-			<%customCode key="ExecuteMiscellaneous" commentCharacters="//"%>
+			<%customCode key="ExecuteMiscellaneous" openingCommentCharacters="//"%>
 		}
 		catch (Exception t_error) {
 			Logger.LogError("<%className%>DAO_NET_Server.Execute() failed with error: ", t_error);
@@ -331,7 +331,7 @@ public class <%className%>DAO_NET_Server extends Request_Base {
 <%text%>
 
 
-	<%customCode key=CustomLoaders commentCharacters="//"%>
+	<%customCode key=CustomLoaders openingCommentCharacters="//"%>
 
 
 	//*********************************
@@ -483,6 +483,6 @@ public class <%className%>DAO_NET_Server extends Request_Base {
 	}
 
 
-	<%customCode key=Miscellaneous commentCharacters="//"%>
+	<%customCode key=Miscellaneous openingCommentCharacters="//"%>
 }
 <%endtext%>
