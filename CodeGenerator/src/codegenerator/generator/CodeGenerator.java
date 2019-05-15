@@ -64,7 +64,7 @@ public class CodeGenerator {
 				System.exit(1);
 			}
 
-			ConfigManager.AddValueSet(t_configValues);
+			ConfigManager.AddValueSetFirst(t_configValues);
 
 
 			// Set up the logger(s) that we need for this app.  This is controlled by the logging config info in the config file.

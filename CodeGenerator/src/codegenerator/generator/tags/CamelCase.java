@@ -36,7 +36,10 @@ The input value can be any mix of upper and lower case.
 
 <p>Example use of this tag:</p>
 
-<pre><code>&lt;%camelCase value = &lt;%className%&gt;%&gt;</code></pre>
+<pre><code>&lt;%camelCase value = &lt;%className%&gt; optionalSeparator = " " %&gt;</code></pre>
+
+<p>Note that the attribute [optionalSeparator] is just that: optional.  It lets you create camel-cased output with a space or other characters between the words, for example, so that it can be used for a UI label.</p>
+
 */
 public class CamelCase extends TemplateBlock_Base {
 
@@ -44,7 +47,8 @@ public class CamelCase extends TemplateBlock_Base {
 
 
 	// Data members
-	protected	TemplateBlock_Base		m_value		= null;
+	private	TemplateBlock_Base		m_value					= null;
+	private	String					m_optionalSeparator		= null;
 
 
 	//*********************************
@@ -67,6 +71,15 @@ public class CamelCase extends TemplateBlock_Base {
 			if (m_value == null) {
 				Logger.LogError("CamelCase.Init() did not get the [value] value from attribute that is required for CamelCase tags.");
 				return false;
+			}
+
+			t_nodeAttribute = p_tagParser.GetNamedAttribute("optionalSeparator");
+			if (t_nodeAttribute != null) {
+				m_optionalSeparator = t_nodeAttribute.GetValue().GetText();
+				if (m_optionalSeparator == null) {
+					Logger.LogError("CamelCase.Init() did not get the value from the optional attribute [optionalSeparator].");
+					return false;
+				}
 			}
 
 			return true;
@@ -144,7 +157,7 @@ public class CamelCase extends TemplateBlock_Base {
 
 	//*********************************
 	private String CreateCamelCaseName(String p_className) {
-		StringBuilder t_newClassName = new StringBuilder();
+		StringBuilder t_newValue = new StringBuilder();
 
 		if (p_className == null) {
 			Logger.LogError("DDLParser.CreateCamelCaseName(): A NULL was passed in.");
@@ -159,23 +172,37 @@ public class CamelCase extends TemplateBlock_Base {
 		}
 
 		if (!p_className.contains(t_separator)) {	// If this name doesn't contain any separators, then we'll just lower-case the rest of the name, add it on and return it.
-			t_newClassName.append(p_className.substring(0, 1).toUpperCase() + p_className.substring(1).toLowerCase());
-			return t_newClassName.toString();
+			t_newValue.append(p_className.substring(0, 1).toUpperCase() + p_className.substring(1).toLowerCase());
+			return t_newValue.toString();
 		}
 
 		// Otherwise, we need to create a camel-case of the name and remove the underscores.
-		String t_remainder = p_className;
-		int t_index;
+		String	t_remainder		= p_className;
+		boolean	t_firstAdded	= false;
+		int		t_index;
 		while (t_remainder.contains(t_separator)) {
+			if (t_firstAdded) {
+				if (m_optionalSeparator != null)
+					t_newValue.append(m_optionalSeparator);
+			}
+			else
+				t_firstAdded = true;
+
 			t_index = t_remainder.indexOf(t_separatorChar);
-			t_newClassName.append(t_remainder.substring(0, 1).toUpperCase() + t_remainder.substring(1, t_index).toLowerCase());
+			t_newValue.append(t_remainder.substring(0, 1).toUpperCase() + t_remainder.substring(1, t_index).toLowerCase());
 			t_remainder = t_remainder.substring(++t_index);
 		}
 
-		t_newClassName.append(t_remainder.substring(0, 1).toUpperCase());
-		if (t_remainder.length() > 1)
-			t_newClassName.append(t_remainder.substring(1).toLowerCase());
+		// Only add the optional separator if there has already been at least one append on the new value.
+		if (t_firstAdded) {
+			if (m_optionalSeparator != null)
+				t_newValue.append(m_optionalSeparator);
+		}
 
-		return t_newClassName.toString();
+		t_newValue.append(t_remainder.substring(0, 1).toUpperCase());
+		if (t_remainder.length() > 1)
+			t_newValue.append(t_remainder.substring(1).toLowerCase());
+
+		return t_newValue.toString();
 	}
 }

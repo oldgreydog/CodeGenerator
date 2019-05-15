@@ -3,15 +3,12 @@
 
 	<property environment="env"/>
 	<property name="jar_dir" value="lib"/>
-	<!--<property name="vendor_jar_dir" value="vendorLib"/>-->
+	<property name="vendor_jar_dir" value="VendorLib"/>
 
 	<echo message="Ant java version: ${ant.java.version}" />
 
 	<target name="clean" description="Destroys all generated files and dirs.">
 		<delete  failonerror="false">
-			<fileset dir="CoreUtil/bin" casesensitive="no">
-				<include name="**/*"/>
-			</fileset>
 			<fileset dir="CodeGenerator/bin" casesensitive="no">
 				<include name="**/*"/>
 			</fileset>
@@ -19,34 +16,15 @@
 				<include name="**/*"/>
 			</fileset>
 		</delete>
-
-		<delete dir="${jar_dir}"  failonerror="false"/>
 	</target>
 
 
-	<target name="coreutil_jar">
-		<mkdir dir="CoreUtil/bin"/>
-
-		<javac includeantruntime="false" srcdir="CoreUtil/src" destdir="CoreUtil/bin" debug="true">
-		</javac>
-
-		<mkdir dir="${jar_dir}"/>
-		<delete file="${jar_dir}/coreutil.jar"/>
-		<jar basedir="CoreUtil/bin"
-			 includes="**/*.class"
-			 jarfile="${jar_dir}/coreutil.jar">
-		</jar>
-
-		<!--<delete dir="CoreUtil/bin"/>-->
-	</target>
-
-
-	<target depends="coreutil_jar" name="code_generator_jar">
+	<target name="code_generator_jar">
 		<mkdir dir="CodeGenerator/bin"/>
 
 		<javac includeantruntime="false" srcdir="CodeGenerator/src" destdir="CodeGenerator/bin" debug="true">
 			<classpath>
-				<pathelement path="${jar_dir}/coreutil.jar"/>
+				<pathelement path="${vendor_jar_dir}/coreutil.jar"/>
 			</classpath>
 			<exclude name="**/ddl/*.java"/>
 		</javac>
@@ -64,8 +42,7 @@
 
 
 	<target name="all"
-			depends="coreutil_jar,
-					 code_generator_jar">
+			depends="code_generator_jar">
 	</target>
 
 </project>
