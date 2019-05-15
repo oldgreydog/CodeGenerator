@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Node name="root">
+
+	<Node name="global">
+		<Value name="databaseName">TestDB</Value>
+		<Value name="packageName">test.output.db</Value>
+		<Value name="outputPath">output</Value>
+	</Node>
+
+	<Node name="table">
+		<Value name="className">Address</Value>
+		<Value name="sqlName">ADDRESS</Value>
+
+		<Node name="column">
+			<Value name="name">AddressId</Value>
+			<Value name="sqlName">ADDRESS_ID</Value>
+			<Value name="memberName">addressId</Value>
+			<Value name="type">Integer</Value>
+			<Value name="isNullable">false</Value>
+			<Value name="isPrimaryKey">true</Value>
+		</Node>
+		<Node name="column">
+			<Value name="name">Street1</Value>
+			<Value name="sqlName">STREET_1</Value>
+			<Value name="memberName">street1</Value>
+			<Value name="type">String</Value>
+			<Value name="valueMaxSize">50</Value>
+			<Value name="isNullable">false</Value>
+			<Value name="isPrimaryKey">false</Value>
+		</Node>
+		<Node name="column">
+			<Value name="name">Street2</Value>
+			<Value name="sqlName">STREET_2</Value>
+			<Value name="memberName">street2</Value>
+			<Value name="type">String</Value>
+			<Value name="valueMaxSize">50</Value>
+			<Value name="isNullable">true</Value>
+			<Value name="isPrimaryKey">false</Value>
+		</Node>
+		<Node name="column">
+			<Value name="name">City</Value>
+			<Value name="sqlName">CITY</Value>
+			<Value name="memberName">city</Value>
+			<Value name="type">String</Value>
+			<Value name="valueMaxSize">50</Value>
+			<Value name="isNullable">false</Value>
+			<Value name="isPrimaryKey">false</Value>
+		</Node>
+		<Node name="column">
+			<Value name="name">State</Value>
+			<Value name="sqlName">STATE</Value>
+			<Value name="memberName">state</Value>
+			<Value name="type">String</Value>
+			<Value name="valueMaxSize">2</Value>
+			<Value name="isNullable">false</Value>
+			<Value name="isPrimaryKey">false</Value>
+		</Node>
+		<Node name="column">
+			<Value name="name">ZipCode</Value>
+			<Value name="sqlName">ZIP_CODE</Value>
+			<Value name="memberName">zipCode</Value>
+			<Value name="type">String</Value>
+			<Value name="valueMaxSize">9</Value>
+			<Value name="isNullable">false</Value>
+			<Value name="isPrimaryKey">false</Value>
+		</Node>
+
+	</Node>
+
+	<Node name="table">
+		<Value name="className">User</Value>
+		<Value name="sqlName">USER</Value>
+
+		<Node name="column">
+			<Value name="name">UserId</Value>
+			<Value name="sqlName">USER_ID</Value>
+			<Value name="memberName">userId</Value>
+			<Value name="type">Integer</Value>
+			<Value name="isNullable">false</Value>
+			<Value name="isPrimaryKey">true</Value>
+		</Node>
+		<Node name="column">
+			<Value name="name">Name</Value>
+			<Value name="sqlName">NAME</Value>
+			<Value name="memberName">name</Value>
+			<Value name="type">String</Value>
+			<Value name="valueMaxSize">15</Value>
+			<Value name="isNullable">false</Value>
+			<Value name="isPrimaryKey">false</Value>
+		</Node>
+		<Node name="column">
+			<Value name="name">AddressId</Value>
+			<Value name="sqlName">ADDRESS_ID</Value>
+			<Value name="memberName">addressId</Value>
+			<Value name="type">Integer</Value>
+			<Value name="isNullable">true</Value>
+			<Value name="isPrimaryKey">false</Value>
+		</Node>
+		<Node name="column">
+			<Value name="name">Login</Value>
+			<Value name="sqlName">LOGIN</Value>
+			<Value name="memberName">login</Value>
+			<Value name="type">String</Value>
+			<Value name="valueMaxSize">50</Value>
+			<Value name="isNullable">false</Value>
+			<Value name="isPrimaryKey">false</Value>
+		</Node>
+		<Node name="column">
+			<Value name="name">Password</Value>
+			<Value name="sqlName">PASSWORD</Value>
+			<Value name="memberName">password</Value>
+			<Value name="type">String</Value>
+			<Value name="valueMaxSize">50</Value>
+			<Value name="isNullable">false</Value>
+			<Value name="isPrimaryKey">false</Value>
+		</Node>
+		<Node name="column">
+			<Value name="name">Salt</Value>
+			<Value name="sqlName">SALT</Value>
+			<Value name="memberName">salt</Value>
+			<Value name="type">String</Value>
+			<Value name="valueMaxSize">15</Value>
+			<Value name="isNullable">false</Value>
+			<Value name="isPrimaryKey">false</Value>
+		</Node>
+
+		<Node name="foreignKey">
+			<Value name="name">AddressId</Value>
+			<Value name="childKeyColumnName">ADDRESS_ID</Value>
+			<Value name="parentTableName">ADDRESS</Value>
+			<Value name="parentColumnName">ADDRESS_ID</Value>
+			<Value name="type">Integer</Value>
+			<Value name="memberName">addressId</Value>
+		</Node>
+
+	</Node>
+
+</Node>

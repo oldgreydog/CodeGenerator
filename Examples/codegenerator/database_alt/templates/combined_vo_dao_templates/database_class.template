@@ -1,0 +1,771 @@
+%%HEADER%% openingDelimiter=<% closingDelimiter=%>
+
+<%tabSettings tabLength = "4" outputType = "tabs" %>
+
+<%text%>/*
+ * This file was generated.
+ */
+
+package <%global.packageName%>;
+
+
+
+import java.io.*;
+import java.sql.*;
+import java.util.*;
+
+import coreutil.logging.*;
+import coreutil.utils.database.*;
+import coreutil.utils.*;
+
+
+
+public class <%className%> {
+
+	<%customCode key="Statics" commentCharacters="//"%>
+
+
+	// Data Members
+<%endtext%>
+
+<%foreach node=column%>
+	<%text%>	protected	<%typeConvert targetLanguage = "java" sourceType = <%type%> groupID = "object" %>	<%tabStop stopType = "stop" offset = "28" %>m_<%firstLetterToLowerCase value = <%name%>%>;
+<%endtext%>
+<%endfor%>
+
+<%text%>
+	<%customCode key="ExtraMembers" commentCharacters="//"%>
+
+
+	//*********************************
+	public <%className%>() {}
+
+
+	//*********************************
+	public <%className%>(<%tabMarker%><%endtext%>
+
+<%foreach node=column%>
+	<%first%>
+		<%text%><%endtext%>
+	<%else%>
+		<%text%>,
+<%endtext%>
+	<%endfirst%>
+
+	<%text%><%tabStop stopType = "marker" %><%typeConvert targetLanguage = "java" sourceType = <%type%> groupID = "object" %>	<%tabStop stopType = "marker" offset = "12" %>p_<%firstLetterToLowerCase value = <%name%>%><%endtext%>
+<%endfor%>
+
+<%text%>)
+	{
+<%endtext%>
+
+<%foreach node=column%>
+	<%text%>		m_<%firstLetterToLowerCase value = <%name%>%>	<%tabStop stopType = "stop" offset = "28" %>= p_<%firstLetterToLowerCase value = <%name%>%>;
+<%endtext%>
+<%endfor%>
+
+<%text%>	}
+
+<%endtext%>
+
+<%foreach node=column%>
+	<%text%>
+
+	//===========================================
+	static public boolean Validate<%name%>(String p_<%firstLetterToLowerCase value = <%name%>%>, StringBuilder p_errorMessagesReturn) {
+		if ((p_<%firstLetterToLowerCase value = <%name%>%> == null) || p_<%firstLetterToLowerCase value = <%name%>%>.isEmpty()) {
+<%endtext%>
+	<%if <%isNullable%> = false%>
+		<%text%>			Logger.LogError("<%^className%>.Validate<%name%>() : this value is not nullable.");
+			p_errorMessagesReturn.append("<%^className%>.<%name%> is not nullable.");
+			return false;
+<%endtext%>
+	<%else%>
+		<%text%>			return true;	// If this field is nullable and the passed in value is NULL, then we are done.
+<%endtext%>
+	<%endif%>
+
+	<%text%>		}
+
+		try {
+<%endtext%>
+
+	<%if  <%typeConvert targetLanguage = "java" sourceType = <%type%> groupID = "object" %> = String%>
+		<%text%>			if (p_<%firstLetterToLowerCase value = <%name%>%>.length() > <%valueMaxSize%>) {
+				Logger.LogError("<%^className%>.Validate<%name%>() : the value [" + p_<%firstLetterToLowerCase value = <%name%>%> + "] is too large for the column [<%sqlName%>] which has a max size of [<%valueMaxSize%>].");
+				p_errorMessagesReturn.append("<%^className%>.<%name%> has a max size of [<%valueMaxSize%>].");
+				return false;
+			}
+<%endtext%>
+	<%elseif  <%typeConvert targetLanguage = "java" sourceType = <%type%> groupID = "object" %> = Calendar%>
+		<%text%>			// A Calendar value should be correct out of the widget.
+<%endtext%>
+	<%elseif  <%typeConvert targetLanguage = "java" sourceType = <%type%> groupID = "object" %> = byte[]%>
+		<%text%>			// No validation can be done for a byte array.
+<%endtext%>
+	<%else%>
+		<%text%>			<%typeConvert targetLanguage = "java" sourceType = <%type%> groupID = "object" %> t_testValue = <%typeConvert targetLanguage = "java" sourceType = <%type%> groupID = "objectParseFunc" %>(p_<%firstLetterToLowerCase value = <%name%>%>);
+<%endtext%>
+	<%endif%>
+<%text%>
+			<%customCode key=Validate<%name%> commentCharacters="//"%>
+		}
+		catch (Exception t_error) {
+			Logger.LogError("<%^className%>.Validate<%name%>() failed with error: ", t_error);
+			p_errorMessagesReturn.append("<%^className%>.<%name%> is invalid: " + t_error);
+			return false;
+		}
+
+		return true;
+	}
+
+
+	//*********************************
+	public boolean Set<%name%>(<%typeConvert targetLanguage = "java" sourceType = <%type%> groupID = "object" %> p_<%firstLetterToLowerCase value = <%name%>%>) {
+<%endtext%>
+
+	<%if  <%typeConvert targetLanguage = "java" sourceType = <%type%> groupID = "object" %> = String%>
+		<%text%>		if (p_<%firstLetterToLowerCase value = <%name%>%> != null) {
+<%endtext%>
+		<%if <%isNullable%> = false%>
+			<%text%>			if (p_<%firstLetterToLowerCase value = <%name%>%>.isEmpty()) {
+				Logger.LogError("<%^className%>.Set<%name%>() : this column is not nullable and therefore can not be set with an empty value.");
+				return false;
+			}
+
+<%endtext%>
+		<%endif%>
+
+		<%text%>			String t_newValue = p_<%firstLetterToLowerCase value = <%name%>%>;
+			if (p_<%firstLetterToLowerCase value = <%name%>%>.length() > <%valueMaxSize%>) {
+				t_newValue = p_<%firstLetterToLowerCase value = <%name%>%>.substring(0, <%valueMaxSize%>);
+				Logger.LogError("<%^className%>.Set<%name%>() : the value [" + p_<%firstLetterToLowerCase value = <%name%>%> + "] is too large for the column [<%sqlName%>] which has a max size of [<%valueMaxSize%>].  It will be truncated to [" + t_newValue + "].");
+			}
+
+			m_<%firstLetterToLowerCase value = <%name%>%> = t_newValue;
+		}
+<%endtext%>
+		<%if <%isNullable%> = true%>
+			<%text%>		else {
+			m_<%firstLetterToLowerCase value = <%name%>%> = p_<%firstLetterToLowerCase value = <%name%>%>;
+		}
+<%endtext%>
+		<%else%>
+			<%text%>		else {
+			Logger.LogError("<%^className%>.Set<%name%>() : this value is not nullable.");
+			return false;
+		}
+<%endtext%>
+		<%endif%>
+	<%else%>
+
+		<%text%>		if (p_<%firstLetterToLowerCase value = <%name%>%> == null)<%endtext%>
+
+		<%if <%isNullable%> = true%>
+			<%text%>
+			m_<%firstLetterToLowerCase value = <%name%>%> = null;
+		else
+	<%endtext%>
+		<%else%>
+			<%text%> {
+			Logger.LogError("<%^className%>.Set<%name%>() : this column is not nullable and therefore can not be set with an empty value.");
+			return false;
+		}
+
+<%endtext%>
+		<%endif%>
+
+		<%if  <%typeConvert targetLanguage = "java" sourceType = <%type%> groupID = "object" %> = Calendar%>
+			<%text%>		m_<%firstLetterToLowerCase value = <%name%>%> = (Calendar)p_<%firstLetterToLowerCase value = <%name%>%>.clone();
+<%endtext%>
+		<%else%>
+			<%text%>		m_<%firstLetterToLowerCase value = <%name%>%> = p_<%firstLetterToLowerCase value = <%name%>%>;
+<%endtext%>
+		<%endif%>
+
+	<%endif%>
+
+
+	<%text%>
+		return true;
+	}
+
+
+	//*********************************
+	public <%endtext%>
+
+	<%if <%isNullable%> = true%>
+		<%text%><%typeConvert targetLanguage = "java" sourceType = <%type%> groupID = "object" %><%endtext%>
+	<%else%>
+		<%text%><%typeConvert targetLanguage = "java" sourceType = <%type%> groupID = "builtin" %><%endtext%>
+	<%endif%>
+
+	<%text%> Get<%name%>() {
+		return m_<%firstLetterToLowerCase value = <%name%>%>;
+	}
+<%endtext%>
+
+<%endfor%>
+
+
+<%text%>
+
+	<%customCode key="ExtraMembersMutators" commentCharacters="//"%>
+
+
+	//*********************************
+	@Override
+	public String toString() {
+		StringBuilder t_result = new StringBuilder();
+		t_result.append("Table name: <%sqlName%>\n");
+<%endtext%>
+
+<%foreach node=column%>
+	<%if  <%typeConvert targetLanguage = "java" sourceType = <%type%> groupID = "object" %> = Calendar%>
+		<%text%>		t_result.append("<%sqlName%> :	<%tabStop stopType = "stop" offset = "52" %>" + ((m_<%firstLetterToLowerCase value = <%name%>%> != null) ? StringUtilities.FormatDateTime(m_<%firstLetterToLowerCase value = <%name%>%>, "-", false) : "") + "\n");
+<%endtext%>
+	<%else%>
+		<%text%>		t_result.append("<%sqlName%> :	<%tabStop stopType = "stop" offset = "52" %>" + m_<%firstLetterToLowerCase value = <%name%>%> + "\n");
+<%endtext%>
+	<%endif%>
+<%endfor%>
+
+<%text%>
+		return t_result.toString();
+	}
+
+
+	//===========================================
+	static public String GetColumnList() {
+		StringBuilder t_columnList = new StringBuilder();
+
+<%endtext%>
+
+<%foreach node=column%>
+	<%first%>
+		<%text%>		t_columnList.append("<%sqlName%>");
+<%endtext%>
+	<%else%>
+		<%text%>		t_columnList.append(", <%sqlName%>");
+<%endtext%>
+	<%endfirst%>
+<%endfor%>
+
+<%text%>
+		return t_columnList.toString();
+	}
+
+
+	//===========================================
+	static public LinkedList<<%className%>> LoadAll<%className%>(Connection p_dbConnection)
+	{
+		StringBuilder t_sql = new StringBuilder();
+		t_sql.append("SELECT " + GetColumnList());
+		t_sql.append(" FROM <%sqlName%>;");
+
+		PreparedStatement t_preparedStatement = null;
+		try {
+			t_preparedStatement = p_dbConnection.prepareStatement(t_sql.toString());
+
+			LinkedList<<%className%>> t_results = Load<%className%>WithSQL(t_preparedStatement, p_dbConnection);
+			if (t_results == null) {
+				Logger.LogError("This is the SQL that failed: " + t_sql);
+				return null;
+			}
+
+			return t_results;
+		}
+		catch (Exception t_error) {
+			Logger.LogError("<%className%>.LoadAll<%className%>() failed with error: ", t_error);
+			Logger.LogError("This is the SQL that failed: " + t_sql);
+			return null;
+		}
+		finally {
+			if (t_preparedStatement != null)
+				try { t_preparedStatement.close(); } catch (Exception t_dontCare) {}
+		}
+	}<%endtext%>
+
+
+<%foreach node=column%>
+	<%if <%isPrimaryKey%> = true%>
+		<%text%>
+
+
+	//===========================================
+	static public LinkedList<<%^className%>> Load<%^className%>For<%name%>(<%typeConvert targetLanguage = "java" sourceType = <%type%> groupID = "object" %> p_<%firstLetterToLowerCase value = <%name%>%>, Connection p_dbConnection)
+	{
+		StringBuilder t_sql = new StringBuilder();
+		t_sql.append("SELECT " + GetColumnList());
+		t_sql.append(" FROM <%^sqlName%> ");
+		t_sql.append(" WHERE <%sqlName%> = ?;");
+
+		PreparedStatement t_preparedStatement = null;
+		try {
+			t_preparedStatement = p_dbConnection.prepareStatement(t_sql.toString());
+<%endtext%>
+
+		<%if <%typeConvert targetLanguage = "java" sourceType = <%type%> groupID = "object" %> = Calendar%>
+			<%text%>			t_preparedStatement.setTimestamp(1, new java.sql.Timestamp(p_<%firstLetterToLowerCase value = <%name%>%>.getTimeInMillis()));
+<%endtext%>
+		<%elseif <%typeConvert targetLanguage = "java" sourceType = <%type%> groupID = "object" %> = byte[]%>
+			<%text%>
+			ByteArrayInputStream t_imageStream	= new ByteArrayInputStream(p_<%firstLetterToLowerCase value = <%name%>%>);
+			t_preparedStatement.setBinaryStream(1, t_imageStream, p_<%firstLetterToLowerCase value = <%name%>%>.length);
+<%endtext%>
+		<%else%>
+			<%text%>			t_preparedStatement.<%typeConvert targetLanguage = "java" sourceType = <%type%> groupID = "prepStmntSetFunc" %>(1, p_<%firstLetterToLowerCase value = <%name%>%>);
+<%endtext%>
+		<%endif%>
+
+<%text%>
+			LinkedList<<%^className%>> t_results = Load<%^className%>WithSQL(t_preparedStatement, p_dbConnection);
+			if (t_results == null) {
+				Logger.LogError("This is the SQL that failed: " + t_sql);
+				return null;
+			}
+
+			return t_results;
+		}
+		catch (Exception t_error) {
+			Logger.LogError("<%^className%>.LoadAll<%^className%>For<%name%>() failed with error: ", t_error);
+			Logger.LogError("This is the SQL that failed: " + t_sql);
+			return null;
+		}
+		finally {
+			if (t_preparedStatement != null)
+				try { t_preparedStatement.close(); } catch (Exception t_dontCare) {}
+		}
+	}<%endtext%>
+
+	<%endif%>
+<%endfor%>
+
+
+<%foreach node=foreignKey%>
+	<%text%>
+
+
+	//===========================================
+	public LinkedList<<%^className%>> LoadAll<%^className%>For<%name%>(<%typeConvert targetLanguage = "java" sourceType = <%type%> groupID = "object" %> p_<%firstLetterToLowerCase value = <%name%>%>, Connection p_dbConnection)
+	{
+		StringBuilder t_sql = new StringBuilder();
+		t_sql.append("SELECT " + GetColumnList());
+		t_sql.append(" FROM <%^sqlName%> ");
+		t_sql.append(" WHERE <%childKeyColumnName%> = ?;");
+
+		PreparedStatement t_preparedStatement = null;
+		try {
+			t_preparedStatement = p_dbConnection.prepareStatement(t_sql.toString());
+<%endtext%>
+
+	<%if <%typeConvert targetLanguage = "java" sourceType = <%type%> groupID = "object" %> = Calendar%>
+		<%text%>			t_preparedStatement.setTimestamp(1, new java.sql.Timestamp(p_<%firstLetterToLowerCase value = <%name%>%>.getTimeInMillis()));
+<%endtext%>
+	<%elseif  <%typeConvert targetLanguage = "java" sourceType = <%type%> groupID = "object" %> = byte[]%>
+		<%text%>
+			ByteArrayInputStream t_imageStream	= new ByteArrayInputStream(p_<%firstLetterToLowerCase value = <%name%>%>);
+			t_preparedStatement.setBinaryStream(1, t_imageStream, p_<%firstLetterToLowerCase value = <%name%>%>.length);
+<%endtext%>
+	<%else%>
+		<%text%>			t_preparedStatement.<%typeConvert targetLanguage = "java" sourceType = <%type%> groupID = "prepStmntSetFunc" %>(1, p_<%firstLetterToLowerCase value = <%name%>%>);
+<%endtext%>
+	<%endif%>
+
+<%text%>
+			LinkedList<<%^className%>> t_results = Load<%^className%>WithSQL(t_preparedStatement, p_dbConnection);
+			if (t_results == null) {
+				Logger.LogError("This is the SQL that failed: " + t_sql);
+				return null;
+			}
+
+			return t_results;
+		}
+		catch (Exception t_error) {
+			Logger.LogError("<%^className%>.LoadAll<%^className%>For<%name%>() failed with error: ", t_error);
+			Logger.LogError("This is the SQL that failed: " + t_sql);
+			return null;
+		}
+		finally {
+			if (t_preparedStatement != null)
+				try { t_preparedStatement.close(); } catch (Exception t_dontCare) {}
+		}
+	}<%endtext%>
+<%endfor%>
+
+<%text%>
+
+
+	<%customCode key=CustomLoaders commentCharacters="//"%>
+
+
+	//===========================================
+	static protected LinkedList<<%className%>> Load<%className%>WithSQL(PreparedStatement p_preparedStatement, Connection p_dbConnection)
+	{
+		LinkedList<<%className%>> t_new<%className%>List = new LinkedList<<%className%>>();
+		<%className%> t_new<%className%> = null;
+
+		try {
+			ResultSet t_result = p_preparedStatement.executeQuery();
+			int t_index;
+			Calendar t_date;
+			Timestamp t_dbDateTime;
+			while (t_result.next()) {
+				t_index 	= 1;
+				t_new<%className%> 	= new <%className%>();
+
+<%endtext%>
+
+<%foreach node=column%>
+	<%if <%typeConvert targetLanguage = "java" sourceType = <%type%> groupID = "object" %> = Calendar%>
+		<%text%>				t_dbDateTime = t_result.getTimestamp(t_index++);
+				if (t_dbDateTime != null) {
+					t_date = Calendar.getInstance();
+					t_date.setTimeInMillis(t_dbDateTime.getTime());
+				}
+				else
+					t_date = null;
+
+				t_new<%^className%>.Set<%name%>(t_date);
+
+<%endtext%>
+	<%else%>
+		<%text%>				t_new<%^className%>.Set<%name%>(t_result.<%typeConvert targetLanguage = "java" sourceType = <%type%> groupID = "resultSetGetFunc" %>(t_index++));
+<%endtext%>
+	<%endif%>
+
+	<%if <%isNullable%> = true%>
+		<%if <%type%> = Calendar%>
+		<%else%>
+			<%text%>				if (t_result.wasNull())
+					t_new<%^className%>.Set<%name%>(null);
+
+<%endtext%>
+		<%endif%>
+	<%endif%>
+<%endfor%>
+
+<%text%>
+				t_new<%className%>List.add(t_new<%className%>);
+			}
+		}
+		catch (Exception t_error) {
+			Logger.LogError("<%className%>.Load<%className%>WithSQL() failed with an exception : ", t_error);
+			return null;
+		}
+
+		return t_new<%className%>List;
+	}
+
+
+	//===========================================
+	static public boolean Create<%className%>(<%className%>	 p_new<%className%>, Connection p_dbConnection)
+	{
+		StringBuilder		t_sql				= new StringBuilder();
+		PreparedStatement	t_preparedStatement = null;
+		try {
+			if (!ValidateBeforeSave(p_new<%className%>))
+				return false;
+
+			long t_nextID = DBConnectionManager.GetIDs(p_dbConnection, "<%sqlName%>", 1);
+			if (t_nextID == -1) {
+				Logger.LogError("<%className%>.Create<%className%>() failed to get a new ID.");
+				return false;
+			}
+
+			t_sql.append("INSERT INTO <%sqlName%> (" + GetColumnList() + ") VALUES (<%endtext%>
+
+<%foreach node=column%>
+	<%first%><%text%>?<%endtext%>
+	<%else%><%text%>, ?<%endtext%>
+	<%endfirst%>
+<%endfor%>
+
+<%text%>);");
+
+			t_preparedStatement = p_dbConnection.prepareStatement(t_sql.toString());
+			int t_index = 1;
+<%endtext%>
+
+<%foreach node=column%>
+	<%if <%isNullable%> = true%>
+		<%text%>
+			if (p_new<%^className%>.Get<%name%>() == null)
+				t_preparedStatement.setNull(t_index++, Types.<%typeConvert targetLanguage = "java" sourceType = <%type%> groupID = "prepStmntSetNullConst" %>);
+			else
+	<%endtext%>
+	<%endif%>
+
+	<%if  <%typeConvert targetLanguage = "java" sourceType = <%type%> groupID = "object" %> = Calendar%>
+		<%text%>			t_preparedStatement.setTimestamp(t_index++, new java.sql.Timestamp(p_new<%^className%>.Get<%name%>().getTimeInMillis()));
+<%endtext%>
+	<%elseif <%typeConvert targetLanguage = "java" sourceType = <%type%> groupID = "object" %> = byte[]%>
+		<%text%>			{	// I had to put these two lines in a block just in case this was a nullable field and the generator put and if-else above them.
+				ByteArrayInputStream t_imageStream	= new ByteArrayInputStream(p_new<%^className%>.Get<%name%>());
+				t_preparedStatement.setBinaryStream(t_index++, t_imageStream, p_new<%^className%>.Get<%name%>().length);
+			}
+<%endtext%>
+
+	<%else%>
+
+		<%if <%isPrimaryKey%> = true%>
+			<%text%>			t_preparedStatement.<%typeConvert targetLanguage = "java" sourceType = <%type%> groupID = "prepStmntSetFunc" %>(t_index++, (<%typeConvert targetLanguage = "java" sourceType = <%type%> groupID = "builtin" %>)t_nextID);
+<%endtext%>
+		<%else%>
+			<%text%>			t_preparedStatement.<%typeConvert targetLanguage = "java" sourceType = <%type%> groupID = "prepStmntSetFunc" %>(t_index++, p_new<%^className%>.Get<%name%>());
+<%endtext%>
+		<%endif%>
+
+	<%endif%>
+<%endfor%>
+
+<%text%>
+			if (t_preparedStatement.executeUpdate() <= 0) {
+				Logger.LogError("<%className%>.Create<%className%>() failed to execute the insert SQL: " + t_sql + "\nFor object: " + p_new<%className%>.toString());
+				return false;
+			}
+<%endtext%>
+
+<%foreach node=column%>
+	<%if <%isPrimaryKey%> = true%>
+		<%text%>
+			p_new<%^className%>.Set<%name%>((<%typeConvert targetLanguage = "java" sourceType = <%type%> groupID = "builtin" %>)t_nextID);
+<%endtext%>
+	<%endif%>
+<%endfor%>
+
+<%text%>		}
+		catch (Exception t_error) {
+			Logger.LogError("<%className%>.Create<%className%>() failed with error: ", t_error);
+			Logger.LogError("The SQL that failed: " + t_sql + "\nFor object: " + p_new<%className%>.toString());
+			return false;
+		}
+		finally {
+			if (t_preparedStatement != null)
+				try { t_preparedStatement.close(); } catch (Exception t_dontCare) {}
+		}
+
+		return true;
+	}
+
+
+	//===========================================
+	static public boolean Update<%className%>(<%className%>	 p_target<%className%>, Connection p_dbConnection)
+	{
+		StringBuilder		t_sql				= new StringBuilder();
+		PreparedStatement	t_preparedStatement = null;
+		try {
+			if (!ValidateBeforeSave(p_target<%className%>))
+				return false;
+
+			t_sql.append("UPDATE <%sqlName%> SET");
+<%endtext%>
+
+<%foreach node=column%>
+
+	<%if <%isPrimaryKey%> = true%>
+		<%--counter%>	<!-- This trick lets us skip over the primary keys AND adjust the counter so that we still get the correct code built in the "else" that follows. -->
+	<%else%>
+		<%first%>
+			<%text%>			t_sql.append(" <%sqlName%> = ?");
+<%endtext%>
+		<%else%>
+			<%text%>			t_sql.append(", <%sqlName%> = ?");
+<%endtext%>
+		<%endfirst%>
+
+	<%endif%>
+<%endfor%>
+
+<%text%>
+			t_sql.append(" WHERE");
+<%endtext%>
+
+<%foreach node=column%>
+	<%if <%isPrimaryKey%> = true%>
+		<%first%>
+			<%text%>			t_sql.append(" <%sqlName%> = ?");
+<%endtext%>
+		<%else%>
+			<%text%>			t_sql.append(" AND <%sqlName%> = ?");
+<%endtext%>
+		<%endfirst%>
+	<%endif%>
+<%endfor%>
+
+<%text%>			t_sql.append(";");
+
+
+			t_preparedStatement = p_dbConnection.prepareStatement(t_sql.toString());
+			int t_index = 1;
+<%endtext%>
+
+<%foreach node=column%>
+	<%if <%isPrimaryKey%> = false%>
+		<%if <%isNullable%> = true%>
+			<%text%>
+			if (p_target<%^className%>.Get<%name%>() == null)
+				t_preparedStatement.setNull(t_index++, Types.<%typeConvert targetLanguage = "java" sourceType = <%type%> groupID = "prepStmntSetNullConst" %>);
+			else
+	<%endtext%>
+		<%endif%>
+
+		<%if  <%typeConvert targetLanguage = "java" sourceType = <%type%> groupID = "object" %> = Calendar%>
+			<%text%>			t_preparedStatement.setTimestamp(t_index++, new java.sql.Timestamp(p_target<%^className%>.Get<%name%>().getTimeInMillis()));
+<%endtext%>
+		<%elseif <%typeConvert targetLanguage = "java" sourceType = <%type%> groupID = "object" %> = byte[]%>
+			<%text%>			{	// I had to put these two lines in a block just in case this was a nullable field and the generator put and if-else above them.
+				ByteArrayInputStream t_imageStream	= new ByteArrayInputStream(p_target<%^className%>.Get<%name%>());
+				t_preparedStatement.setBinaryStream(t_index++, t_imageStream, p_target<%^className%>.Get<%name%>().length);
+			}
+<%endtext%>
+		<%else%>
+
+			<%text%>			t_preparedStatement.<%typeConvert targetLanguage = "java" sourceType = <%type%> groupID = "prepStmntSetFunc" %>(t_index++, p_target<%^className%>.Get<%name%>());
+<%endtext%>
+
+		<%endif%>
+
+		<%if <%isNullable%> = true%>
+			<%text%>
+<%endtext%>
+		<%endif%>
+
+	<%endif%>
+<%endfor%>
+
+<%text%>
+			// Set the primary key(s).
+<%endtext%>
+
+<%foreach node=column%>
+	<%if <%isPrimaryKey%> = true%>
+		<%if <%typeConvert targetLanguage = "java" sourceType = <%type%> groupID = "object" %> = Calendar%>
+			<%text%>			t_preparedStatement.setTimestamp(t_index++, new java.sql.Timestamp(p_target<%^className%>.Get<%name%>().getTimeInMillis()));
+<%endtext%>
+		<%elseif <%typeConvert targetLanguage = "java" sourceType = <%type%> groupID = "object" %> = byte[]%>
+			<%text%>			{	// I had to put these two lines in a block just in case this was a nullable field and the generator put and if-else above them.
+				ByteArrayInputStream t_imageStream	= new ByteArrayInputStream(p_target<%^className%>.Get<%name%>());
+				t_preparedStatement.setBinaryStream(t_index++, t_imageStream, p_target<%^className%>.Get<%name%>().length);
+			}
+<%endtext%>
+		<%else%>
+
+			<%text%>			t_preparedStatement.<%typeConvert targetLanguage = "java" sourceType = <%type%> groupID = "prepStmntSetFunc" %>(t_index++, p_target<%^className%>.Get<%name%>());
+<%endtext%>
+
+		<%endif%>
+	<%endif%>
+<%endfor%>
+
+<%text%>
+			if (t_preparedStatement.executeUpdate() <= 0) {
+				Logger.LogError("<%className%>.Update<%className%>() failed to execute the update SQL: " + t_sql + "\nFor object: " + p_target<%className%>.toString());
+				return false;
+			}
+		}
+		catch (Exception t_error) {
+			Logger.LogError("<%className%>.Update<%className%>() failed with error: ", t_error);
+			Logger.LogError("The SQL that failed: " + t_sql + "\nFor object: " + p_target<%className%>.toString());
+			return false;
+		}
+		finally {
+			if (t_preparedStatement != null)
+				try { t_preparedStatement.close(); } catch (Exception t_dontCare) {}
+		}
+
+		return true;
+	}
+
+
+	//===========================================
+	static public boolean Delete<%className%>(<%className%>	 p_target<%className%>, Connection p_dbConnection)
+	{
+		StringBuilder		t_sql				= new StringBuilder();
+		PreparedStatement	t_preparedStatement = null;
+
+		try {
+			t_sql.append("DELETE FROM <%sqlName%> WHERE");
+<%endtext%>
+
+<%foreach node=column%>
+	<%if <%isPrimaryKey%> = true%>
+		<%first%>
+			<%text%>			t_sql.append(" <%sqlName%> = ?");
+<%endtext%>
+		<%else%>
+			<%text%>			t_sql.append(" AND <%sqlName%> = ?");
+<%endtext%>
+		<%endfirst%>
+	<%endif%>
+<%endfor%>
+
+<%text%>			t_sql.append(";");
+
+
+			t_preparedStatement = p_dbConnection.prepareStatement(t_sql.toString());
+			int t_index = 1;
+<%endtext%>
+
+<%foreach node=column%>
+	<%if <%isPrimaryKey%> = true%>
+		<%if <%typeConvert targetLanguage = "java" sourceType = <%type%> groupID = "object" %> = Calendar%>
+			<%text%>			t_preparedStatement.setTimestamp(t_index++, new java.sql.Timestamp(p_target<%^className%>.Get<%name%>().getTimeInMillis()));
+<%endtext%>
+		<%elseif <%typeConvert targetLanguage = "java" sourceType = <%type%> groupID = "object" %> = byte[]%>
+			<%text%>			{	// I had to put these two lines in a block just in case this was a nullable field and the generator put and if-else above them.
+				ByteArrayInputStream t_imageStream	= new ByteArrayInputStream(p_target<%^className%>.Get<%name%>());
+				t_preparedStatement.setBinaryStream(t_index++, t_imageStream, p_target<%^className%>.Get<%name%>().length);
+			}
+<%endtext%>
+		<%else%>
+
+			<%text%>			t_preparedStatement.<%typeConvert targetLanguage = "java" sourceType = <%type%> groupID = "prepStmntSetFunc" %>(t_index++, p_target<%^className%>.Get<%name%>());
+<%endtext%>
+
+		<%endif%>
+	<%endif%>
+<%endfor%>
+
+<%text%>
+			t_preparedStatement.executeUpdate();
+		}
+		catch (Exception t_error) {
+			Logger.LogError("<%className%>.Delete<%className%>() failed with error: ", t_error);
+			Logger.LogError("The SQL that failed: " + t_sql + "\nFor object: " + p_target<%className%>.toString());
+			return false;
+		}
+		finally {
+			if (t_preparedStatement != null)
+				try { t_preparedStatement.close(); } catch (Exception t_dontCare) {}
+		}
+
+		return true;
+	}
+
+
+	//===========================================
+	static public boolean ValidateBeforeSave(<%className%>	 p_new<%className%>)
+	{
+		boolean t_noError = true;
+
+<%endtext%>
+
+<%foreach node=column%>
+	<%if <%isNullable%> = false%>
+		<%text%>		if (p_new<%^className%>.m_<%firstLetterToLowerCase value = <%name%>%> == null) {
+			Logger.LogError("<%^className%>.<%sqlName%> cannot be NULL");
+			t_noError = false;
+		}
+
+<%endtext%>
+	<%endif%>
+<%endfor%>
+
+<%text%>		return t_noError;
+	}
+
+
+	<%customCode key=Miscellaneous commentCharacters="//"%>
+}
+<%endtext%>

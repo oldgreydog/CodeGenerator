@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Node name="root">
+	<Node name="dataTypeMaps">
+		<Node name="typeMap">
+			<Value name="targetLanguage">java</Value>
+			<Value name="targetTypeFieldDelimiter">:</Value>
+
+			<!--	The targetType field is defined as:	<groupID(i.e. builtin,object)>:<type>	-->
+			<!--	The "groupID" subfield allows you to have as many mappings as you need for a particular type, including, for example, specific functions needed to read and write that value to the database.	-->
+			<Node name="type">
+				<Value name="sourceType"	>int</Value>
+				<Value name="targetType"	>builtin:int</Value>
+				<Value name="targetType"	>object:Integer</Value>
+				<Value name="targetType"	>objectParseFunc:Integer.parseInt</Value>
+				<Value name="targetType"	>prepStmntSetFunc:setInt</Value>
+				<Value name="targetType"	>prepStmntSetNullConst:INTEGER</Value>
+				<Value name="targetType"	>resultSetGetFunc:getInt</Value>
+				<Value name="targetType"	>jsonGetParamFunc:GetIntParameterValue</Value>
+			</Node>
+
+			<Node name="type">
+				<Value name="sourceType"	>tinyint</Value>
+				<Value name="targetType"	>builtin:int</Value>
+				<Value name="targetType"	>object:Integer</Value>
+				<Value name="targetType"	>objectParseFunc:Integer.parseInt</Value>
+				<Value name="targetType"	>prepStmntSetFunc:setInt</Value>
+				<Value name="targetType"	>prepStmntSetNullConst:INTEGER</Value>
+				<Value name="targetType"	>resultSetGetFunc:getInt</Value>
+				<Value name="targetType"	>jsonGetParamFunc:GetIntParameterValue</Value>
+			</Node>
+
+			<Node name="type">
+				<Value name="sourceType"	>smallint</Value>
+				<Value name="targetType"	>builtin:int</Value>
+				<Value name="targetType"	>object:Integer</Value>
+				<Value name="targetType"	>objectParseFunc:Integer.parseInt</Value>
+				<Value name="targetType"	>prepStmntSetFunc:setInt</Value>
+				<Value name="targetType"	>prepStmntSetNullConst:INTEGER</Value>
+				<Value name="targetType"	>resultSetGetFunc:getInt</Value>
+				<Value name="targetType"	>jsonGetParamFunc:GetIntParameterValue</Value>
+			</Node>
+
+			<Node name="type">
+				<Value name="sourceType"	>bigint</Value>
+				<Value name="targetType"	>builtin:long</Value>
+				<Value name="targetType"	>object:Long</Value>
+				<Value name="targetType"	>objectParseFunc:Long.parseLong</Value>
+				<Value name="targetType"	>prepStmntSetFunc:setLong</Value>
+				<Value name="targetType"	>prepStmntSetNullConst:BIGINT</Value>
+				<Value name="targetType"	>resultSetGetFunc:getLong</Value>
+				<Value name="targetType"	>jsonGetParamFunc:GetLongParameterValue</Value>
+			</Node>
+
+			<Node name="type">
+				<Value name="sourceType"	>float</Value>
+				<Value name="targetType"	>builtin:float</Value>
+				<Value name="targetType"	>object:Float</Value>
+				<Value name="targetType"	>objectParseFunc:Float.parseFloat</Value>
+				<Value name="targetType"	>prepStmntSetFunc:setFloat</Value>
+				<Value name="targetType"	>prepStmntSetNullConst:FLOAT</Value>
+				<Value name="targetType"	>resultSetGetFunc:getFloat</Value>
+				<Value name="targetType"	>jsonGetParamFunc:GetFloatParameterValue</Value>
+			</Node>
+
+			<Node name="type">
+				<Value name="sourceType"	>decimal</Value>
+				<Value name="targetType"	>builtin:double</Value>
+				<Value name="targetType"	>object:Double</Value>
+				<Value name="targetType"	>objectParseFunc:Double.parseDouble</Value>
+				<Value name="targetType"	>prepStmntSetFunc:setDouble</Value>
+				<Value name="targetType"	>prepStmntSetNullConst:DOUBLE</Value>
+				<Value name="targetType"	>resultSetGetFunc:getDouble</Value>
+				<Value name="targetType"	>jsonGetParamFunc:GetDoubleParameterValue</Value>
+			</Node>
+
+			<Node name="type">
+				<Value name="sourceType"	>numeric</Value>
+				<Value name="targetType"	>builtin:double</Value>
+				<Value name="targetType"	>object:Double</Value>
+				<Value name="targetType"	>objectParseFunc:Double.parseDouble</Value>
+				<Value name="targetType"	>prepStmntSetFunc:setDouble</Value>
+				<Value name="targetType"	>prepStmntSetNullConst:DOUBLE</Value>
+				<Value name="targetType"	>resultSetGetFunc:getDouble</Value>
+				<Value name="targetType"	>jsonGetParamFunc:GetDoubleParameterValue</Value>
+			</Node>
+
+			<Node name="type">
+				<Value name="sourceType"	>boolean</Value>
+				<Value name="targetType"	>builtin:boolean</Value>
+				<Value name="targetType"	>object:Boolean</Value>
+				<Value name="targetType"	>objectParseFunc:Boolean.parseBoolean</Value>
+				<Value name="targetType"	>prepStmntSetFunc:setBoolean</Value>
+				<Value name="targetType"	>prepStmntSetNullConst:BOOLEAN</Value>
+				<Value name="targetType"	>resultSetGetFunc:getBoolean</Value>
+				<Value name="targetType"	>jsonGetParamFunc:GetBooleanParameterValue</Value>
+			</Node>
+
+			<Node name="type">
+				<Value name="sourceType"	>char</Value>
+				<Value name="targetType"	>builtin:String</Value>
+				<Value name="targetType"	>object:String</Value>
+				<Value name="targetType"	>objectParseFunc:Character.</Value>
+				<Value name="targetType"	>prepStmntSetFunc:setString</Value>
+				<Value name="targetType"	>prepStmntSetNullConst:VARCHAR</Value>
+				<Value name="targetType"	>resultSetGetFunc:getString</Value>
+				<Value name="targetType"	>jsonGetParamFunc:GetStringParameterValue</Value>
+			</Node>
+
+			<Node name="type">
+				<Value name="sourceType"	>varchar</Value>
+				<Value name="targetType"	>builtin:String</Value>
+				<Value name="targetType"	>object:String</Value>
+
+				<Value name="targetType"	>prepStmntSetFunc:setString</Value>
+				<Value name="targetType"	>prepStmntSetNullConst:VARCHAR</Value>
+				<Value name="targetType"	>resultSetGetFunc:getString</Value>
+				<Value name="targetType"	>jsonGetParamFunc:GetStringParameterValue</Value>
+			</Node>
+
+			<Node name="type">
+				<Value name="sourceType"	>text</Value>
+				<Value name="targetType"	>builtin:String</Value>
+				<Value name="targetType"	>object:String</Value>
+
+				<Value name="targetType"	>prepStmntSetFunc:setString</Value>
+				<Value name="targetType"	>prepStmntSetNullConst:VARCHAR</Value>
+				<Value name="targetType"	>resultSetGetFunc:getString</Value>
+				<Value name="targetType"	>jsonGetParamFunc:GetStringParameterValue</Value>
+			</Node>
+
+			<Node name="type">
+				<Value name="sourceType"	>datetime</Value>
+				<Value name="targetType"	>builtin:Calendar</Value>
+				<Value name="targetType"	>object:Calendar</Value>
+
+
+				<Value name="targetType"	>prepStmntSetNullConst:DATE</Value>
+
+				<Value name="targetType"	>jsonGetParamFunc:GetCalendarParameterValue</Value>
+			</Node>
+
+			<Node name="type">
+				<Value name="sourceType"	>smalldatetime</Value>
+				<Value name="targetType"	>builtin:Calendar</Value>
+				<Value name="targetType"	>object:Calendar</Value>
+
+
+				<Value name="targetType"	>prepStmntSetNullConst:DATE</Value>
+
+				<Value name="targetType"	>jsonGetParamFunc:GetCalendarParameterValue</Value>
+			</Node>
+
+			<Node name="type">
+				<Value name="sourceType"	>image</Value>
+				<Value name="targetType"	>builtin:byte[]</Value>
+				<Value name="targetType"	>object:byte[]</Value>
+
+
+				<Value name="targetType"	>prepStmntSetNullConst:ARRAY</Value>
+				<Value name="targetType"	>resultSetGetFunc:getBytes</Value>
+			</Node>
+
+			<Node name="type">
+				<Value name="sourceType"	>binary</Value>
+				<Value name="targetType"	>builtin:byte[]</Value>
+				<Value name="targetType"	>object:byte[]</Value>
+
+
+				<Value name="targetType"	>prepStmntSetNullConst:ARRAY</Value>
+				<Value name="targetType"	>resultSetGetFunc:getBytes</Value>
+			</Node>
+
+			<Node name="type">
+				<Value name="sourceType"	>varbinary</Value>
+				<Value name="targetType"	>builtin:byte[]</Value>
+				<Value name="targetType"	>object:byte[]</Value>
+
+
+				<Value name="targetType"	>prepStmntSetNullConst:ARRAY</Value>
+				<Value name="targetType"	>resultSetGetFunc:getBytes</Value>
+			</Node>
+
+		</Node>
+	</Node>
+</Node>

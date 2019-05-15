@@ -1,0 +1,81 @@
+%%HEADER%% openingDelimiter=<% closingDelimiter=%>
+<%text%>/*
+ * This file was generated.
+ */
+
+package <%global.packageName%>.marshalling.gson;
+
+
+
+import java.lang.reflect.*;
+import java.util.*;
+
+import com.google.gson.*;
+import com.google.gson.reflect.*;
+
+import coreutil.logging.*;
+import <%global.packageName%>.*;
+import <%global.packageName%>.marshalling.*;
+
+
+
+public class Gson<%className%>Marshalling implements <%className%>Marshalling {
+
+
+	//*********************************
+	@Override
+	public String Marshal(<%className%> p_object) {
+		try {
+			Gson t_gson = new Gson();
+			return t_gson.toJson(p_object);
+		}
+		catch (Exception t_error) {
+			Logger.LogError("Gson<%className%>Marshalling.Marshal(<%className%>) failed with error: ", t_error);
+			return null;
+		}
+	}
+
+
+	//*********************************
+	@Override
+	public String Marshal(LinkedList<<%className%>> p_objectList) {
+		try {
+			Gson t_gson = new Gson();
+			return t_gson.toJson(p_objectList);
+		}
+		catch (Exception t_error) {
+			Logger.LogError("Gson<%className%>Marshalling.Marshal(LinkedList<<%className%>>) failed with error: ", t_error);
+			return null;
+		}
+	}
+
+
+	//*********************************
+	@Override
+	public <%className%> UnMarshal(String p_string) {
+		try {
+			Gson t_gson				= new Gson();
+			return t_gson.fromJson(p_string, <%className%>.class);
+		}
+		catch (Exception t_error) {
+			Logger.LogError("Gson<%className%>Marshalling.UnMarshal() failed with error: ", t_error);
+			return null;
+		}
+	}
+
+
+	//*********************************
+	@Override
+	public LinkedList<<%className%>> UnMarshalList(String p_string) {
+		try {
+			Gson t_gson				= new Gson();
+			Type t_collectionType	= new TypeToken<LinkedList<<%className%>>>(){}.getType();
+			return t_gson.fromJson(p_string, t_collectionType);
+		}
+		catch (Exception t_error) {
+			Logger.LogError("Gson<%className%>Marshalling.UnMarshalList() failed with error: ", t_error);
+			return null;
+		}
+	}
+}
+<%endtext%>

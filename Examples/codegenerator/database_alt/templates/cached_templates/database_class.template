@@ -1,0 +1,279 @@
+%%HEADER%% openingDelimiter=<% closingDelimiter=%>
+<%tabSettings tabLength = "4" outputType = "tabs" %>
+
+<%text%>/*
+ * This file was generated.
+ */
+
+package <%global.packageName%>;
+
+
+
+import java.util.*;
+
+import coreutil.logging.*;
+import coreutil.utils.*;
+
+
+
+public class <%className%> {
+
+	<%customCode key="Statics" commentCharacters="//"%>
+
+
+	// Data Members
+<%endtext%>
+
+<%foreach node=column%>
+	<%text%>	protected	<%typeConvert targetLanguage = "java" sourceType = <%type%> groupID = "object" %>	<%tabStop stopType = "stop" offset = "28" %>m_<%firstLetterToLowerCase value = <%name%>%>;
+<%endtext%>
+<%endfor%>
+
+<%text%>
+	<%customCode key="ExtraMembers" commentCharacters="//"%>
+
+
+	//*********************************
+	public <%className%>() {}
+
+
+	//*********************************
+	public <%className%>(<%tabMarker%><%endtext%>
+
+<%foreach node=column%>
+	<%first%>
+		<%text%><%endtext%>
+	<%else%>
+		<%text%>,
+<%endtext%>
+	<%endfirst%>
+
+	<%text%><%tabStop stopType = "marker" %><%typeConvert targetLanguage = "java" sourceType = <%type%> groupID = "object" %>	<%tabStop stopType = "marker" offset = "12" %>p_<%firstLetterToLowerCase value = <%name%>%><%endtext%>
+<%endfor%>
+
+<%text%>)
+	{
+<%endtext%>
+
+<%foreach node=column%>
+	<%text%>		m_<%firstLetterToLowerCase value = <%name%>%>	<%tabStop stopType = "stop" offset = "28" %>= p_<%firstLetterToLowerCase value = <%name%>%>;
+<%endtext%>
+<%endfor%>
+
+<%text%>	}
+
+<%endtext%>
+
+<%foreach node=column%>
+	<%text%>
+
+	//===========================================
+	static public boolean Validate<%name%>(String p_<%firstLetterToLowerCase value = <%name%>%>, StringBuilder p_errorMessagesReturn) {
+		if ((p_<%firstLetterToLowerCase value = <%name%>%> == null) || p_<%firstLetterToLowerCase value = <%name%>%>.isEmpty()) {
+<%endtext%>
+	<%if <%isNullable%> = false%>
+		<%text%>			Logger.LogError("<%^className%>.Validate<%name%>() : this value is not nullable.");
+			p_errorMessagesReturn.append("<%^className%>.<%name%> is not nullable.");
+			return false;
+<%endtext%>
+	<%else%>
+		<%text%>			return true;	// If this field is nullable and the passed in value is NULL, then we are done.
+<%endtext%>
+	<%endif%>
+
+	<%text%>		}
+
+		try {
+<%endtext%>
+
+	<%if  <%typeConvert targetLanguage = "java" sourceType = <%type%> groupID = "object" %> = String%>
+		<%text%>			if (p_<%firstLetterToLowerCase value = <%name%>%>.length() > <%valueMaxSize%>) {
+				Logger.LogError("<%^className%>.Validate<%name%>() : the value [" + p_<%firstLetterToLowerCase value = <%name%>%> + "] is too large for the column [<%sqlName%>] which has a max size of [<%valueMaxSize%>].");
+				p_errorMessagesReturn.append("<%^className%>.<%name%> has a max size of [<%valueMaxSize%>].");
+				return false;
+			}
+<%endtext%>
+	<%elseif  <%typeConvert targetLanguage = "java" sourceType = <%type%> groupID = "object" %> = Calendar%>
+		<%text%>			// A Calendar value should be correct out of the widget.
+<%endtext%>
+	<%elseif  <%typeConvert targetLanguage = "java" sourceType = <%type%> groupID = "object" %> = byte[]%>
+		<%text%>			// No validation can be done for a byte array.
+<%endtext%>
+	<%else%>
+		<%text%>			<%typeConvert targetLanguage = "java" sourceType = <%type%> groupID = "object" %> t_testValue = <%typeConvert targetLanguage = "java" sourceType = <%type%> groupID = "objectParseFunc" %>(p_<%firstLetterToLowerCase value = <%name%>%>);
+<%endtext%>
+	<%endif%>
+<%text%>
+			<%customCode key=Validate<%name%> commentCharacters="//"%>
+		}
+		catch (Exception t_error) {
+			Logger.LogError("<%^className%>.Validate<%name%>() failed with error: ", t_error);
+			p_errorMessagesReturn.append("<%^className%>.<%name%> is invalid: " + t_error);
+			return false;
+		}
+
+		return true;
+	}
+
+
+	//*********************************
+	public boolean Set<%name%>(<%typeConvert targetLanguage = "java" sourceType = <%type%> groupID = "object" %> p_<%firstLetterToLowerCase value = <%name%>%>) {
+<%endtext%>
+
+	<%if  <%typeConvert targetLanguage = "java" sourceType = <%type%> groupID = "object" %> = String%>
+		<%text%>		if (p_<%firstLetterToLowerCase value = <%name%>%> != null) {
+<%endtext%>
+		<%if <%isNullable%> = false%>
+			<%text%>			if (p_<%firstLetterToLowerCase value = <%name%>%>.isEmpty()) {
+				Logger.LogError("<%^className%>.Set<%name%>() : this column is not nullable and therefore can not be set with an empty value.");
+				return false;
+			}
+
+<%endtext%>
+		<%endif%>
+
+		<%text%>			String t_newValue = p_<%firstLetterToLowerCase value = <%name%>%>;
+			if (p_<%firstLetterToLowerCase value = <%name%>%>.length() > <%valueMaxSize%>) {
+				t_newValue = p_<%firstLetterToLowerCase value = <%name%>%>.substring(0, <%valueMaxSize%>);
+				Logger.LogError("<%^className%>.Set<%name%>() : the value [" + p_<%firstLetterToLowerCase value = <%name%>%> + "] is too large for the column [<%sqlName%>] which has a max size of [<%valueMaxSize%>].  It will be truncated to [" + t_newValue + "].");
+			}
+
+			m_<%firstLetterToLowerCase value = <%name%>%> = t_newValue;
+		}
+<%endtext%>
+		<%if <%isNullable%> = true%>
+			<%text%>		else {
+			m_<%firstLetterToLowerCase value = <%name%>%> = p_<%firstLetterToLowerCase value = <%name%>%>;
+		}
+<%endtext%>
+		<%else%>
+			<%text%>		else {
+			Logger.LogError("<%^className%>.Set<%name%>() : this value is not nullable.");
+			return false;
+		}
+<%endtext%>
+		<%endif%>
+	<%else%>
+
+		<%text%>		if (p_<%firstLetterToLowerCase value = <%name%>%> == null)<%endtext%>
+
+		<%if <%isNullable%> = true%>
+			<%text%>
+			m_<%firstLetterToLowerCase value = <%name%>%> = null;
+		else
+	<%endtext%>
+		<%else%>
+			<%text%> {
+			Logger.LogError("<%^className%>.Set<%name%>() : this column is not nullable and therefore can not be set with an empty value.");
+			return false;
+		}
+
+<%endtext%>
+		<%endif%>
+
+		<%if  <%typeConvert targetLanguage = "java" sourceType = <%type%> groupID = "object" %> = Calendar%>
+			<%text%>		m_<%firstLetterToLowerCase value = <%name%>%> = (Calendar)p_<%firstLetterToLowerCase value = <%name%>%>.clone();
+<%endtext%>
+		<%else%>
+			<%text%>		m_<%firstLetterToLowerCase value = <%name%>%> = p_<%firstLetterToLowerCase value = <%name%>%>;
+<%endtext%>
+		<%endif%>
+
+	<%endif%>
+
+
+	<%text%>
+		return true;
+	}
+
+
+	//*********************************
+	public <%endtext%>
+
+	<%if <%isNullable%> = true%>
+		<%text%><%typeConvert targetLanguage = "java" sourceType = <%type%> groupID = "object" %><%endtext%>
+	<%else%>
+		<%text%><%typeConvert targetLanguage = "java" sourceType = <%type%> groupID = "builtin" %><%endtext%>
+	<%endif%>
+
+	<%text%> Get<%name%>() {
+		return m_<%firstLetterToLowerCase value = <%name%>%>;
+	}
+<%endtext%>
+
+<%endfor%>
+
+
+<%text%>
+
+	<%customCode key="ExtraMembersMutators" commentCharacters="//"%>
+
+
+	//*********************************
+	@Override
+	public String toString() {
+		StringBuilder t_result = new StringBuilder();
+		t_result.append("Table name: <%sqlName%>\n");
+<%endtext%>
+
+<%foreach node=column%>
+	<%if  <%typeConvert targetLanguage = "java" sourceType = <%type%> groupID = "object" %> = Calendar%>
+		<%text%>		t_result.append("<%sqlName%> :	<%tabStop stopType = "stop" offset = "52" %>" + ((m_<%firstLetterToLowerCase value = <%name%>%> != null) ? StringUtilities.FormatDateTime(m_<%firstLetterToLowerCase value = <%name%>%>, "-", false) : "") + "\n");
+<%endtext%>
+	<%else%>
+		<%text%>		t_result.append("<%sqlName%> :	<%tabStop stopType = "stop" offset = "52" %>" + m_<%firstLetterToLowerCase value = <%name%>%> + "\n");
+<%endtext%>
+	<%endif%>
+<%endfor%>
+
+<%text%>
+		return t_result.toString();
+	}
+
+
+	//===========================================
+	static public String GetColumnList() {
+		StringBuilder t_columnList = new StringBuilder();
+
+<%endtext%>
+
+<%foreach node=column%>
+	<%first%>
+		<%text%>		t_columnList.append("<%sqlName%>");
+<%endtext%>
+	<%else%>
+		<%text%>		t_columnList.append(", <%sqlName%>");
+<%endtext%>
+	<%endfirst%>
+<%endfor%>
+
+<%text%>
+		return t_columnList.toString();
+	}
+
+
+	//===========================================
+	public boolean ValidateBeforeSave()
+	{
+		boolean t_noError = true;
+
+<%endtext%>
+
+<%foreach node=column%>
+	<%if <%isNullable%> = false%>
+		<%text%>		if (m_<%firstLetterToLowerCase value = <%name%>%> == null) {
+			Logger.LogError("<%^className%>.<%sqlName%> cannot be NULL");
+			t_noError = false;
+		}
+
+<%endtext%>
+	<%endif%>
+<%endfor%>
+
+<%text%>		return t_noError;
+	}
+
+
+	<%customCode key=Miscellaneous commentCharacters="//"%>
+}
+<%endtext%>

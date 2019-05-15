@@ -1,0 +1,316 @@
+%%HEADER%% openingDelimiter=<% closingDelimiter=%>
+<%text%>/*
+ * This file was generated.
+ */
+
+package <%global.packageName%>;
+
+
+
+import java.util.*;
+
+import coreutil.logging.*;
+import coreutil.utils.*;
+
+
+
+public class <%className%> {
+
+	<%customCode key="Statics" commentCharacters="//"%>
+
+
+	// Data Members
+<%endtext%>
+
+<%foreach node=column%>
+<%text%>	protected	<%type%>		m_<%memberName%>;
+<%endtext%>
+<%endfor%>
+
+<%text%>
+	<%customCode key="ExtraMembers" commentCharacters="//"%>
+
+
+	//*********************************
+	public <%className%>() {}
+
+
+	//*********************************
+	public <%className%>(
+<%endtext%>
+<%foreach node=column%>
+
+<%first%>
+<%text%><%endtext%>
+<%else%>
+<%text%>,
+<%endtext%>
+<%endfirst%>
+
+<%text%>					<%type%>		p_<%memberName%><%endtext%>
+
+<%endfor%>
+
+<%text%>)
+	{
+<%endtext%>
+
+<%foreach node=column%>
+<%text%>		m_<%memberName%>	= p_<%memberName%>;
+<%endtext%>
+<%endfor%>
+
+<%text%>	}
+
+<%endtext%>
+
+<%foreach node=column%>
+<%text%>
+
+	//===========================================
+	static public boolean Validate<%name%>(String p_<%memberName%>, StringBuilder p_errorMessagesReturn) {
+		if ((p_<%memberName%> == null) || p_<%memberName%>.isEmpty()) {
+<%endtext%>
+<%if <%isNullable%> = false%>
+<%text%>			Logger.LogError("<%^className%>.Validate<%name%>() : this value is not nullable.");
+			p_errorMessagesReturn.append("<%^className%>.<%name%> is not nullable.");
+			return false;
+<%endtext%>
+<%else%>
+<%text%>			return true;	// If this field is nullable and the passed in value is NULL, then we are done.
+<%endtext%>
+<%endif%>
+
+<%text%>		}
+
+		try {
+<%endtext%>
+
+<%if  <%type%> = Integer%>
+<%text%>			Integer t_newInt = Integer.parseInt(p_<%memberName%>);
+<%endtext%>
+<%elseif  <%type%> = Long%>
+<%text%>			Long t_newLong = Long.parseLong(p_<%memberName%>);
+<%endtext%>
+<%elseif  <%type%> = Float%>
+<%text%>			Float t_newFloat = Float.parseFloat(p_<%memberName%>);
+<%endtext%>
+<%elseif  <%type%> = Double%>
+<%text%>			Double t_newDouble = Double.parseDouble(p_<%memberName%>);
+<%endtext%>
+<%elseif  <%type%> = String%>
+<%text%>			if (p_<%memberName%>.length() > <%valueMaxSize%>) {
+				Logger.LogError("<%^className%>.Validate<%name%>() : the value [" + p_<%memberName%> + "] is too large for the column [<%sqlName%>] which has a max size of [<%valueMaxSize%>].");
+				p_errorMessagesReturn.append("<%^className%>.<%name%> has a max size of [<%valueMaxSize%>].");
+				return false;
+			}
+<%endtext%>
+<%elseif  <%type%> = Calendar%>
+<%text%>			// A Calendar value should be correct out of the widget.
+<%endtext%>
+<%elseif  <%type%> = byte[]%>
+<%text%>			// No validation can be done for a byte array.
+<%endtext%>
+<%else%>
+<%text%>An unknown type [<%type%>] was not handled by the template.
+<%endtext%>
+<%endif%>
+<%text%>
+			<%customCode key=Validate<%name%> commentCharacters="//"%>
+		}
+		catch (Exception t_error) {
+			Logger.LogError("<%^className%>.Validate<%name%>() failed with error: ", t_error);
+			p_errorMessagesReturn.append("<%^className%>.<%name%> is invalid: " + t_error);
+			return false;
+		}
+
+		return true;
+	}
+
+
+	//*********************************
+	public boolean Set<%name%>(<%type%> p_<%memberName%>) {
+<%endtext%>
+<%if  <%type%> = String%>
+<%text%>		if (p_<%memberName%> != null) {
+<%endtext%>
+<%if <%isNullable%> = false%>
+<%text%>			if (p_<%memberName%>.isEmpty()) {
+				Logger.LogError("<%^className%>.Set<%name%>() : this column is not nullable and therefore can not be set with an empty value.");
+				return false;
+			}
+
+<%endtext%>
+<%endif%>
+
+<%text%>			String t_newValue = p_<%memberName%>;
+			if (p_<%memberName%>.length() > <%valueMaxSize%>) {
+				t_newValue = p_<%memberName%>.substring(0, <%valueMaxSize%>);
+				Logger.LogError("<%^className%>.Set<%name%>() : the value [" + p_<%memberName%> + "] is too large for the column [<%sqlName%>] which has a max size of [<%valueMaxSize%>].  It will be truncated to [" + t_newValue + "].");
+			}
+
+			m_<%memberName%> = t_newValue;
+		}
+<%endtext%>
+<%if <%isNullable%> = true%>
+<%text%>		else {
+			m_<%memberName%> = p_<%memberName%>;
+		}
+<%endtext%>
+<%else%>
+<%text%>		else {
+			Logger.LogError("<%^className%>.Set<%name%>() : this value is not nullable.");
+			return false;
+		}
+<%endtext%>
+<%endif%>
+<%else%>
+
+<%text%>		if (p_<%memberName%> == null)<%endtext%>
+
+<%if <%isNullable%> = true%>
+<%text%>
+			m_<%memberName%> = null;
+		else
+	<%endtext%>
+<%else%>
+<%text%> {
+			Logger.LogError("<%^className%>.Set<%name%>() : this column is not nullable and therefore can not be set with an empty value.");
+			return false;
+		}
+
+<%endtext%>
+<%endif%>
+<%if  <%type%> = Calendar%>
+<%text%>		m_<%memberName%> = (Calendar)p_<%memberName%>.clone();
+<%endtext%>
+<%else%>
+<%text%>		m_<%memberName%> = p_<%memberName%>;
+<%endtext%>
+<%endif%>
+
+<%endif%>
+
+
+<%text%>
+		return true;
+	}
+
+
+	//*********************************
+	public <%endtext%>
+<%if  <%type%> = Integer%>
+	<%if <%isNullable%> = true%>
+		<%text%>Integer<%endtext%>
+	<%else%>
+		<%text%>int<%endtext%>
+	<%endif%>
+<%elseif  <%type%> = Long%>
+	<%if <%isNullable%> = true%>
+		<%text%>Long<%endtext%>
+	<%else%>
+		<%text%>long<%endtext%>
+	<%endif%>
+<%elseif  <%type%> = Float%>
+	<%if <%isNullable%> = true%>
+		<%text%>Float<%endtext%>
+	<%else%>
+		<%text%>float<%endtext%>
+	<%endif%>
+<%elseif  <%type%> = Double%>
+	<%if <%isNullable%> = true%>
+		<%text%>Double<%endtext%>
+	<%else%>
+		<%text%>double<%endtext%>
+	<%endif%>
+<%elseif  <%type%> = String%>
+		<%text%>String<%endtext%>
+<%elseif  <%type%> = Calendar%>
+	<%text%>Calendar<%endtext%>
+<%elseif  <%type%> = byte[]%>
+	<%text%>byte[]<%endtext%>
+<%else%>
+<%text%>An unknown type [<%type%>] was not handled by the template.
+<%endtext%>
+<%endif%>
+<%text%> Get<%name%>() {
+		return m_<%memberName%>;
+	}
+<%endtext%>
+
+<%endfor%>
+
+
+<%text%>
+
+	<%customCode key="ExtraMembersMutators" commentCharacters="//"%>
+
+
+	//*********************************
+	@Override
+	public String toString() {
+		StringBuilder t_result = new StringBuilder();
+		t_result.append("Table name: <%sqlName%>\n");
+<%endtext%>
+
+<%foreach node=column%>
+<%if  <%type%> = Calendar%>
+<%text%>		t_result.append("<%sqlName%> :    " + ((m_<%memberName%> != null) ? StringUtilities.FormatDateTime(m_<%memberName%>, "-", false) : "") + "\n");
+<%endtext%>
+<%else%>
+<%text%>		t_result.append("<%sqlName%> :    " + m_<%memberName%> + "\n");
+<%endtext%>
+<%endif%>
+<%endfor%>
+
+<%text%>
+		return t_result.toString();
+	}
+
+
+	//===========================================
+	static public String GetColumnList() {
+		StringBuilder t_columnList = new StringBuilder();
+
+<%endtext%>
+
+<%foreach node=column%>
+<%first%>
+<%text%>		t_columnList.append("<%sqlName%>");
+<%endtext%>
+<%else%>
+<%text%>		t_columnList.append(", <%sqlName%>");
+<%endtext%>
+<%endfirst%>
+<%endfor%>
+
+<%text%>
+		return t_columnList.toString();
+	}
+
+
+	//===========================================
+	public boolean ValidateBeforeSave()
+	{
+		boolean t_noError = true;
+
+<%endtext%>
+
+<%foreach node=column%>
+<%if <%isNullable%> = false%>
+<%text%>		if (m_<%memberName%> == null) {
+			Logger.LogError("<%^className%>.<%sqlName%> cannot be NULL");
+			t_noError = false;
+		}
+
+<%endtext%>
+<%endif%>
+<%endfor%>
+
+<%text%>		return t_noError;
+	}
+
+
+	<%customCode key=Miscellaneous commentCharacters="//"%>
+}
+<%endtext%>

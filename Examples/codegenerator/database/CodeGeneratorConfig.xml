@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Config>
+	<Node name="dataTypeManager">
+	</Node>
+
+	<Node name="logging">
+		<Node name="logTargets">
+			<Value name="target">coreutil.logging.ConsoleLogger</Value>
+			<Value name="target">coreutil.logging.FileLogger</Value>
+		</Node>
+		<Node name="consoleLogger">
+			<Value name="maxLoggingLevel">30</Value>
+		</Node>
+		<Node name="fileLogger">
+			<Value name="logDirectory">output/logs</Value>
+			<Value name="appFileNamePrefix">ConfigGen</Value>
+			<Value name="maxLoggingLevel">30</Value>
+		</Node>
+	</Node>
+</Config>

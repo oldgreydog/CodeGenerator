@@ -1,0 +1,181 @@
+/*
+Copyright 2016 Wes Kaylor
+
+This file is part of CodeGenerator.
+
+CodeGenerator is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+CodeGenerator is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with CodeGenerator.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+
+package codegenerator.generator.tags;
+
+
+
+import java.io.*;
+
+import codegenerator.generator.utils.*;
+import coreutil.config.*;
+import coreutil.logging.*;
+
+
+
+/**
+Takes any config value of the form "aa_bb_cc" or "aa-bb-cc" and outputs it in camel case "AaBbCc".
+The input value can be any mix of upper and lower case.
+
+<p>Example use of this tag:</p>
+
+<pre><code>&lt;%camelCase value = &lt;%className%&gt;%&gt;</code></pre>
+*/
+public class CamelCase extends TemplateBlock_Base {
+
+	static public final String		BLOCK_NAME		= "camelCase";
+
+
+	// Data members
+	protected	TemplateBlock_Base		m_value		= null;
+
+
+	//*********************************
+	public CamelCase() {
+		super(BLOCK_NAME);
+	}
+
+
+	//*********************************
+	@Override
+	public boolean Init(TagParser p_tagParser) {
+		try {
+			TagAttributeParser t_nodeAttribute = p_tagParser.GetNamedAttribute("value");
+			if (t_nodeAttribute == null) {
+				Logger.LogError("CamelCase.Init() did not find the [value] attribute that is required for CamelCase tags.");
+				return false;
+			}
+
+			m_value = t_nodeAttribute.GetValue();
+			if (m_value == null) {
+				Logger.LogError("CamelCase.Init() did not get the [value] value from attribute that is required for CamelCase tags.");
+				return false;
+			}
+
+			return true;
+		}
+		catch (Throwable t_error) {
+			Logger.LogError("CamelCase.Init() failed with error: ", t_error);
+			return false;
+		}
+	}
+
+
+	//*********************************
+	@Override
+	public TemplateBlock_Base GetInstance() {
+		return new CamelCase();
+	}
+
+
+	//*********************************
+	@Override
+	public boolean Parse(TemplateTokenizer p_tokenizer) {
+
+		return true;
+	}
+
+
+	//*********************************
+	@Override
+	public boolean Evaluate(ConfigNode		p_currentNode,
+							ConfigNode		p_rootNode,
+							Cursor 			p_writer,
+							LoopCounter		p_iterationCounter)	// There wasn't any good way to tell a CamelCase which iteration it was in that would be safe for arbitrary nesting, so I added this iteration counter to handle the problem.
+	{
+		try {
+			// If there are no child blocks, then this is a "leaf" node text object and we have to output its string.
+			if (m_value == null) {
+				Logger.LogError("CamelCase.Evaluate() was not initialized.");
+				return false;
+			}
+
+			StringWriter	t_valueWriter	= new StringWriter();
+			Cursor			t_valueCursor	= new Cursor(t_valueWriter);
+			if (!m_value.Evaluate(p_currentNode, p_rootNode, t_valueCursor, p_iterationCounter)) {
+				Logger.LogError("CamelCase.Evaluate() failed to evaluate the value.");
+				return false;
+			}
+
+			p_writer.Write(CreateCamelCaseName(t_valueWriter.toString()));
+		}
+		catch (Throwable t_error) {
+			Logger.LogError("CamelCase.Evaluate() failed with error: ", t_error);
+			return false;
+		}
+
+		return true;
+	}
+
+
+	//*********************************
+	@Override
+	public String Dump(String p_tabs) {
+		StringBuilder t_dump = new StringBuilder();
+
+		t_dump.append(p_tabs + "Block type name  :  " + m_name 	+ "\n");
+
+		if (m_value != null) {
+			t_dump.append("\n\n");
+			t_dump.append(m_value.Dump(p_tabs + "\t"));
+
+		}
+
+		return t_dump.toString();
+	}
+
+
+	//*********************************
+	private String CreateCamelCaseName(String p_className) {
+		StringBuilder t_newClassName = new StringBuilder();
+
+		if (p_className == null) {
+			Logger.LogError("DDLParser.CreateCamelCaseName(): A NULL was passed in.");
+			return null;
+		}
+
+		String	t_separator		= "_";
+		char	t_separatorChar	= '_';
+		if (p_className.contains("-")) {
+			t_separator		= "-";
+			t_separatorChar	= '-';
+		}
+
+		if (!p_className.contains(t_separator)) {	// If this name doesn't contain any separators, then we'll just lower-case the rest of the name, add it on and return it.
+			t_newClassName.append(p_className.substring(0, 1).toUpperCase() + p_className.substring(1).toLowerCase());
+			return t_newClassName.toString();
+		}
+
+		// Otherwise, we need to create a camel-case of the name and remove the underscores.
+		String t_remainder = p_className;
+		int t_index;
+		while (t_remainder.contains(t_separator)) {
+			t_index = t_remainder.indexOf(t_separatorChar);
+			t_newClassName.append(t_remainder.substring(0, 1).toUpperCase() + t_remainder.substring(1, t_index).toLowerCase());
+			t_remainder = t_remainder.substring(++t_index);
+		}
+
+		t_newClassName.append(t_remainder.substring(0, 1).toUpperCase());
+		if (t_remainder.length() > 1)
+			t_newClassName.append(t_remainder.substring(1).toLowerCase());
+
+		return t_newClassName.toString();
+	}
+}

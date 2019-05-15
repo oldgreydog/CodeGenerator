@@ -1,0 +1,526 @@
+%%HEADER%% openingDelimiter=<% closingDelimiter=%>
+<%text%>/*
+ * This file was generated.
+ */
+
+package <%global.packageName%>.dao.message.server;
+
+
+
+import java.util.*;
+
+import <%global.packageName%>.*;
+import <%global.packageName%>.dao.*;
+import <%global.packageName%>.marshalling.gson.*;
+import coreutil.logging.*;
+import coreutil.utils.database.*;
+import coreutil.utils.database.DBConnectionManager.*;
+import coreutil.utils.message.*;
+import coreutil.utils.network.*;
+
+
+
+public class <%className%>DAO_NET_Server extends Request_Base {
+
+	static public final String		MODULE_NAME				= "<%className%>DAO";
+
+	static public final String		WEB_CONNECT_PRIORITY	= "500";
+
+
+
+	//*********************************
+	public <%className%>DAO_NET_Server() {
+		super((MessageRouter)null);
+
+		setName("<%className%> DAO network server handler");	// Set the thread name so that it is identifiable in the monitor and in error messages.
+	}
+
+
+	//*********************************
+	public <%className%>DAO_NET_Server(String p_requestKey, MessageRouter p_parentMessageRouter) {
+		super(p_requestKey, p_parentMessageRouter);
+
+		setName("<%className%> DAO network server handler");	// Set the thread name so that it is identifiable in the monitor and in error messages.
+	}
+
+
+	//*********************************
+	public <%className%>DAO_NET_Server(<%className%>DAO_NET_Server p_Other<%className%>DAO_NET_Server, String p_requestKey, MessageRouter p_parentMessageRouter) {
+		super(p_requestKey, p_parentMessageRouter);
+
+		setName("<%className%> DAO network server handler");	// Set the thread name so that it is identifiable in the monitor and in error messages.
+	}
+
+
+	//*********************************
+	@Override
+	public Request_Base GetClone(String p_requestKey, MessageRouter p_parentMessageRouter) {
+		return new <%className%>DAO_NET_Server(this, p_requestKey, p_parentMessageRouter);
+	}
+
+
+	//*********************************
+	/**
+	 * This is a generic way for the factory to pass in the config
+	 * values that are included in the config section of a particular handler.
+	 *
+	 * @param p_parameterName
+	 * @param p_value
+	 */
+	@Override
+	public boolean SetParameter(String p_parameterName, String p_value) {
+		try {
+			return super.SetParameter(p_parameterName, p_value);
+		}
+		catch (Exception t_error) {
+			Logger.LogError("<%className%>DAO_NET_Server.SetParameter() failed with error: ", t_error);
+			return false;
+		}
+	}
+
+
+	//*********************************
+	@Override
+	public String GetModuleID() {
+		return MODULE_NAME;
+	}
+
+
+	//*********************************
+	@Override
+	public void Execute() {
+		MessageInfo t_nextMessageInfo = null;
+		try {
+			if ((t_nextMessageInfo = GetNextMessage()) == null) {
+				Logger.LogError("<%className%>DAO_NET_Server.Execute() failed to get a message from the queue.");
+				return;
+			}
+
+			// Dispatch the message to the correct target function.
+			NetMessage t_nextMessage = t_nextMessageInfo.GetMessage();	// This API will only make single request/response calls, so this only has to get one message instead of looping.
+			if (t_nextMessage.GetCommandString().equalsIgnoreCase("LoadAll<%className%>")) {
+				if (!LoadAll<%className%>(t_nextMessageInfo)) {
+					Logger.LogError("<%className%>DAO_NET_Server.Execute() failed in LoadAll<%className%>().");
+					return;
+				}
+			}<%endtext%>
+
+<%foreach node=column%>
+<%if <%isPrimaryKey%> = true%>
+<%text%>
+			else if (t_nextMessage.GetCommandString().equalsIgnoreCase("Load<%^className%>For<%name%>")) {
+				if (!Load<%^className%>For<%name%>(t_nextMessageInfo)) {
+					Logger.LogError("<%^className%>DAO_NET_Server.Execute() failed in Load<%^className%>For<%name%>().");
+					return;
+				}
+			}<%endtext%>
+<%endif%>
+<%endfor%>
+
+<%foreach node=foreignKey%>
+<%text%>
+			else if (t_nextMessage.GetCommandString().equalsIgnoreCase("LoadAll<%^className%>For<%name%>")) {
+				if (!LoadAll<%^className%>For<%name%>(t_nextMessageInfo)) {
+					Logger.LogError("<%^className%>DAO_NET_Server.Execute() failed in LoadAll<%^className%>For<%name%>().");
+					return;
+				}
+			}<%endtext%>
+<%endfor%>
+
+<%text%>
+
+			<%customCode key="ExecuteCustomLoaders" commentCharacters="//"%>
+
+			else if (t_nextMessage.GetCommandString().equalsIgnoreCase("Create<%className%>")) {
+				if (!Create<%className%>(t_nextMessageInfo)) {
+					Logger.LogError("<%className%>DAO_NET_Server.Execute() failed in Create<%className%>().");
+					return;
+				}
+			}
+			else if (t_nextMessage.GetCommandString().equalsIgnoreCase("Update<%className%>")) {
+				if (!Update<%className%>(t_nextMessageInfo)) {
+					Logger.LogError("<%className%>DAO_NET_Server.Execute() failed in Update<%className%>().");
+					return;
+				}
+			}
+			else if (t_nextMessage.GetCommandString().equalsIgnoreCase("Delete<%className%>")) {
+				if (!Delete<%className%>(t_nextMessageInfo)) {
+					Logger.LogError("<%className%>DAO_NET_Server.Execute() failed in Delete<%className%>().");
+					return;
+				}
+			}
+
+			<%customCode key="ExecuteMiscellaneous" commentCharacters="//"%>
+		}
+		catch (Exception t_error) {
+			Logger.LogError("<%className%>DAO_NET_Server.Execute() failed with error: ", t_error);
+
+			if (t_nextMessageInfo != null) {
+				NetMessage	t_response = t_nextMessageInfo.GetMessage().CreateResponseMessage();
+				t_response.SetMessageProperty(NetMessage.NM_HEADER_RESPONSE_STATUS, NetMessage.RESPONSE_FAIL);	// The default response status is "success".  We have to set it to "fail" here.
+				t_response.SetMessageProperty(NetMessage.NM_HEADER_RESPONSE_MESSAGE, "Execute() failed with error: " + t_error);
+				t_nextMessageInfo.GetSourceConnection().AddMessage(t_response);
+			}
+
+			return;
+		}
+		finally {
+			// Be sure to remove the handler from the MessageRouter!  We can't leave these things lying around after we're done with them.
+			if (m_requestKey != null)
+				m_parentMessageRouter.RemoveModuleFromModuleMap(m_requestKey);
+		}
+	}
+
+
+	//*********************************
+	public boolean LoadAll<%className%>(MessageInfo p_messageInfo) {
+		NetMessage			t_response		= p_messageInfo.GetMessage().CreateResponseMessage();
+		ConnectionProxy		t_dbConnection	= null;
+		try {
+			t_dbConnection = DBConnectionManager.GetConnection("defaultdb", true);
+			if (t_dbConnection == null) {
+				Logger.LogError("<%className%>DAO_NET_Server.LoadAll<%className%>() failed to get a database connection.");
+				t_response.SetMessageProperty(NetMessage.NM_HEADER_RESPONSE_STATUS, NetMessage.RESPONSE_FAIL);	// The default response status is "success".  We have to set it to "fail" here.
+				t_response.SetMessageProperty(NetMessage.NM_HEADER_RESPONSE_MESSAGE, "LoadAll<%className%>() failed to get a database connection.");
+				p_messageInfo.GetSourceConnection().AddMessage(t_response);
+				return false;
+			}
+
+			<%className%>DAO t_<%className%>DAO = <%global.databaseName%>DAOFactory.GetInstance().Get<%className%>DAO();
+			LinkedList<<%className%>> t_results	= t_<%className%>DAO.LoadAll<%className%>(t_dbConnection);
+
+			if (t_results == null) {
+				Logger.LogError("<%className%>DAO_NET_Server.LoadAll<%className%>() failed to load the data.");
+				t_response.SetMessageProperty(NetMessage.NM_HEADER_RESPONSE_STATUS, NetMessage.RESPONSE_FAIL);	// The default response status is "success".  We have to set it to "fail" here.
+				t_response.SetMessageProperty(NetMessage.NM_HEADER_RESPONSE_MESSAGE, "LoadAll<%className%>() failed to load the data.");
+				p_messageInfo.GetSourceConnection().AddMessage(t_response);
+				return false;
+			}
+
+			Gson<%className%>Marshalling t_marshaler = new Gson<%className%>Marshalling();
+			t_response.SetContents(t_marshaler.Marshal(t_results).getBytes(), true);	// Marshal the ServiceInfo list to JSON and set that as the contents of the response.
+
+			p_messageInfo.GetSourceConnection().AddMessage(t_response);
+		}
+		catch (Exception t_error) {
+			Logger.LogError("<%className%>DAO_NET_Server.LoadAll<%className%>() failed with error: ", t_error);
+			t_response.SetMessageProperty(NetMessage.NM_HEADER_RESPONSE_STATUS, NetMessage.RESPONSE_FAIL);	// The default response status is "success".  We have to set it to "fail" here.
+			t_response.SetMessageProperty(NetMessage.NM_HEADER_RESPONSE_MESSAGE, "LoadAll<%className%>() failed with error: " + t_error);
+			p_messageInfo.GetSourceConnection().AddMessage(t_response);
+			return false;
+		}
+		finally {
+			if (t_dbConnection != null)
+				DBConnectionManager.ReleaseConnection(t_dbConnection);
+		}
+
+		return true;
+	}<%endtext%>
+
+
+<%foreach node=column%>
+<%if <%isPrimaryKey%> = true%>
+<%text%>
+
+
+	//*********************************
+	public boolean Load<%^className%>For<%name%>(MessageInfo p_messageInfo) {
+		NetMessage			t_response		= p_messageInfo.GetMessage().CreateResponseMessage();
+		ConnectionProxy		t_dbConnection	= null;
+		try {
+			t_dbConnection = DBConnectionManager.GetConnection("defaultdb", true);
+			if (t_dbConnection == null) {
+				Logger.LogError("<%^className%>DAO_NET_Server.Load<%^className%>For<%name%>() failed to get a database connection.");
+				t_response.SetMessageProperty(NetMessage.NM_HEADER_RESPONSE_STATUS, NetMessage.RESPONSE_FAIL);	// The default response status is "success".  We have to set it to "fail" here.
+				t_response.SetMessageProperty(NetMessage.NM_HEADER_RESPONSE_MESSAGE, "Load<%^className%>For<%name%>() failed to get a database connection.");
+				p_messageInfo.GetSourceConnection().AddMessage(t_response);
+				return false;
+			}
+
+			JSONParameters	t_parameters	= JSONParameters.UnMarshal(p_messageInfo.GetMessage().GetContentsAsCharString());
+			<%type%>			t_<%memberName%>	= t_parameters.<%endtext%>
+
+<%if  <%type%> = Integer%>
+<%text%>GetIntParameterValue<%endtext%>
+<%elseif  <%type%> = Long%>
+<%text%>GetLongParameterValue<%endtext%>
+<%elseif  <%type%> = Float%>
+<%text%>GetFloatParameterValue<%endtext%>
+<%elseif  <%type%> = Double%>
+<%text%>GetDoubleParameterValue<%endtext%>
+<%elseif  <%type%> = String%>
+<%text%>GetStringParameterValue<%endtext%>
+<%elseif  <%type%> = Calendar%>
+<%text%>GetCalendarParameterValue<%endtext%>
+<%elseif  <%type%> = byte[]%>
+<%text%>	Type byte[] is not handled by the template.	<%endtext%>
+<%else%>
+<%text%>	An unknown type [<%type%>] is not handled by the template.	<%endtext%>
+<%endif%>
+<%text%>("<%memberName%>");
+
+			<%^className%>DAO t_<%^className%>DAO = <%global.databaseName%>DAOFactory.GetInstance().Get<%^className%>DAO();
+			<%^className%> t_results	= t_<%^className%>DAO.Load<%^className%>For<%name%>(t_<%memberName%>, t_dbConnection);
+
+			if (t_results == null) {
+				Logger.LogError("<%^className%>DAO_NET_Server.Load<%^className%>For<%name%>() failed to load the data.");
+				t_response.SetMessageProperty(NetMessage.NM_HEADER_RESPONSE_STATUS, NetMessage.RESPONSE_FAIL);	// The default response status is "success".  We have to set it to "fail" here.
+				t_response.SetMessageProperty(NetMessage.NM_HEADER_RESPONSE_MESSAGE, "Load<%^className%>For<%name%>() failed to load the data.");
+				p_messageInfo.GetSourceConnection().AddMessage(t_response);
+				return false;
+			}
+
+			Gson<%^className%>Marshalling t_marshaler = new Gson<%^className%>Marshalling();
+			t_response.SetContents(t_marshaler.Marshal(t_results).getBytes(), true);	// Marshal the <%^className%> list to JSON and set that as the contents of the response.
+
+			p_messageInfo.GetSourceConnection().AddMessage(t_response);
+		}
+		catch (Exception t_error) {
+			Logger.LogError("<%^className%>DAO_NET_Server.Load<%^className%>For<%name%>() failed with error: ", t_error);
+			t_response.SetMessageProperty(NetMessage.NM_HEADER_RESPONSE_STATUS, NetMessage.RESPONSE_FAIL);	// The default response status is "success".  We have to set it to "fail" here.
+			t_response.SetMessageProperty(NetMessage.NM_HEADER_RESPONSE_MESSAGE, "Load<%^className%>For<%name%>() failed with error: " + t_error);
+			p_messageInfo.GetSourceConnection().AddMessage(t_response);
+			return false;
+		}
+		finally {
+			if (t_dbConnection != null)
+				DBConnectionManager.ReleaseConnection(t_dbConnection);
+		}
+
+		return true;
+	}<%endtext%>
+
+<%endif%>
+<%endfor%>
+
+
+<%foreach node=foreignKey%>
+<%text%>
+
+
+	//*********************************
+	public boolean LoadAll<%^className%>For<%name%>(MessageInfo p_messageInfo) {
+		NetMessage			t_response		= p_messageInfo.GetMessage().CreateResponseMessage();
+		ConnectionProxy		t_dbConnection	= null;
+		try {
+			t_dbConnection = DBConnectionManager.GetConnection("defaultdb", true);
+			if (t_dbConnection == null) {
+				Logger.LogError("<%^className%>DAO_NET_Server.LoadAll<%^className%>For<%name%>() failed to get a database connection.");
+				t_response.SetMessageProperty(NetMessage.NM_HEADER_RESPONSE_STATUS, NetMessage.RESPONSE_FAIL);	// The default response status is "success".  We have to set it to "fail" here.
+				t_response.SetMessageProperty(NetMessage.NM_HEADER_RESPONSE_MESSAGE, "Load<%^className%>For<%name%>() failed to get a database connection.");
+				p_messageInfo.GetSourceConnection().AddMessage(t_response);
+				return false;
+			}
+
+			JSONParameters	t_parameters		= JSONParameters.UnMarshal(p_messageInfo.GetMessage().GetContentsAsCharString());
+			<%type%>			t_<%memberName%>	= t_parameters.<%endtext%>
+
+<%if  <%type%> = Integer%>
+<%text%>GetIntParameterValue<%endtext%>
+<%elseif  <%type%> = Long%>
+<%text%>GetLongParameterValue<%endtext%>
+<%elseif  <%type%> = Float%>
+<%text%>GetFloatParameterValue<%endtext%>
+<%elseif  <%type%> = Double%>
+<%text%>GetDoubleParameterValue<%endtext%>
+<%elseif  <%type%> = String%>
+<%text%>GetStringParameterValue<%endtext%>
+<%elseif  <%type%> = Calendar%>
+<%text%>GetCalendarParameterValue<%endtext%>
+<%elseif  <%type%> = byte[]%>
+<%text%>	Type byte[] is not handled by the template.	<%endtext%>
+<%else%>
+<%text%>	An unknown type [<%type%>] is not handled by the template.	<%endtext%>
+<%endif%>
+<%text%>("<%memberName%>");
+
+			<%^className%>DAO t_<%^className%>DAO = <%global.databaseName%>DAOFactory.GetInstance().Get<%^className%>DAO();
+			LinkedList<<%^className%>> t_results	= t_<%^className%>DAO.LoadAll<%^className%>For<%name%>(t_<%memberName%>, t_dbConnection);
+
+			if (t_results == null) {
+				Logger.LogError("<%^className%>DAO_NET_Server.Load<%^className%>For<%name%>() failed to load the data.");
+				t_response.SetMessageProperty(NetMessage.NM_HEADER_RESPONSE_STATUS, NetMessage.RESPONSE_FAIL);	// The default response status is "success".  We have to set it to "fail" here.
+				t_response.SetMessageProperty(NetMessage.NM_HEADER_RESPONSE_MESSAGE, "LoadAll<%^className%>For<%name%>() failed to load the data.");
+				p_messageInfo.GetSourceConnection().AddMessage(t_response);
+				return false;
+			}
+
+			Gson<%^className%>Marshalling t_marshaler = new Gson<%^className%>Marshalling();
+			t_response.SetContents(t_marshaler.Marshal(t_results).getBytes(), true);	// Marshal the ServiceInfo list to JSON and set that as the contents of the response.
+
+			p_messageInfo.GetSourceConnection().AddMessage(t_response);
+		}
+		catch (Exception t_error) {
+			Logger.LogError("<%^className%>DAO_NET_Server.LoadAll<%^className%>For<%name%>() failed with error: ", t_error);
+			t_response.SetMessageProperty(NetMessage.NM_HEADER_RESPONSE_STATUS, NetMessage.RESPONSE_FAIL);	// The default response status is "success".  We have to set it to "fail" here.
+			t_response.SetMessageProperty(NetMessage.NM_HEADER_RESPONSE_MESSAGE, "LoadAll<%^className%>For<%name%>() failed with error: " + t_error);
+			p_messageInfo.GetSourceConnection().AddMessage(t_response);
+			return false;
+		}
+		finally {
+			if (t_dbConnection != null)
+				DBConnectionManager.ReleaseConnection(t_dbConnection);
+		}
+
+		return true;
+	}<%endtext%>
+
+<%endfor%>
+<%text%>
+
+
+	<%customCode key=CustomLoaders commentCharacters="//"%>
+
+
+	//*********************************
+	public boolean Create<%className%>(MessageInfo p_messageInfo) {
+		NetMessage			t_response		= p_messageInfo.GetMessage().CreateResponseMessage();
+		ConnectionProxy		t_dbConnection	= null;
+		try {
+			t_dbConnection = DBConnectionManager.GetConnection("defaultdb", true);
+			if (t_dbConnection == null) {
+				Logger.LogError("<%className%>DAO_NET_Server.Create<%className%>() failed to get a database connection.");
+				return false;
+			}
+
+			JSONParameters	t_parameters		= JSONParameters.UnMarshal(p_messageInfo.GetMessage().GetContentsAsCharString());
+			String			t_new<%className%>JSON	= t_parameters.GetJSONParameterValue("new<%className%>");
+			if (t_new<%className%>JSON == null) {
+				t_response.SetMessageProperty(NetMessage.NM_HEADER_RESPONSE_STATUS, NetMessage.RESPONSE_FAIL);	// The default response status is "success".  We have to set it to "fail" here.
+				t_response.SetMessageProperty(NetMessage.NM_HEADER_RESPONSE_MESSAGE, "Create<%className%>() did not receive a new <%className%> object in the parameters.");
+				p_messageInfo.GetSourceConnection().AddMessage(t_response);
+				return false;
+			}
+
+			Gson<%className%>Marshalling	t_marshaler		= new Gson<%className%>Marshalling();
+			<%className%>					t_new<%className%>	= t_marshaler.UnMarshal(t_new<%className%>JSON);
+
+			<%className%>DAO t_<%className%>DAO = <%global.databaseName%>DAOFactory.GetInstance().Get<%className%>DAO();
+			if (!t_<%className%>DAO.Create<%className%>(t_new<%className%>, t_dbConnection)) {
+				t_response.SetMessageProperty(NetMessage.NM_HEADER_RESPONSE_STATUS, NetMessage.RESPONSE_FAIL);	// The default response status is "success".  We have to set it to "fail" here.
+				t_response.SetMessageProperty(NetMessage.NM_HEADER_RESPONSE_MESSAGE, "Create<%className%>() failed to create the new Create<%className%>:\n" + t_new<%className%>.toString());
+				p_messageInfo.GetSourceConnection().AddMessage(t_response);
+				return false;
+			}
+
+			t_response.SetContents(t_marshaler.Marshal(t_new<%className%>).getBytes(), true);	// Marshal the <%className%> to JSON and set that as the contents of the response.  This will let the client side grab the new ID and set it in its local copy of the object.
+
+			p_messageInfo.GetSourceConnection().AddMessage(t_response);
+		}
+		catch (Exception t_error) {
+			Logger.LogError("<%className%>DAO_NET_Server.Create<%className%>() failed with error: ", t_error);
+			t_response.SetMessageProperty(NetMessage.NM_HEADER_RESPONSE_STATUS, NetMessage.RESPONSE_FAIL);	// The default response status is "success".  We have to set it to "fail" here.
+			t_response.SetMessageProperty(NetMessage.NM_HEADER_RESPONSE_MESSAGE, "Create<%className%>() failed with error: " + t_error);
+			p_messageInfo.GetSourceConnection().AddMessage(t_response);
+			return false;
+		}
+		finally {
+			if (t_dbConnection != null)
+				DBConnectionManager.ReleaseConnection(t_dbConnection);
+		}
+
+		return true;
+	}
+
+
+	//*********************************
+	public boolean Update<%className%>(MessageInfo p_messageInfo) {
+		NetMessage			t_response		= p_messageInfo.GetMessage().CreateResponseMessage();
+		ConnectionProxy		t_dbConnection	= null;
+		try {
+			t_dbConnection = DBConnectionManager.GetConnection("defaultdb", true);
+			if (t_dbConnection == null) {
+				Logger.LogError("<%className%>DAO_NET_Server.Update<%className%>() failed to get a database connection.");
+				return false;
+			}
+
+			JSONParameters	t_parameters		= JSONParameters.UnMarshal(p_messageInfo.GetMessage().GetContentsAsCharString());
+			String			t_new<%className%>JSON	= t_parameters.GetJSONParameterValue("new<%className%>");
+			if (t_new<%className%>JSON == null) {
+				t_response.SetMessageProperty(NetMessage.NM_HEADER_RESPONSE_STATUS, NetMessage.RESPONSE_FAIL);	// The default response status is "success".  We have to set it to "fail" here.
+				t_response.SetMessageProperty(NetMessage.NM_HEADER_RESPONSE_MESSAGE, "Update<%className%>() did not receive a new <%className%> object in the parameters.");
+				p_messageInfo.GetSourceConnection().AddMessage(t_response);
+				return false;
+			}
+
+			Gson<%className%>Marshalling	t_marshaler		= new Gson<%className%>Marshalling();
+			<%className%>					t_new<%className%>	= t_marshaler.UnMarshal(t_new<%className%>JSON);
+
+			<%className%>DAO t_<%className%>DAO = <%global.databaseName%>DAOFactory.GetInstance().Get<%className%>DAO();
+			if (!t_<%className%>DAO.Update<%className%>(t_new<%className%>, t_dbConnection)) {
+				t_response.SetMessageProperty(NetMessage.NM_HEADER_RESPONSE_STATUS, NetMessage.RESPONSE_FAIL);	// The default response status is "success".  We have to set it to "fail" here.
+				t_response.SetMessageProperty(NetMessage.NM_HEADER_RESPONSE_MESSAGE, "Update<%className%>() failed to create the new Update<%className%>:\n" + t_new<%className%>.toString());
+				p_messageInfo.GetSourceConnection().AddMessage(t_response);
+				return false;
+			}
+
+			p_messageInfo.GetSourceConnection().AddMessage(t_response);
+		}
+		catch (Exception t_error) {
+			Logger.LogError("<%className%>DAO_NET_Server.Update<%className%>() failed with error: ", t_error);
+			t_response.SetMessageProperty(NetMessage.NM_HEADER_RESPONSE_STATUS, NetMessage.RESPONSE_FAIL);	// The default response status is "success".  We have to set it to "fail" here.
+			t_response.SetMessageProperty(NetMessage.NM_HEADER_RESPONSE_MESSAGE, "Update<%className%>() failed with error: " + t_error);
+			p_messageInfo.GetSourceConnection().AddMessage(t_response);
+			return false;
+		}
+		finally {
+			if (t_dbConnection != null)
+				DBConnectionManager.ReleaseConnection(t_dbConnection);
+		}
+
+		return true;
+	}
+
+
+	//*********************************
+	public boolean Delete<%className%>(MessageInfo p_messageInfo) {
+		NetMessage			t_response		= p_messageInfo.GetMessage().CreateResponseMessage();
+		ConnectionProxy		t_dbConnection	= null;
+		try {
+			t_dbConnection = DBConnectionManager.GetConnection("defaultdb", true);
+			if (t_dbConnection == null) {
+				Logger.LogError("<%className%>DAO_NET_Server.Delete<%className%>() failed to get a database connection.");
+				return false;
+			}
+
+			JSONParameters	t_parameters		= JSONParameters.UnMarshal(p_messageInfo.GetMessage().GetContentsAsCharString());
+			String			t_new<%className%>JSON	= t_parameters.GetJSONParameterValue("new<%className%>");
+			if (t_new<%className%>JSON == null) {
+				t_response.SetMessageProperty(NetMessage.NM_HEADER_RESPONSE_STATUS, NetMessage.RESPONSE_FAIL);	// The default response status is "success".  We have to set it to "fail" here.
+				t_response.SetMessageProperty(NetMessage.NM_HEADER_RESPONSE_MESSAGE, "Delete<%className%>() did not receive a new <%className%> object in the parameters.");
+				p_messageInfo.GetSourceConnection().AddMessage(t_response);
+				return false;
+			}
+
+			Gson<%className%>Marshalling	t_marshaler		= new Gson<%className%>Marshalling();
+			<%className%>					t_new<%className%>	= t_marshaler.UnMarshal(t_new<%className%>JSON);
+
+			<%className%>DAO t_<%className%>DAO = <%global.databaseName%>DAOFactory.GetInstance().Get<%className%>DAO();
+			if (!t_<%className%>DAO.Delete<%className%>(t_new<%className%>, t_dbConnection)) {
+				t_response.SetMessageProperty(NetMessage.NM_HEADER_RESPONSE_STATUS, NetMessage.RESPONSE_FAIL);	// The default response status is "success".  We have to set it to "fail" here.
+				t_response.SetMessageProperty(NetMessage.NM_HEADER_RESPONSE_MESSAGE, "Delete<%className%>() failed to create the new Delete<%className%>:\n" + t_new<%className%>.toString());
+				p_messageInfo.GetSourceConnection().AddMessage(t_response);
+				return false;
+			}
+
+			p_messageInfo.GetSourceConnection().AddMessage(t_response);
+		}
+		catch (Exception t_error) {
+			Logger.LogError("<%className%>DAO_NET_Server.Delete<%className%>() failed with error: ", t_error);
+			t_response.SetMessageProperty(NetMessage.NM_HEADER_RESPONSE_STATUS, NetMessage.RESPONSE_FAIL);	// The default response status is "success".  We have to set it to "fail" here.
+			t_response.SetMessageProperty(NetMessage.NM_HEADER_RESPONSE_MESSAGE, "Delete<%className%>() failed with error: " + t_error);
+			p_messageInfo.GetSourceConnection().AddMessage(t_response);
+			return false;
+		}
+		finally {
+			if (t_dbConnection != null)
+				DBConnectionManager.ReleaseConnection(t_dbConnection);
+		}
+
+		return true;
+	}
+
+
+	<%customCode key=Miscellaneous commentCharacters="//"%>
+}
+<%endtext%>

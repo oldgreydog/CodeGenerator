@@ -1,0 +1,706 @@
+%%HEADER%% openingDelimiter=<% closingDelimiter=%>
+<%text%>/*
+ * This file was generated.
+ */
+
+package <%global.packageName%>.dao.db;
+
+
+
+import java.io.*;
+import java.sql.*;
+import java.util.*;
+
+import <%global.packageName%>.*;
+import <%global.packageName%>.dao.*;
+import coreutil.logging.*;
+import coreutil.utils.database.*;
+
+
+
+public class <%className%>DAO_DB implements <%className%>DAO {
+
+
+	//*********************************
+	public <%className%>DAO_DB() {}
+
+
+	//*********************************
+	@Override
+	public LinkedList<<%className%>> LoadAll<%className%>(Connection p_dbConnection)
+	{
+		StringBuilder t_sql = new StringBuilder();
+		t_sql.append("SELECT " + <%className%>.GetColumnList());
+		t_sql.append(" FROM <%sqlName%>;");
+
+		PreparedStatement t_preparedStatement = null;
+		try {
+			t_preparedStatement = p_dbConnection.prepareStatement(t_sql.toString());
+
+			LinkedList<<%className%>> t_results = Load<%className%>WithSQL(t_preparedStatement, p_dbConnection);
+			if (t_results == null) {
+				Logger.LogError("This is the SQL that failed: " + t_sql);
+				return null;
+			}
+
+			return t_results;
+		}
+		catch (Exception t_error) {
+			Logger.LogError("<%className%>DAO_DB.LoadAll<%className%>() failed with error: ", t_error);
+			Logger.LogError("This is the SQL that failed: " + t_sql);
+			return null;
+		}
+		finally {
+			if (t_preparedStatement != null)
+				try { t_preparedStatement.close(); } catch (Exception t_dontCare) {}
+		}
+	}<%endtext%>
+
+
+<%foreach node=column%>
+<%if <%isPrimaryKey%> = true%>
+<%text%>
+
+
+	//*********************************
+	@Override
+	public <%^className%> Load<%^className%>For<%name%>(<%type%> p_<%memberName%>, Connection p_dbConnection)
+	{
+		StringBuilder t_sql = new StringBuilder();
+		t_sql.append("SELECT " + <%^className%>.GetColumnList());
+		t_sql.append(" FROM <%^sqlName%> ");
+		t_sql.append(" WHERE <%sqlName%> = ?;");
+
+		PreparedStatement t_preparedStatement = null;
+		try {
+			t_preparedStatement = p_dbConnection.prepareStatement(t_sql.toString());
+<%endtext%>
+<%if <%type%> = int%>
+<%text%>			t_preparedStatement.setInt(1, p_<%memberName%>);
+<%endtext%>
+<%elseif  <%type%> = Integer%>
+<%text%>			t_preparedStatement.setInt(1, p_<%memberName%>);
+<%endtext%>
+<%elseif  <%type%> = Long%>
+<%text%>			t_preparedStatement.setLong(1, p_<%memberName%>);
+<%endtext%>
+<%elseif  <%type%> = Float%>
+<%text%>			t_preparedStatement.setFloat(1, p_<%memberName%>);
+<%endtext%>
+<%elseif  <%type%> = Double%>
+<%text%>			t_preparedStatement.setDouble(1, p_<%memberName%>);
+<%endtext%>
+<%elseif  <%type%> = String%>
+<%text%>			t_preparedStatement.setString(1, p_<%memberName%>);
+<%endtext%>
+<%elseif  <%type%> = Boolean%>
+<%text%>			t_preparedStatement.setBoolean(1, p_<%memberName%>);
+<%endtext%>
+<%elseif  <%type%> = Calendar%>
+<%text%>			t_preparedStatement.setTimestamp(1, new java.sql.Timestamp(p_<%memberName%>.getTimeInMillis()));
+<%endtext%>
+<%elseif  <%type%> = byte[]%>
+<%text%>
+			ByteArrayInputStream t_imageStream	= new ByteArrayInputStream(p_<%memberName%>);
+			t_preparedStatement.setBinaryStream(1, t_imageStream, p_<%memberName%>.length);
+<%endtext%>
+<%else%>
+<%text%>An unknown type [<%type%>] was not handled by the template.
+<%endtext%>
+<%endif%>
+
+<%text%>
+			LinkedList<<%^className%>> t_results = Load<%^className%>WithSQL(t_preparedStatement, p_dbConnection);
+			if (t_results == null) {
+				Logger.LogError("This is the SQL that failed: " + t_sql);
+				return null;
+			}
+
+			return (!t_results.isEmpty()) ? t_results.getFirst() : null;
+		}
+		catch (Exception t_error) {
+			Logger.LogError("<%^className%>DAO_DB.Load<%^className%>For<%name%>() failed with error: ", t_error);
+			Logger.LogError("This is the SQL that failed: " + t_sql);
+			return null;
+		}
+		finally {
+			if (t_preparedStatement != null)
+				try { t_preparedStatement.close(); } catch (Exception t_dontCare) {}
+		}
+	}<%endtext%>
+
+<%endif%>
+<%endfor%>
+
+
+<%foreach node=foreignKey%>
+<%text%>
+
+
+	//*********************************
+	@Override
+	public LinkedList<<%^className%>> LoadAll<%^className%>For<%name%>(<%type%> p_<%memberName%>, Connection p_dbConnection)
+	{
+		StringBuilder t_sql = new StringBuilder();
+		t_sql.append("SELECT " + <%^className%>.GetColumnList());
+		t_sql.append(" FROM <%^sqlName%> ");
+		t_sql.append(" WHERE <%childKeyColumnName%> = ?;");
+
+		PreparedStatement t_preparedStatement = null;
+		try {
+			t_preparedStatement = p_dbConnection.prepareStatement(t_sql.toString());
+<%endtext%>
+<%if <%type%> = int%>
+<%text%>			t_preparedStatement.setInt(1, p_<%memberName%>);
+<%endtext%>
+<%elseif  <%type%> = Integer%>
+<%text%>			t_preparedStatement.setInt(1, p_<%memberName%>);
+<%endtext%>
+<%elseif  <%type%> = Long%>
+<%text%>			t_preparedStatement.setLong(1, p_<%memberName%>);
+<%endtext%>
+<%elseif  <%type%> = Float%>
+<%text%>			t_preparedStatement.setFloat(1, p_<%memberName%>);
+<%endtext%>
+<%elseif  <%type%> = Double%>
+<%text%>			t_preparedStatement.setDouble(1, p_<%memberName%>);
+<%endtext%>
+<%elseif  <%type%> = String%>
+<%text%>			t_preparedStatement.setString(1, p_<%memberName%>);
+<%endtext%>
+<%elseif  <%type%> = Boolean%>
+<%text%>			t_preparedStatement.setBoolean(1, p_<%memberName%>);
+<%endtext%>
+<%elseif  <%type%> = Calendar%>
+<%text%>			t_preparedStatement.setTimestamp(1, new java.sql.Timestamp(p_<%memberName%>.getTimeInMillis()));
+<%endtext%>
+<%elseif  <%type%> = byte[]%>
+<%text%>
+			ByteArrayInputStream t_imageStream	= new ByteArrayInputStream(p_<%memberName%>);
+			t_preparedStatement.setBinaryStream(1, t_imageStream, p_<%memberName%>.length);
+<%endtext%>
+<%else%>
+<%text%>An unknown type [<%type%>] was not handled by the template.
+<%endtext%>
+<%endif%>
+
+<%text%>
+			LinkedList<<%^className%>> t_results = Load<%^className%>WithSQL(t_preparedStatement, p_dbConnection);
+			if (t_results == null) {
+				Logger.LogError("This is the SQL that failed: " + t_sql);
+				return null;
+			}
+
+			return t_results;
+		}
+		catch (Exception t_error) {
+			Logger.LogError("<%^className%>DAO_DB.LoadAll<%^className%>For<%name%>() failed with error: ", t_error);
+			Logger.LogError("This is the SQL that failed: " + t_sql);
+			return null;
+		}
+		finally {
+			if (t_preparedStatement != null)
+				try { t_preparedStatement.close(); } catch (Exception t_dontCare) {}
+		}
+	}<%endtext%>
+<%endfor%>
+
+<%text%>
+
+
+	<%customCode key=CustomLoaders commentCharacters="//"%>
+
+
+	//*********************************
+	@Override
+	public LinkedList<<%className%>> Load<%className%>WithSQL(PreparedStatement p_preparedStatement, Connection p_dbConnection)
+	{
+		LinkedList<<%className%>> t_new<%className%>List = new LinkedList<<%className%>>();
+		<%className%> t_new<%className%> = null;
+
+		try {
+			ResultSet t_result = p_preparedStatement.executeQuery();
+			int t_index;
+			Calendar t_date;
+			Timestamp t_dbDateTime;
+			while (t_result.next()) {
+				t_index 	= 1;
+				t_new<%className%> 	= new <%className%>();
+
+<%endtext%>
+
+<%foreach node=column%>
+<%if <%type%> = int%>
+<%text%>				t_new<%^className%>.Set<%name%>(t_result.getInt(t_index++));
+<%endtext%>
+<%elseif  <%type%> = Integer%>
+<%text%>				t_new<%^className%>.Set<%name%>(t_result.getInt(t_index++));
+<%endtext%>
+<%elseif  <%type%> = Long%>
+<%text%>				t_new<%^className%>.Set<%name%>(t_result.getLong(t_index++));
+<%endtext%>
+<%elseif  <%type%> = Float%>
+<%text%>				t_new<%^className%>.Set<%name%>(t_result.getFloat(t_index++));
+<%endtext%>
+<%elseif  <%type%> = Double%>
+<%text%>				t_new<%^className%>.Set<%name%>(t_result.getDouble(t_index++));
+<%endtext%>
+<%elseif  <%type%> = String%>
+<%text%>				t_new<%^className%>.Set<%name%>(t_result.getString(t_index++));
+<%endtext%>
+<%elseif  <%type%> = Boolean%>
+<%text%>				t_new<%^className%>.Set<%name%>(t_result.getBoolean(t_index++));
+<%endtext%>
+<%elseif  <%type%> = Calendar%>
+<%text%>				t_dbDateTime = t_result.getTimestamp(t_index++);
+				if (t_dbDateTime != null) {
+					t_date = Calendar.getInstance();
+					t_date.setTimeInMillis(t_dbDateTime.getTime());
+				}
+				else
+					t_date = null;
+
+				t_new<%^className%>.Set<%name%>(t_date);
+
+<%endtext%>
+<%elseif  <%type%> = byte[]%>
+<%text%>				t_new<%^className%>.Set<%name%>(t_result.getBytes(t_index++));
+<%endtext%>
+<%else%>
+<%text%>An unknown type [<%type%>] was not handled by the template.
+<%endtext%>
+<%endif%>
+<%if <%isNullable%> = true%>
+<%if <%type%> = Calendar%>
+<%else%>
+<%text%>				if (t_result.wasNull())
+					t_new<%^className%>.Set<%name%>(null);
+
+<%endtext%>
+<%endif%>
+<%endif%>
+<%endfor%>
+
+<%text%>
+				t_new<%className%>List.add(t_new<%className%>);
+			}
+		}
+		catch (Exception t_error) {
+			Logger.LogError("<%className%>DAO_DB.Load<%className%>WithSQL() failed with an exception : ", t_error);
+			return null;
+		}
+
+		return t_new<%className%>List;
+	}
+
+
+	//*********************************
+	@Override
+	public boolean Create<%className%>(<%className%> p_new<%className%>, Connection p_dbConnection)
+	{
+		StringBuilder		t_sql				= new StringBuilder();
+		PreparedStatement	t_preparedStatement = null;
+		try {
+			if (!p_new<%className%>.ValidateBeforeSave())
+				return false;
+
+			long t_nextID = DBConnectionManager.GetIDs(p_dbConnection, "<%sqlName%>", 1);
+			if (t_nextID == -1) {
+				Logger.LogError("<%className%>DAO_DB.Create<%className%>() failed to get a new ID.");
+				return false;
+			}
+
+			t_sql.append("INSERT INTO <%sqlName%> (" + <%className%>.GetColumnList() + ") VALUES (<%endtext%>
+
+<%foreach node=column%>
+<%first%><%text%>?<%endtext%>
+<%else%><%text%>, ?<%endtext%>
+<%endfirst%>
+<%endfor%>
+
+<%text%>);");
+
+			t_preparedStatement = p_dbConnection.prepareStatement(t_sql.toString());
+			int t_index = 1;
+<%endtext%>
+
+<%foreach node=column%>
+<%if <%isNullable%> = true%>
+<%text%>
+			if (p_new<%^className%>.Get<%name%>() == null)
+				t_preparedStatement.setNull(t_index++, Types.<%endtext%>
+<%if <%type%> = int%><%text%>INTEGER<%endtext%>
+<%elseif  <%type%> = Integer%><%text%>INTEGER<%endtext%>
+<%elseif  <%type%> = Long%><%text%>BIGINT<%endtext%>
+<%elseif  <%type%> = Float%><%text%>FLOAT<%endtext%>
+<%elseif  <%type%> = Double%><%text%>DOUBLE<%endtext%>
+<%elseif  <%type%> = String%><%text%>VARCHAR<%endtext%>
+<%elseif  <%type%> = Boolean%><%text%>BOOLEAN<%endtext%>
+<%elseif  <%type%> = Calendar%><%text%>DATE<%endtext%>
+<%elseif  <%type%> = byte[]%><%text%>ARRAY<%endtext%>
+<%else%>
+<%text%>An unknown type [<%type%>] was not handled by the template.
+<%endtext%>
+<%endif%>)<%text%>);
+			else
+	<%endtext%>
+<%endif%>
+<%if <%type%> = int%>
+
+<%if <%isPrimaryKey%> = true%>
+<%text%>			t_preparedStatement.setInt(t_index++, (int)t_nextID);
+<%endtext%>
+<%else%>
+<%text%>			t_preparedStatement.setInt(t_index++, p_new<%^className%>.Get<%name%>());
+<%endtext%>
+<%endif%>
+
+<%elseif  <%type%> = Integer%>
+
+<%if <%isPrimaryKey%> = true%>
+<%text%>			t_preparedStatement.setInt(t_index++, (int)t_nextID);
+<%endtext%>
+<%else%>
+<%text%>			t_preparedStatement.setInt(t_index++, p_new<%^className%>.Get<%name%>());
+<%endtext%>
+<%endif%>
+
+<%elseif  <%type%> = Long%>
+
+<%if <%isPrimaryKey%> = true%>
+<%text%>			t_preparedStatement.setLong(t_index++, t_nextID);
+<%endtext%>
+<%else%>
+<%text%>			t_preparedStatement.setLong(t_index++, p_new<%^className%>.Get<%name%>());
+<%endtext%>
+<%endif%>
+
+<%elseif  <%type%> = Float%>
+<%text%>			t_preparedStatement.setFloat(t_index++, p_new<%^className%>.Get<%name%>());
+<%endtext%>
+<%elseif  <%type%> = Double%>
+<%text%>			t_preparedStatement.setDouble(t_index++, p_new<%^className%>.Get<%name%>());
+<%endtext%>
+<%elseif  <%type%> = String%>
+<%text%>			t_preparedStatement.setString(t_index++, p_new<%^className%>.Get<%name%>());
+<%endtext%>
+<%elseif  <%type%> = Boolean%>
+<%text%>			t_preparedStatement.setBoolean(t_index++, p_new<%^className%>.Get<%name%>());
+<%endtext%>
+<%elseif  <%type%> = Calendar%>
+<%text%>			t_preparedStatement.setTimestamp(t_index++, new java.sql.Timestamp(p_new<%^className%>.Get<%name%>().getTimeInMillis()));
+<%endtext%>
+<%elseif  <%type%> = byte[]%>
+<%text%>			{	// I had to put these two lines in a block just in case this was a nullable field and the generator put and if-else above them.
+				ByteArrayInputStream t_imageStream	= new ByteArrayInputStream(p_new<%^className%>.Get<%name%>());
+				t_preparedStatement.setBinaryStream(t_index++, t_imageStream, p_new<%^className%>.Get<%name%>().length);
+			}
+<%endtext%>
+
+<%else%>
+<%text%>An unknown type [<%type%>] was not handled by the template.
+<%endtext%>
+<%endif%>
+<%endfor%>
+
+<%text%>
+			if (t_preparedStatement.executeUpdate() <= 0) {
+				Logger.LogError("<%className%>DAO_DB.Create<%className%>() failed to execute the insert SQL: " + t_sql + "\nFor object: " + p_new<%className%>.toString());
+				return false;
+			}
+<%endtext%>
+
+<%foreach node=column%>
+<%if <%isPrimaryKey%> = true%>
+<%if <%type%> = Integer%>
+<%text%>
+			p_new<%^className%>.Set<%name%>((int)t_nextID);
+<%endtext%>
+<%elseif <%type%> = Long%>
+<%text%>
+			p_new<%^className%>.Set<%name%>(t_nextID);
+<%endtext%>
+<%endif%>
+<%endif%>
+<%endfor%>
+
+<%text%>		}
+		catch (Exception t_error) {
+			Logger.LogError("<%className%>DAO_DB.Create<%className%>() failed with error: ", t_error);
+			Logger.LogError("The SQL that failed: " + t_sql + "\nFor object: " + p_new<%className%>.toString());
+			return false;
+		}
+		finally {
+			if (t_preparedStatement != null)
+				try { t_preparedStatement.close(); } catch (Exception t_dontCare) {}
+		}
+
+		return true;
+	}
+
+
+	//*********************************
+	@Override
+	public boolean Update<%className%>(<%className%> p_target<%className%>, Connection p_dbConnection)
+	{
+		StringBuilder		t_sql				= new StringBuilder();
+		PreparedStatement	t_preparedStatement = null;
+		try {
+			if (!p_target<%className%>.ValidateBeforeSave())
+				return false;
+
+			t_sql.append("UPDATE <%sqlName%> SET");
+<%endtext%>
+
+<%foreach node=column%>
+
+<%if <%isPrimaryKey%> = true%>
+<%--counter%>
+<%else%>
+<%first%><%text%>			t_sql.append(" <%sqlName%> = ?");
+<%endtext%>
+<%else%><%text%>			t_sql.append(", <%sqlName%> = ?");
+<%endtext%>
+<%endfirst%>
+
+<%endif%>
+<%endfor%>
+
+<%text%>
+			t_sql.append(" WHERE");
+<%endtext%>
+
+<%foreach node=column%>
+<%if <%isPrimaryKey%> = true%>
+<%first%><%text%>			t_sql.append(" <%sqlName%> = ?");
+<%endtext%>
+<%else%><%text%>			t_sql.append(" AND <%sqlName%> = ?");
+<%endtext%>
+<%endfirst%>
+<%endif%>
+<%endfor%>
+
+<%text%>			t_sql.append(";");
+
+
+			t_preparedStatement = p_dbConnection.prepareStatement(t_sql.toString());
+			int t_index = 1;
+<%endtext%>
+
+<%foreach node=column%>
+<%if <%isPrimaryKey%> = false%>
+<%if <%isNullable%> = true%>
+<%text%>
+			if (p_target<%^className%>.Get<%name%>() == null)
+				t_preparedStatement.setNull(t_index++, Types.<%endtext%>
+<%if <%type%> = int%><%text%>INTEGER<%endtext%>
+<%elseif  <%type%> = Integer%><%text%>INTEGER<%endtext%>
+<%elseif  <%type%> = Long%><%text%>BIGINT<%endtext%>
+<%elseif  <%type%> = Float%><%text%>FLOAT<%endtext%>
+<%elseif  <%type%> = Double%><%text%>DOUBLE<%endtext%>
+<%elseif  <%type%> = String%><%text%>VARCHAR<%endtext%>
+<%elseif  <%type%> = Boolean%><%text%>BOOLEAN<%endtext%>
+<%elseif  <%type%> = Calendar%><%text%>DATE<%endtext%>
+<%elseif  <%type%> = byte[]%><%text%>ARRAY<%endtext%>
+<%else%>
+<%text%>An unknown type [<%type%>] was not handled by the template.
+<%endtext%>
+<%endif%>)<%text%>);
+			else
+	<%endtext%>
+<%endif%>
+<%if <%type%> = int%>
+<%text%>			t_preparedStatement.setInt(t_index++, p_target<%^className%>.Get<%name%>());
+<%endtext%>
+<%elseif  <%type%> = Integer%>
+<%text%>			t_preparedStatement.setInt(t_index++, p_target<%^className%>.Get<%name%>());
+<%endtext%>
+<%elseif  <%type%> = Long%>
+<%text%>			t_preparedStatement.setLong(t_index++, p_target<%^className%>.Get<%name%>());
+<%endtext%>
+<%elseif  <%type%> = Float%>
+<%text%>			t_preparedStatement.setFloat(t_index++, p_target<%^className%>.Get<%name%>());
+<%endtext%>
+<%elseif  <%type%> = Double%>
+<%text%>			t_preparedStatement.setDouble(t_index++, p_target<%^className%>.Get<%name%>());
+<%endtext%>
+<%elseif  <%type%> = String%>
+<%text%>			t_preparedStatement.setString(t_index++, p_target<%^className%>.Get<%name%>());
+<%endtext%>
+<%elseif  <%type%> = Boolean%>
+<%text%>			t_preparedStatement.setBoolean(t_index++, p_target<%^className%>.Get<%name%>());
+<%endtext%>
+<%elseif  <%type%> = Calendar%>
+<%text%>			t_preparedStatement.setTimestamp(t_index++, new java.sql.Timestamp(p_target<%^className%>.Get<%name%>().getTimeInMillis()));
+<%endtext%>
+<%elseif  <%type%> = byte[]%>
+<%text%>			{	// I had to put these two lines in a block just in case this was a nullable field and the generator put and if-else above them.
+				ByteArrayInputStream t_imageStream	= new ByteArrayInputStream(p_target<%^className%>.Get<%name%>());
+				t_preparedStatement.setBinaryStream(t_index++, t_imageStream, p_target<%^className%>.Get<%name%>().length);
+			}
+<%endtext%>
+<%else%>
+<%text%>An unknown type [<%type%>] was not handled by the template.
+<%endtext%>
+
+<%endif%>
+
+<%if <%isNullable%> = true%>
+<%text%>
+<%endtext%>
+<%endif%>
+
+<%endif%>
+<%endfor%>
+
+<%text%>
+			// Set the primary key(s).
+<%endtext%>
+
+<%foreach node=column%>
+<%if <%isPrimaryKey%> = true%>
+<%if <%type%> = int%>
+<%text%>			t_preparedStatement.setInt(t_index++, p_target<%^className%>.Get<%name%>());
+<%endtext%>
+<%elseif  <%type%> = Integer%>
+<%text%>			t_preparedStatement.setInt(t_index++, p_target<%^className%>.Get<%name%>());
+<%endtext%>
+<%elseif  <%type%> = Long%>
+<%text%>			t_preparedStatement.setLong(t_index++, p_target<%^className%>.Get<%name%>());
+<%endtext%>
+<%elseif  <%type%> = Float%>
+<%text%>			t_preparedStatement.setFloat(t_index++, p_target<%^className%>.Get<%name%>());
+<%endtext%>
+<%elseif  <%type%> = Double%>
+<%text%>			t_preparedStatement.setDouble(t_index++, p_target<%^className%>.Get<%name%>());
+<%endtext%>
+<%elseif  <%type%> = String%>
+<%text%>			t_preparedStatement.setString(t_index++, p_target<%^className%>.Get<%name%>());
+<%endtext%>
+<%elseif  <%type%> = Boolean%>
+<%text%>			t_preparedStatement.setBoolean(t_index++, p_target<%^className%>.Get<%name%>());
+<%endtext%>
+<%elseif  <%type%> = Calendar%>
+<%text%>			t_preparedStatement.setTimestamp(t_index++, new java.sql.Timestamp(p_target<%^className%>.Get<%name%>().getTimeInMillis()));
+<%endtext%>
+<%elseif  <%type%> = byte[]%>
+<%text%>			{	// I had to put these two lines in a block just in case this was a nullable field and the generator put and if-else above them.
+				ByteArrayInputStream t_imageStream	= new ByteArrayInputStream(p_target<%^className%>.Get<%name%>());
+				t_preparedStatement.setBinaryStream(t_index++, t_imageStream, p_target<%^className%>.Get<%name%>().length);
+			}
+<%endtext%>
+<%else%>
+<%text%>An unknown type [<%type%>] was not handled by the template.
+<%endtext%>
+
+<%endif%>
+<%endif%>
+<%endfor%>
+
+<%text%>
+			if (t_preparedStatement.executeUpdate() <= 0) {
+				Logger.LogError("<%className%>DAO_DB.Update<%className%>() failed to execute the update SQL: " + t_sql + "\nFor object: " + p_target<%className%>.toString());
+				return false;
+			}
+		}
+		catch (Exception t_error) {
+			Logger.LogError("<%className%>DAO_DB.Update<%className%>() failed with error: ", t_error);
+			Logger.LogError("The SQL that failed: " + t_sql + "\nFor object: " + p_target<%className%>.toString());
+			return false;
+		}
+		finally {
+			if (t_preparedStatement != null)
+				try { t_preparedStatement.close(); } catch (Exception t_dontCare) {}
+		}
+
+		return true;
+	}
+
+
+	//*********************************
+	@Override
+	public boolean Delete<%className%>(<%className%> p_target<%className%>, Connection p_dbConnection)
+	{
+		StringBuilder		t_sql				= new StringBuilder();
+		PreparedStatement	t_preparedStatement = null;
+
+		try {
+			t_sql.append("DELETE FROM <%sqlName%> WHERE");
+<%endtext%>
+
+<%foreach node=column%>
+<%if <%isPrimaryKey%> = true%>
+<%first%><%text%>			t_sql.append(" <%sqlName%> = ?");
+<%endtext%>
+<%else%><%text%>			t_sql.append(" AND <%sqlName%> = ?");
+<%endtext%>
+<%endfirst%>
+<%endif%>
+<%endfor%>
+
+<%text%>			t_sql.append(";");
+
+
+			t_preparedStatement = p_dbConnection.prepareStatement(t_sql.toString());
+			int t_index = 1;
+<%endtext%>
+
+<%foreach node=column%>
+<%if <%isPrimaryKey%> = true%>
+<%if <%type%> = int%>
+<%text%>			t_preparedStatement.setInt(t_index++, p_target<%^className%>.Get<%name%>());
+<%endtext%>
+<%elseif  <%type%> = Integer%>
+<%text%>			t_preparedStatement.setInt(t_index++, p_target<%^className%>.Get<%name%>());
+<%endtext%>
+<%elseif  <%type%> = Long%>
+<%text%>			t_preparedStatement.setLong(t_index++, p_target<%^className%>.Get<%name%>());
+<%endtext%>
+<%elseif  <%type%> = Float%>
+<%text%>			t_preparedStatement.setFloat(t_index++, p_target<%^className%>.Get<%name%>());
+<%endtext%>
+<%elseif  <%type%> = Double%>
+<%text%>			t_preparedStatement.setDouble(t_index++, p_target<%^className%>.Get<%name%>());
+<%endtext%>
+<%elseif  <%type%> = String%>
+<%text%>			t_preparedStatement.setString(t_index++, p_target<%^className%>.Get<%name%>());
+<%endtext%>
+<%elseif  <%type%> = Boolean%>
+<%text%>			t_preparedStatement.setBoolean(t_index++, p_target<%^className%>.Get<%name%>());
+<%endtext%>
+<%elseif  <%type%> = Calendar%>
+<%text%>			t_preparedStatement.setTimestamp(t_index++, new java.sql.Timestamp(p_target<%^className%>.Get<%name%>().getTimeInMillis()));
+<%endtext%>
+<%elseif  <%type%> = byte[]%>
+<%text%>			{	// I had to put these two lines in a block just in case this was a nullable field and the generator put and if-else above them.
+				ByteArrayInputStream t_imageStream	= new ByteArrayInputStream(p_target<%^className%>.Get<%name%>());
+				t_preparedStatement.setBinaryStream(t_index++, t_imageStream, p_target<%^className%>.Get<%name%>().length);
+			}
+<%endtext%>
+<%else%>
+<%text%>An unknown type [<%type%>] was not handled by the template.
+<%endtext%>
+<%endif%>
+<%endif%>
+<%endfor%>
+
+<%text%>
+			t_preparedStatement.executeUpdate();
+		}
+		catch (Exception t_error) {
+			Logger.LogError("<%className%>DAO_DB.Delete<%className%>() failed with error: ", t_error);
+			Logger.LogError("The SQL that failed: " + t_sql + "\nFor object: " + p_target<%className%>.toString());
+			return false;
+		}
+		finally {
+			if (t_preparedStatement != null)
+				try { t_preparedStatement.close(); } catch (Exception t_dontCare) {}
+		}
+
+		return true;
+	}
+
+
+	<%customCode key=Miscellaneous commentCharacters="//"%>
+}
+<%endtext%>

@@ -1,0 +1,8 @@
+*.class
+*.ja
+
+.settings/
+.metadata/
+.recommenders/
+bin/
+lib/

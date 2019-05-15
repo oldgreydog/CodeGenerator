@@ -1,0 +1,443 @@
+%%HEADER%% openingDelimiter=<% closingDelimiter=%>
+<%text%>/*
+ * This file was generated.
+ */
+
+package <%global.packageName%>.dao.cache;
+
+
+
+import java.sql.*;
+import java.util.*;
+
+import <%global.packageName%>.*;
+import <%global.packageName%>.dao.*;
+import <%global.packageName%>.dao.db.*;
+import coreutil.config.*;
+import coreutil.logging.*;
+import coreutil.utils.cache.*;
+import coreutil.utils.database.*;
+import coreutil.utils.database.DBConnectionManager.*;
+
+
+
+public class <%className%>DAO_Cache extends CacheDAO implements <%className%>DAO {
+
+	// Static members
+
+	static private final <%className%>DAO_Cache		s_instance	= new <%className%>DAO_Cache();
+
+
+	//===========================================
+	static public <%className%>DAO_Cache GetInstance() {
+		return s_instance;
+	}
+
+
+	// Data members
+
+
+	<%customCode key=CacheDataMembers commentCharacters="//"%>
+
+
+	//*********************************
+	private <%className%>DAO_Cache() {
+		super("<%className%>DAO_Cache");
+	}
+
+
+	//*********************************
+	private void AddToCaches(<%className%> p_new<%className%>) {
+		try {
+			<%customCode key=AddToCaches commentCharacters="//"%>
+		}
+		catch (Exception t_error) {
+			Logger.LogError("<%className%>DAO_Cache.AddToCaches() failed with error: ", t_error);
+		}
+		finally {
+			<%customCode key=AddToCachesFinally commentCharacters="//"%>
+		}
+	}
+
+
+	//*********************************
+	private void DeleteFromCaches(<%className%> p_target<%className%>) {
+		try {
+			<%customCode key=DeleteFromCaches commentCharacters="//"%>
+		}
+		catch (Exception t_error) {
+			Logger.LogError("<%className%>DAO_Cache.DeleteFromCaches() failed with error: ", t_error);
+			return;
+		}
+		finally {
+			<%customCode key=DeleteFromCachesFinally commentCharacters="//"%>
+		}
+	}
+
+
+
+
+	/**=================================
+	 * NOTE!!  You must already have the read lock before you call this!
+	 * @param p_dbConnection
+	 * @return
+	 */
+	protected boolean LoadCache(Connection p_dbConnection)
+	{
+		if (!m_cacheIsValid) {
+			try {
+				// Must release read lock before acquiring write lock
+				m_readWriteLock.readLock().unlock();
+				m_readWriteLock.writeLock().lock();
+
+				// Recheck state because another thread might have acquired
+				//   write lock and changed state before we did.
+				if (!m_cacheIsValid) {
+					<%customCode key=LoadCacheClearCacheMaps commentCharacters="//"%>
+
+					// Now that we are supporting Mysql, we have to dynamically alter the query to make it work in MS SQL and Mysql.
+					String t_dbURL = ConfigManager.GetValue("defaultdb.url");
+					String t_lockingAddon = "";
+					if (t_dbURL.toLowerCase().contains("sqlserver"))
+						t_lockingAddon = " WITH (NOLOCK)";
+
+					StringBuilder t_sql = new StringBuilder();
+					t_sql.append("SELECT " + <%className%>.GetColumnList());
+					t_sql.append(" FROM <%sqlName%>" + t_lockingAddon + ";");
+
+					// If a NULL was passed in for the db connection and we get here, then that means that this class has been accessed before it could be properly loaded and there is no db connection available from the caller's context, so we will get a temp connection here to get the cache loaded.
+					ConnectionProxy t_dbConnection = (p_dbConnection != null) ? new ConnectionProxy("defaultdb", p_dbConnection) : null;
+					PreparedStatement t_preparedStatement = null;
+					try {
+						if (t_dbConnection == null) {
+							t_dbConnection = DBConnectionManager.GetConnection("defaultdb", false);
+							if (t_dbConnection == null) {
+								Logger.LogError("<%className%>DAO_Cache.LoadCache() failed to get a temporary database connection for [defaultdb].");
+								return false;
+							}
+						}
+
+						t_preparedStatement = t_dbConnection.prepareStatement(t_sql.toString());
+
+						LinkedList<<%className%>> t_results = Load<%className%>WithSQL(t_preparedStatement, t_dbConnection);
+						if (t_results == null) {
+							Logger.LogError("This is the SQL that failed: " + t_sql);
+							return false;
+						}
+
+						// Put the <%className%>s in the cache map collection.
+						for (<%className%> t_next<%className%>: t_results) {
+							AddToCaches(t_next<%className%>);
+						}
+					}
+					catch (Exception t_error) {
+						Logger.LogError("<%className%>DAO_Cache.LoadCache() failed with error: ", t_error);
+						Logger.LogError("This is the SQL that failed: " + t_sql);
+						return false;
+					}
+					finally {
+						if (t_preparedStatement != null)
+							try { t_preparedStatement.close(); } catch (Exception t_dontCare) {}
+
+						if (p_dbConnection == null)
+							DBConnectionManager.ReleaseConnection(t_dbConnection);
+					}
+
+					m_cacheIsValid = true;
+					Logger.LogDebug("<%className%> cache loaded.");
+				}
+			}
+			catch (Exception t_error) {
+				Logger.LogError("<%className%>DAO_Cache.LoadCache() failed with error: ", t_error);
+				return false;
+			}
+			finally {
+				// Downgrade by acquiring read lock before releasing write lock
+				m_readWriteLock.readLock().lock();
+				m_readWriteLock.writeLock().unlock(); // Unlock write, still hold read
+			}
+		}
+
+		return true;
+	}
+
+
+	//*********************************
+	@Override
+	public LinkedList<<%className%>> LoadAll<%className%>(Connection p_dbConnection)
+	{
+		try {
+			CacheLockManager.AcquireSingleTableLock();	// This is a read-lock under the covers.  It protects us if a multi-table cache transaction is started that acquires the write-lock at that level.  Otherwise, this should fly through the vast majority of the time.
+			m_readWriteLock.readLock().lock();
+
+			// To simplify the code, I put the all of the write locking code in LoadCache() so we just call it every time we are about to read from the cache and let it decide if we need to reload it.
+			if (!LoadCache(p_dbConnection)) {
+				Logger.LogError("<%className%>DAO_Cache.LoadAll<%className%>s() failed to load the cache.");
+				return null;
+			}
+
+			LinkedList<<%className%>> t_results = new LinkedList<<%className%>>();
+			<%customCode key=LoadAll<%className%>CacheCode commentCharacters="//"%>
+
+			return t_results;
+		}
+		catch (Exception t_error) {
+			Logger.LogError("<%className%>DAO_Cache.LoadAll<%className%>() failed with error: ", t_error);
+			return null;
+		}
+		finally {
+			m_readWriteLock.readLock().unlock();		// Finally, release the read lock.
+			CacheLockManager.ReleaseSingleTableLock();	// These locks HAVE to be released in the reverse order they were acquired in!
+		}
+	}<%endtext%>
+
+
+<%foreach node=column%>
+<%if <%isPrimaryKey%> = true%>
+<%text%>
+
+
+	//*********************************
+	@Override
+	public <%^className%> Load<%^className%>For<%name%>(<%type%> p_<%memberName%>, Connection p_dbConnection)
+	{
+		try {
+			CacheLockManager.AcquireSingleTableLock();	// This is a read-lock under the covers.  It protects us if a multi-table cache transaction is started that acquires the write-lock at that level.  Otherwise, this should fly through the vast majority of the time.
+			m_readWriteLock.readLock().lock();
+
+			// To simplify the code, I put the all of the write locking code in LoadCache() so we just call it every time we are about to read from the cache and let it decide if we need to reload it.
+			if (!LoadCache(p_dbConnection)) {
+				Logger.LogError("<%^className%>DAO_Cache.Load<%^className%>For<%name%>() failed to load the cache.");
+				return null;
+			}
+
+			<%^className%> t_result = null;
+			<%customCode key=Load<%^className%>For<%name%> commentCharacters="//"%>
+
+			return t_result;
+		}
+		catch (Exception t_error) {
+			Logger.LogError("<%^className%>DAO_Cache.Load<%^className%>For<%name%>() failed with error: ", t_error);
+			return null;
+		}
+		finally {
+			m_readWriteLock.readLock().unlock();		// Finally, release the read lock.
+			CacheLockManager.ReleaseSingleTableLock();	// These locks HAVE to be released in the reverse order they were acquired in!
+		}
+	}<%endtext%>
+
+<%endif%>
+<%endfor%>
+
+
+<%foreach node=foreignKey%>
+<%text%>
+
+
+	//*********************************
+	@Override
+	public LinkedList<<%^className%>> LoadAll<%^className%>For<%name%>(<%type%> p_<%memberName%>, Connection p_dbConnection)
+	{
+		try {
+			CacheLockManager.AcquireSingleTableLock();	// This is a read-lock under the covers.  It protects us if a multi-table cache transaction is started that acquires the write-lock at that level.  Otherwise, this should fly through the vast majority of the time.
+			m_readWriteLock.readLock().lock();
+
+			// To simplify the code, I put the all of the write locking code in LoadCache() so we just call it every time we are about to read from the cache and let it decide if we need to reload it.
+			if (!LoadCache(p_dbConnection)) {
+				Logger.LogError("<%^className%>DAO_Cache.LoadAll<%^className%>For<%name%>() failed to load the cache.");
+				return null;
+			}
+
+			LinkedList<<%^className%>> t_results = new LinkedList<<%^className%>>();
+			<%customCode key=LoadAll<%^className%>For<%name%> commentCharacters="//"%>
+
+			return t_results;
+		}
+		catch (Exception t_error) {
+			Logger.LogError("<%^className%>DAO_Cache.LoadAll<%^className%>For<%name%>() failed with error: ", t_error);
+			return null;
+		}
+		finally {
+			m_readWriteLock.readLock().unlock();		// Finally, release the read lock.
+			CacheLockManager.ReleaseSingleTableLock();	// These locks HAVE to be released in the reverse order they were acquired in!
+		}
+	}<%endtext%>
+<%endfor%>
+<%text%>
+
+
+	<%customCode key=CustomLoaders commentCharacters="//"%>
+
+
+	//*********************************
+	@Override
+	public LinkedList<<%className%>> Load<%className%>WithSQL(PreparedStatement p_preparedStatement, Connection p_dbConnection)
+	{
+		try {
+			<%className%>DAO t_<%firstLetterToLowerCase value = <%className%>%>DAO = new <%className%>DAO_DB();
+			LinkedList<<%className%>> t_results = t_<%firstLetterToLowerCase value = <%className%>%>DAO.Load<%className%>WithSQL(p_preparedStatement, p_dbConnection);
+			if (t_results == null) {
+				Logger.LogError("<%className%>DAO_Cache.Load<%className%>WithSQL() - the call to <%className%>DAO.Load<%className%>WithSQL() failed.");
+				return null;
+			}
+
+			return t_results;
+		}
+		catch (Exception t_error) {
+			Logger.LogError("<%className%>DAO_Cache.Load<%className%>WithSQL() failed with error: ", t_error);
+			return null;
+		}
+	}
+
+
+	//*********************************
+	@Override
+	public boolean Create<%className%>(<%className%> p_new<%className%>, Connection p_dbConnection)
+	{
+		try {
+			CacheLockManager.AcquireSingleTableLock();	// This is a read-lock under the covers.  It protects us if a multi-table cache transaction is started that acquires the write-lock at that level.  Otherwise, this should fly through the vast majority of the time.
+
+			<%className%>DAO_DB t_<%firstLetterToLowerCase value = <%className%>%>DAO = new <%className%>DAO_DB();
+			if (!t_<%firstLetterToLowerCase value = <%className%>%>DAO.Create<%className%>(p_new<%className%>, p_dbConnection)) {
+				Logger.LogError("<%className%>DAO_Cache.Create<%className%>() failed to create the new <%className%> in the database.");
+				return false;
+			}
+
+
+			// If the cache is invalid, we have already committed the insert to the db so all we have to do to get the new <%className%> into it is reload the cache.
+			if (!m_cacheIsValid) {
+				try {
+					m_readWriteLock.readLock().lock();	// You have to have a the read lock before you can enter LoadCache().
+					if (!LoadCache(p_dbConnection)) {
+						Logger.LogError("<%className%>DAO_Cache.Create<%className%>() failed to load the cache.");
+						return false;
+					}
+				}
+				finally {
+					m_readWriteLock.readLock().unlock();
+				}
+			}
+			else {	// Otherwise, we have to get the write lock on the cache before we can update it.
+				try {
+					m_readWriteLock.writeLock().lock();
+					AddToCaches(p_new<%className%>);
+				}
+				finally {
+					m_readWriteLock.writeLock().unlock(); // Unlock write, still hold read
+				}
+			}
+		}
+		catch (Exception t_error) {
+			Logger.LogError("<%className%>DAO_Cache.Create<%className%>() failed with error: ", t_error);
+			return false;
+		}
+		finally {
+			CacheLockManager.ReleaseSingleTableLock();	// These locks HAVE to be released in the reverse order they were acquired in!
+		}
+
+		return true;
+	}
+
+
+	//*********************************
+	@Override
+	public boolean Update<%className%>(<%className%> p_target<%className%>, Connection p_dbConnection)
+	{
+		try {
+			CacheLockManager.AcquireSingleTableLock();	// This is a read-lock under the covers.  It protects us if a multi-table cache transaction is started that acquires the write-lock at that level.  Otherwise, this should fly through the vast majority of the time.
+
+			<%className%>DAO_DB t_<%firstLetterToLowerCase value = <%className%>%>DAO = new <%className%>DAO_DB();
+			if (!t_<%firstLetterToLowerCase value = <%className%>%>DAO.Update<%className%>(p_target<%className%>, p_dbConnection)) {
+				Logger.LogError("<%className%>DAO_Cache.Update<%className%>() failed to update the <%className%> in the database.");
+				return false;
+			}
+
+
+			// If the cache is invalid, we have already committed the insert to the db so all we have to do to get the new <%className%> into it is reload the cache.
+			if (!m_cacheIsValid) {
+				try {
+					m_readWriteLock.readLock().lock();	// You have to have a the read lock before you can enter LoadCache().
+					if (!LoadCache(p_dbConnection)) {
+						Logger.LogError("<%className%>DAO_Cache.Update<%className%>() failed to load the cache.");
+						return false;
+					}
+				}
+				finally {
+					m_readWriteLock.readLock().unlock();
+				}
+			}
+			else {	// Otherwise, we have to get the write lock on the cache before we can update it.
+				try {
+					m_readWriteLock.writeLock().lock();
+					DeleteFromCaches(p_target<%className%>);
+					AddToCaches(p_target<%className%>);
+				}
+				finally {
+					m_readWriteLock.writeLock().unlock(); // Unlock write, still hold read
+				}
+			}
+		}
+		catch (Exception t_error) {
+			Logger.LogError("<%className%>DAO_Cache.Update<%className%>() failed with error: ", t_error);
+			return false;
+		}
+		finally {
+			CacheLockManager.ReleaseSingleTableLock();	// These locks HAVE to be released in the reverse order they were acquired in!
+		}
+
+		return true;
+	}
+
+
+	//*********************************
+	@Override
+	public boolean Delete<%className%>(<%className%> p_target<%className%>, Connection p_dbConnection)
+	{
+		try {
+			CacheLockManager.AcquireSingleTableLock();	// This is a read-lock under the covers.  It protects us if a multi-table cache transaction is started that acquires the write-lock at that level.  Otherwise, this should fly through the vast majority of the time.
+
+			<%className%>DAO_DB t_<%firstLetterToLowerCase value = <%className%>%>DAO = new <%className%>DAO_DB();
+			if (!t_<%firstLetterToLowerCase value = <%className%>%>DAO.Delete<%className%>(p_target<%className%>, p_dbConnection)) {
+				Logger.LogError("<%className%>DAO_Cache.Delete<%className%>() failed to delete the <%className%> from the database.");
+				return false;
+			}
+
+
+			// If the cache is invalid, we have already committed the insert to the db so all we have to do to get the new <%className%> into it is reload the cache.
+			if (!m_cacheIsValid) {
+				try {
+					m_readWriteLock.readLock().lock();	// You have to have a the read lock before you can enter LoadCache().
+					if (!LoadCache(p_dbConnection)) {
+						Logger.LogError("<%className%>DAO_Cache.Delete<%className%>() failed to load the cache.");
+						return false;
+					}
+				}
+				finally {
+					m_readWriteLock.readLock().unlock();
+				}
+			}
+			else {	// Otherwise, we have to get the write lock on the cache before we can update it.
+				try {
+					m_readWriteLock.writeLock().lock();
+					DeleteFromCaches(p_target<%className%>);
+				}
+				finally {
+					m_readWriteLock.writeLock().unlock(); // Unlock write, still hold read
+				}
+			}
+		}
+		catch (Exception t_error) {
+			Logger.LogError("<%className%>DAO_Cache.Delete<%className%>() failed with error: ", t_error);
+			return false;
+		}
+		finally {
+			CacheLockManager.ReleaseSingleTableLock();	// These locks HAVE to be released in the reverse order they were acquired in!
+		}
+
+		return true;
+	}
+
+
+	<%customCode key=Miscellaneous commentCharacters="//"%>
+}
+<%endtext%>

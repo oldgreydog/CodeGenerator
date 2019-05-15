@@ -1,0 +1,23 @@
+%%HEADER%% openingDelimiter=<% closingDelimiter=%>
+
+// This is dummy text to make sure the parser ignores it since it isn't in a text block.
+<%file template=templates/cached_templates/ddl.template								filename=database.ddl	 destDir=<%global.outputPath%>/cached/ddl %>
+
+<%foreach node=table%>
+	<%file template=templates/cached_templates/database_class.template							filename=<%className%>.java						destDir=<%global.outputPath%>/cached%>
+
+	<%file template=templates/cached_templates/marshalling/marshalling_interface.template		filename=<%className%>Marshalling.java			destDir=<%global.outputPath%>/cached/marshalling%>
+	<%file template=templates/cached_templates/marshalling/marshalling_gson.template			filename=Gson<%className%>Marshalling.java		destDir=<%global.outputPath%>/cached/marshalling/gson%>
+
+	<%file template=templates/cached_templates/dao/dao_interface.template						filename=<%className%>DAO.java					destDir=<%global.outputPath%>/cached/dao%>
+	<%file template=templates/cached_templates/dao/dao_db.template								filename=<%className%>DAO_DB.java				destDir=<%global.outputPath%>/cached/dao/db%>
+	<%file template=templates/cached_templates/dao/dao_cache.template							filename=<%className%>DAO_Cache.java			destDir=<%global.outputPath%>/cached/dao/cache%>
+
+	<%file template=templates/cached_templates/dao/dao_net_client.template						filename=<%className%>DAO_NET.java				destDir=<%global.outputPath%>/cached/dao/net%>
+	<%file template=templates/cached_templates/dao/dao_net_server.template						filename=<%className%>DAO_NET_Server.java		destDir=<%global.outputPath%>/cached/dao/net/server%>
+<%endfor%>
+
+<%file template=templates/cached_templates/marshalling/marshalling_factory.template				filename=<%global.databaseName%>MarshallingFactory.java destDir=<%global.outputPath%>/cached/marshalling%>
+<%file template=templates/cached_templates/dao/dao_factory_interface.template					filename=<%global.databaseName%>DAOFactory.java			destDir=<%global.outputPath%>/cached/dao/factory%>
+<%file template=templates/cached_templates/dao/dao_server_factory.template						filename=<%global.databaseName%>ClientDAOFactory.java	destDir=<%global.outputPath%>/cached/dao/factory%>
+<%file template=templates/cached_templates/dao/dao_server_factory.template						filename=<%global.databaseName%>ServerDAOFactory.java	destDir=<%global.outputPath%>/cached/dao/factory%>

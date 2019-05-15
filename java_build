@@ -1,0 +1,8 @@
+
+# Uncomment  this "declare -x" line and change it to the correct path if you are using a JDK other than the default one installed on your system.
+# declare -x JAVA_HOME=/home/kaylor/opt/jdk1.8.0_162
+
+echo
+
+ant $@
+

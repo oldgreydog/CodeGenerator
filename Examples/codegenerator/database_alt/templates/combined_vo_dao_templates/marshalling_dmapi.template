@@ -1,0 +1,155 @@
+%%HEADER%% openingDelimiter=<% closingDelimiter=%>
+<%text%>/*
+ * This file was generated.
+ */
+
+package <%global.packageName%>.marshalling.dmapijson;
+
+
+
+import java.util.*;
+
+import com.google.gson.*;
+
+import coreutil.logging.*;
+import <%global.packageName%>.*;
+import <%global.packageName%>.marshalling.*;
+
+
+
+public class DMAPIJson<%className%>Marshalling implements <%className%>Marshalling {
+
+	//*********************************
+	@Override
+	public String Marshal(<%className%> p_<%firstLetterToLowerCase value = <%className%>%>) {
+		try {
+			StringBuilder t_jsonString = new StringBuilder();
+//			t_jsonString.append("{\"id\":"
+//								+ p_<%firstLetterToLowerCase value = <%className%>%>.Get<%className%>Id()
+//					   			+ "}");
+
+			return t_jsonString.toString();
+		}
+		catch (Exception t_error) {
+			Logger.LogError("DMAPIJson<%className%>Marshalling.Marshal(<%className%>) failed with error: ", t_error);
+			return null;
+		}
+	}
+
+
+	//*********************************
+	@Override
+	public String Marshal(LinkedList<<%className%>> p_<%firstLetterToLowerCase value = <%className%>%>List) {
+		try {
+			StringBuilder t_jsonString = new StringBuilder();
+			if (p_<%firstLetterToLowerCase value = <%className%>%>List != null && !p_<%firstLetterToLowerCase value = <%className%>%>List.isEmpty())
+			{
+				boolean t_firstHasBeenAdded	=	false;
+
+//				t_jsonString.append("{\"sites\":[");
+				for (<%className%> t_nextObject : p_<%firstLetterToLowerCase value = <%className%>%>List)
+				{
+					if(t_nextObject.Get<%className%>Id() < 100)
+						continue;
+
+					if (t_firstHasBeenAdded)
+						t_jsonString.append(",");
+					else
+						t_firstHasBeenAdded = true;
+
+					//only return sites with ids 100 and greater
+					//sites with ids less than 100 are internal system companies
+					//and should not be used.
+//					t_jsonString.append("{\"id\":"
+//										+ p_<%firstLetterToLowerCase value = <%className%>%>.Get<%className%>Id()
+//									    + "}");
+				}
+
+				t_jsonString.append("]}");
+			}
+			else
+//				t_jsonString.append("{\"sites\":[]}");
+
+			return t_jsonString.toString();
+		}
+		catch (Exception t_error) {
+			Logger.LogError("DMAPIJson<%className%>Marshalling.Marshal(LinkedList<<%className%>>) failed with error: ", t_error);
+			return null;
+		}
+	}
+
+
+	//*********************************
+	@Override
+	public <%className%> UnMarshal(String p_string) {
+		JsonParser	t_jsonParser	= new JsonParser();
+		JsonElement	t_jsonElement	= t_jsonParser.parse(p_string);
+		JsonObject	t_jsonObject	= t_jsonElement.getAsJsonObject();
+
+		return UnMarshalJsonObject(t_jsonObject);
+	}
+
+
+	//*********************************
+	@Override
+	public LinkedList<<%className%>> UnMarshalList(String p_string) {
+		try {
+			JsonParser	t_jsonParser	= new JsonParser();
+			JsonElement	t_jsonElement	= t_jsonParser.parse(p_string);
+			JsonObject	t_jsonObject	= t_jsonElement.getAsJsonObject();
+
+
+			// Next we'll iterate through any names of nodes connected to this entry and add them to the new DMAPIJson<%className%>Marshalling.
+			t_jsonElement = t_jsonObject.get("sites");
+			if (t_jsonElement == null) {
+				Logger.LogError("DMAPIJson<%className%>Marshalling.UnMarshalList() received an invalid object that does not have a [<%className%>] value.");
+				return null;
+			}
+
+			LinkedList<<%className%>>	t_new<%className%>List	= new LinkedList<<%className%>>();
+			<%className%>				t_new<%className%>;
+			JsonArray					t_jsonArray				= t_jsonElement.getAsJsonArray();
+			JsonObject					t_nextName;
+			for (int i = 0; i < t_jsonArray.size(); ++i) {
+				t_new<%className%> = UnMarshalJsonObject(t_jsonArray.get(i).getAsJsonObject());
+				if (t_new<%className%> == null) {
+					Logger.LogError("DMAPIJson<%className%>Marshalling.UnMarshalList() failed to parse a <%className%> object from the json.");
+					return null;
+				}
+
+				t_new<%className%>List.add(t_new<%className%>);
+			}
+
+			return t_new<%className%>List;
+		}
+		catch (Exception t_error) {
+			Logger.LogError("DMAPIJson<%className%>Marshalling.UnMarshalList() failed with error: ", t_error);
+			return null;
+		}
+	}
+
+
+	//*********************************
+	private <%className%> UnMarshalJsonObject(JsonObject p_json<%className%>Object) {
+		try {
+//			String t_siteID			= p_json<%className%>Object.get("id").getAsString();
+//			String t_siteName		= p_json<%className%>Object.get("name").getAsString();
+//			String t_companyId		= p_json<%className%>Object.get("companyId").getAsString();
+//			String t_siteStatusId	= p_json<%className%>Object.get("siteStatusId").getAsString();
+//			String t_customer<%className%>Id = p_json<%className%>Object.get("customer<%className%>Id").getAsString();
+//			String t_timeZoneRuleId = p_json<%className%>Object.get("timeZoneRuleId").getAsString();
+
+//			return new <%className%>(Integer.getInteger(t_siteID),
+//							Integer.getInteger(t_companyId),
+//							t_siteName,
+//							Integer.getInteger(t_siteStatusId),
+//							t_customer<%className%>Id,
+//							Integer.getInteger(t_timeZoneRuleId));
+		}
+		catch (Exception t_error) {
+			Logger.LogError("DMAPIJson<%className%>Marshalling.UnMarshalJsonObject() failed with error: ", t_error);
+			return null;
+		}
+	}
+}
+<%endtext%>

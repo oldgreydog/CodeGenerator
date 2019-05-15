@@ -1,0 +1,358 @@
+%%HEADER%% openingDelimiter=<% closingDelimiter=%>
+<%text%>/*
+ * This file was generated.
+ */
+
+package <%global.packageName%>.dao.net;
+
+
+
+import java.sql.*;
+import java.util.*;
+
+import <%global.packageName%>.*;
+import <%global.packageName%>.dao.*;
+import <%global.packageName%>.dao.message.server.*;
+import <%global.packageName%>.marshalling.gson.*;
+import coreutil.logging.*;
+import coreutil.utils.message.*;
+
+
+
+public class <%className%>DAO_NET extends Request_Base implements <%className%>DAO {
+
+
+	//*********************************
+	public <%className%>DAO_NET(MessageRouter p_parentMessageRouter) {
+		super(p_parentMessageRouter);
+
+		setName("<%className%> DAO network client");	// Set the thread name so that it is identifiable in the monitor and in error messages.
+	}
+
+
+	//*********************************
+	public <%className%>DAO_NET(String p_requestKey, MessageRouter p_parentMessageRouter) {
+		super(p_requestKey, p_parentMessageRouter);
+
+		setName("<%className%> DAO network client");	// Set the thread name so that it is identifiable in the monitor and in error messages.
+	}
+
+
+	//*********************************
+	/**
+	 * This should never be used on a client-side handler so it should return NULL.
+	 */
+	@Override
+	public Request_Base GetClone(String p_requestKey, MessageRouter p_parentMessageRouter) {
+		return null;
+	}
+
+
+	//*********************************
+	@Override
+	public String GetModuleID() {
+		return <%className%>DAO_NET_Server.MODULE_NAME;
+	}
+
+
+	//*********************************
+	@Override
+	public void Execute() {
+		// This should never be run on this client-side request.
+		Logger.LogError("<%className%>DAO_NET cannot be executed as a thread.");
+	}
+
+
+	//*********************************
+	@Override
+	public LinkedList<<%className%>> LoadAll<%className%>(Connection p_dbConnection)
+	{
+		try {
+			// The first thing we'll do is see if we can find the target service and it's node info.
+			String t_serviceNodeName =  m_parentMessageRouter.FindNodeForGlobalService(MessageRouter.SERVICE_CORE_SERVER);
+			if ((t_serviceNodeName == null) || t_serviceNodeName.isEmpty()) {
+				Logger.LogError("<%className%>DAO_NET.LoadAll<%className%>() did not find a route entry for [" + MessageRouter.SERVICE_CORE_SERVER + "].");
+				return null;
+			}
+
+
+			String t_jsonString = ExecuteStringResultCall("LoadAll<%className%>",								// String	p_commandString,
+														  t_serviceNodeName,									// String	p_targetNodeID,
+														  MessageRouter.SERVICE_CORE_SERVER,					// String	p_targetServiceID,
+														  <%className%>DAO_NET_Server.MODULE_NAME,				// String	p_targetModuleID,
+														  <%className%>DAO_NET_Server.MODULE_NAME,				// String	p_sourceModuleID,
+														  <%className%>DAO_NET_Server.WEB_CONNECT_PRIORITY,		// String	p_messagePriority,
+														  null,													// byte[]	p_parameters)
+														  true);												// boolean	p_removeThisHandlerAfterEachCall
+
+			if ((t_jsonString == null) || t_jsonString.isEmpty()) {
+				Logger.LogError("<%className%>DAO_NET.LoadAll<%className%>() received a response with no contents.");
+				return null;
+			}
+
+			Gson<%className%>Marshalling	t_marshaler		= new Gson<%className%>Marshalling();
+			LinkedList<<%className%>>		t_resultList	= t_marshaler.UnMarshalList(t_jsonString);
+			if (t_resultList == null) {
+				Logger.LogError("<%className%>DAO_NET.LoadAll<%className%>() failed to unmarshal the response string [" + t_jsonString + "].");
+				return null;
+			}
+
+			return t_resultList;
+		}
+		catch (Exception t_error) {
+			Logger.LogError("<%className%>DAO_NET.LoadAll<%className%>() failed with error: ", t_error);
+			return null;
+		}
+	}<%endtext%>
+
+
+<%foreach node=column%>
+<%if <%isPrimaryKey%> = true%>
+<%text%>
+
+
+	//*********************************
+	@Override
+	public <%^className%> Load<%^className%>For<%name%>(<%type%> p_<%memberName%>, Connection p_dbConnection)
+	{
+		try {
+			// The first thing we'll do is see if we can find the target service and it's node info.
+			String t_serviceNodeName =  m_parentMessageRouter.FindNodeForGlobalService(MessageRouter.SERVICE_CORE_SERVER);
+			if ((t_serviceNodeName == null) || t_serviceNodeName.isEmpty()) {
+				Logger.LogError("<%^className%>DAO_NET.Load<%^className%>For<%name%>() did not find a route entry for [" + MessageRouter.SERVICE_CORE_SERVER + "].");
+				return null;
+			}
+
+
+			// Add the parameters to the request.
+			JSONParameters t_parameters = new JSONParameters();
+			t_parameters.AddParameter("<%memberName%>", p_<%memberName%>);
+
+			String t_jsonString = ExecuteStringResultCall("Load<%^className%>For<%name%>",						// String	p_commandString,
+														  t_serviceNodeName,									// String	p_targetNodeID,
+														  MessageRouter.SERVICE_CORE_SERVER,					// String	p_targetServiceID,
+														  <%^className%>DAO_NET_Server.MODULE_NAME,				// String	p_targetModuleID,
+														  <%^className%>DAO_NET_Server.MODULE_NAME,				// String	p_sourceModuleID,
+														  <%^className%>DAO_NET_Server.WEB_CONNECT_PRIORITY,	// String	p_messagePriority,
+														  t_parameters.Marshal().getBytes(),					// byte[]	p_parameters
+														  true);												// boolean	p_removeThisHandlerAfterEachCall
+
+			if ((t_jsonString == null) || t_jsonString.isEmpty()) {
+				Logger.LogError("<%^className%>DAO_NET.Load<%^className%>For<%name%>() received a response with no contents.");
+				return null;
+			}
+
+			Gson<%^className%>Marshalling	t_marshaler		= new Gson<%^className%>Marshalling();
+			<%^className%>					t_result		= t_marshaler.UnMarshal(t_jsonString);
+			if (t_result == null) {
+				Logger.LogError("<%^className%>DAO_NET.Load<%^className%>For<%name%>() failed to unmarshal the response string [" + t_jsonString + "].");
+				return null;
+			}
+
+			return t_result;
+		}
+		catch (Exception t_error) {
+			Logger.LogError("<%^className%>DAO_NET.Load<%^className%>For<%name%>() failed with error: ", t_error);
+			return null;
+		}
+	}<%endtext%>
+
+<%endif%>
+<%endfor%>
+
+
+<%foreach node=foreignKey%>
+<%text%>
+
+
+	//*********************************
+	@Override
+	public LinkedList<<%^className%>> LoadAll<%^className%>For<%name%>(<%type%> p_<%memberName%>, Connection p_dbConnection)
+	{
+		try {
+			// The first thing we'll do is see if we can find the target service and it's node info.
+			String t_serviceNodeName =  m_parentMessageRouter.FindNodeForGlobalService(MessageRouter.SERVICE_CORE_SERVER);
+			if ((t_serviceNodeName == null) || t_serviceNodeName.isEmpty()) {
+				Logger.LogError("<%^className%>DAO_NET.LoadAll<%^className%>For<%name%>() did not find a route entry for [" + MessageRouter.SERVICE_CORE_SERVER + "].");
+				return null;
+			}
+
+
+			// Add the parameters to the request.
+			JSONParameters t_parameters = new JSONParameters();
+			t_parameters.AddParameter("<%memberName%>", p_<%memberName%>);
+
+			String t_jsonString = ExecuteStringResultCall("LoadAll<%^className%>For<%name%>",					// String	p_commandString,
+														  t_serviceNodeName,									// String	p_targetNodeID,
+														  MessageRouter.SERVICE_CORE_SERVER,					// String	p_targetServiceID,
+														  <%^className%>DAO_NET_Server.MODULE_NAME,				// String	p_targetModuleID,
+														  <%^className%>DAO_NET_Server.MODULE_NAME,				// String	p_sourceModuleID,
+														  <%^className%>DAO_NET_Server.WEB_CONNECT_PRIORITY,	// String	p_messagePriority,
+														  t_parameters.Marshal().getBytes(),					// byte[]	p_parameters
+														  true);												// boolean	p_removeThisHandlerAfterEachCall
+
+			if ((t_jsonString == null) || t_jsonString.isEmpty()) {
+				Logger.LogError("<%^className%>DAO_NET.LoadAll<%^className%>For<%name%>() received a response with no contents.");
+				return null;
+			}
+
+			Gson<%^className%>Marshalling	t_marshaler		= new Gson<%^className%>Marshalling();
+			LinkedList<<%^className%>>		t_resultList	= t_marshaler.UnMarshalList(t_jsonString);
+			if (t_resultList == null) {
+				Logger.LogError("<%^className%>DAO_NET.LoadAll<%^className%>For<%name%>() failed to unmarshal the response string [" + t_jsonString + "].");
+				return null;
+			}
+
+			return t_resultList;
+		}
+		catch (Exception t_error) {
+			Logger.LogError("<%^className%>DAO_NET.LoadAll<%^className%>For<%name%>() failed with error: ", t_error);
+			return null;
+		}
+	}<%endtext%>
+
+<%endfor%>
+
+<%text%>
+
+
+	<%customCode key=CustomLoaders commentCharacters="//"%>
+
+
+	//*********************************
+	@Override
+	public LinkedList<<%className%>> Load<%className%>WithSQL(PreparedStatement p_preparedStatement, Connection p_dbConnection)
+	{
+		return null;	// Net clients should never call this function.
+	}
+
+
+	//*********************************
+	@Override
+	public boolean Create<%className%>(<%className%> p_new<%className%>, Connection p_dbConnection)
+	{
+		try {
+			// The first thing we'll do is see if we can find the target service and it's node info.
+			String t_serviceNodeName =  m_parentMessageRouter.FindNodeForGlobalService(MessageRouter.SERVICE_CORE_SERVER);
+			if ((t_serviceNodeName == null) || t_serviceNodeName.isEmpty()) {
+				Logger.LogError("<%className%>DAO_NET.Create<%className%>() did not find a route entry for [" + MessageRouter.SERVICE_CORE_SERVER + "].");
+				return false;
+			}
+
+
+			// Add the parameters to the request.
+			Gson<%className%>Marshalling t_marshaler = new Gson<%className%>Marshalling();
+			JSONParameters t_parameters = new JSONParameters();
+			t_parameters.AddJSONParameter("new<%className%>", t_marshaler.Marshal(p_new<%className%>));
+
+			// We have to get the new DB ID back and set it on this local object, so this has to be a JSON call instead of a boolean call.
+			String t_jsonString = ExecuteStringResultCall("Create<%className%>",								// String	p_commandString,
+														  t_serviceNodeName,									// String	p_targetNodeID,
+														  MessageRouter.SERVICE_CORE_SERVER,					// String	p_targetServiceID,
+														  <%className%>DAO_NET_Server.MODULE_NAME,				// String	p_targetModuleID,
+														  <%className%>DAO_NET_Server.MODULE_NAME,				// String	p_sourceModuleID,
+														  <%className%>DAO_NET_Server.WEB_CONNECT_PRIORITY,	// String	p_messagePriority,
+														  t_parameters.Marshal().getBytes(),					// byte[]	p_parameters
+														  true);												// boolean	p_removeThisHandlerAfterEachCall
+
+			if ((t_jsonString == null) || t_jsonString.isEmpty()) {
+				Logger.LogError("<%className%>DAO_NET.Create<%className%>() received a response with no contents.");
+				return false;
+			}
+
+			<%className%> t_result = t_marshaler.UnMarshal(t_jsonString);
+			if (t_result == null) {
+				Logger.LogError("<%className%>DAO_NET.Create<%className%>() failed to unmarshal the response string [" + t_jsonString + "].");
+				return false;
+			}
+
+<%endtext%>
+
+<%foreach node=column%>
+<%if <%isPrimaryKey%> = true%>
+<%text%>			p_new<%^className%>.Set<%name%>(t_result.Get<%name%>());
+<%endtext%>
+<%endif%>
+<%endfor%>
+
+<%text%>		}
+		catch (Exception t_error) {
+			Logger.LogError("<%className%>DAO_NET.Create<%className%>() failed with error: ", t_error);
+			return false;
+		}
+
+		return true;
+	}
+
+
+	//*********************************
+	@Override
+	public boolean Update<%className%>(<%className%> p_target<%className%>, Connection p_dbConnection)
+	{
+		try {
+			// The first thing we'll do is see if we can find the target service and it's node info.
+			String t_serviceNodeName =  m_parentMessageRouter.FindNodeForGlobalService(MessageRouter.SERVICE_CORE_SERVER);
+			if ((t_serviceNodeName == null) || t_serviceNodeName.isEmpty()) {
+				Logger.LogError("<%className%>DAO_NET.Update<%className%>() did not find a route entry for [" + MessageRouter.SERVICE_CORE_SERVER + "].");
+				return false;
+			}
+
+
+			// Add the parameters to the request.
+			Gson<%className%>Marshalling t_marshaler = new Gson<%className%>Marshalling();
+			JSONParameters t_parameters = new JSONParameters();
+			t_parameters.AddJSONParameter("target<%className%>", t_marshaler.Marshal(p_target<%className%>));
+
+			return ExecuteBooleanResultCall("Update<%className%>",									// String	p_commandString,
+											t_serviceNodeName,										// String	p_targetNodeID,
+											MessageRouter.SERVICE_CORE_SERVER,						// String	p_targetServiceID,
+											<%className%>DAO_NET_Server.MODULE_NAME,				// String	p_targetModuleID,
+											<%className%>DAO_NET_Server.MODULE_NAME,				// String	p_sourceModuleID,
+											<%className%>DAO_NET_Server.WEB_CONNECT_PRIORITY,		// String	p_messagePriority,
+											t_parameters.Marshal().getBytes(),						// byte[]	p_parameters
+											true);													// boolean	p_removeThisHandlerAfterEachCall
+		}
+		catch (Exception t_error) {
+			Logger.LogError("<%className%>DAO_NET.Update<%className%>() failed with error: ", t_error);
+			return false;
+		}
+	}
+
+
+	//*********************************
+	@Override
+	public boolean Delete<%className%>(<%className%> p_target<%className%>, Connection p_dbConnection)
+	{
+		try {
+			// The first thing we'll do is see if we can find the target service and it's node info.
+			String t_serviceNodeName =  m_parentMessageRouter.FindNodeForGlobalService(MessageRouter.SERVICE_CORE_SERVER);
+			if ((t_serviceNodeName == null) || t_serviceNodeName.isEmpty()) {
+				Logger.LogError("<%className%>DAO_NET.Delete<%className%>() did not find a route entry for [" + MessageRouter.SERVICE_CORE_SERVER + "].");
+				return false;
+			}
+
+
+			// Add the parameters to the request.
+			Gson<%className%>Marshalling t_marshaler = new Gson<%className%>Marshalling();
+			JSONParameters t_parameters = new JSONParameters();
+			t_parameters.AddJSONParameter("target<%className%>", t_marshaler.Marshal(p_target<%className%>));
+
+			return ExecuteBooleanResultCall("Delete<%className%>",									// String	p_commandString,
+											t_serviceNodeName,										// String	p_targetNodeID,
+											MessageRouter.SERVICE_CORE_SERVER,						// String	p_targetServiceID,
+											<%className%>DAO_NET_Server.MODULE_NAME,				// String	p_targetModuleID,
+											<%className%>DAO_NET_Server.MODULE_NAME,				// String	p_sourceModuleID,
+											<%className%>DAO_NET_Server.WEB_CONNECT_PRIORITY,		// String	p_messagePriority,
+											t_parameters.Marshal().getBytes(),						// byte[]	p_parameters
+											true);													// boolean	p_removeThisHandlerAfterEachCall
+		}
+		catch (Exception t_error) {
+			Logger.LogError("<%className%>DAO_NET.Delete<%className%>() failed with error: ", t_error);
+			return false;
+		}
+	}
+
+
+	<%customCode key=Miscellaneous commentCharacters="//"%>
+}
+<%endtext%>

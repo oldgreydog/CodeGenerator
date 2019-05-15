@@ -1,0 +1,41 @@
+%%HEADER%% openingDelimiter=<% closingDelimiter=%>
+<%text%>/*
+ * This file was generated.
+ */
+
+package <%global.packageName%>.dao.factory;
+
+
+
+import <%global.packageName%>.dao.*;
+import <%global.packageName%>.dao.db.*;
+import <%global.packageName%>.dao.cache.*;
+
+
+
+public class <%global.databaseName%>ServerDAOFactory extends <%global.databaseName%>DAOFactory {
+
+	// Data members
+<%endtext%>
+
+<%foreach node=table%>
+	<%text%>	private <%className%>DAO		s_<%firstLetterToLowerCase value = <%className%>%>DAOInstance		= new <%className%>DAO_DB();
+<%endtext%>
+<%endfor%>
+
+
+
+<%foreach node=table%>
+	<%text%>
+
+	//===========================================
+	@Override
+	public <%className%>DAO		Get<%className%>DAO() {
+		return s_<%firstLetterToLowerCase value = <%className%>%>DAOInstance;
+	}
+<%endtext%>
+<%endfor%>
+
+<%text%>
+}
+<%endtext%>

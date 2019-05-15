@@ -1,0 +1,40 @@
+%%HEADER%% openingDelimiter=<% closingDelimiter=%>
+<%text%>/*
+ * This file was generated.
+ */
+
+package <%global.packageName%>.marshalling;
+
+
+
+import coreutil.logging.*;
+import <%global.packageName%>.marshalling.dmapijson.*;
+import <%global.packageName%>.marshalling.gson.*;
+
+
+
+public class <%global.databaseName%>MarshallingFactory {
+
+	static public final String		MARCHALLING_TYPE_GSON			= "gson";
+	static public final String		MARCHALLING_TYPE_DM_API_JSON	= "dmApiJson";
+<%endtext%>
+
+<%foreach node=table%>
+<%text%>
+
+	//===========================================
+	static public <%className%>Marshalling		Get<%className%>Marshalling(String p_marshallingType) {
+		if (p_marshallingType.equalsIgnoreCase(MARCHALLING_TYPE_GSON))
+			return new Gson<%className%>Marshalling();
+		else if (p_marshallingType.equalsIgnoreCase(MARCHALLING_TYPE_DM_API_JSON))
+			return new DMAPIJson<%className%>Marshalling();
+
+		Logger.LogError("<%global.databaseName%>MarshallingFactory.<%className%>Marshalling() does not handle the marshalling type [" + p_marshallingType + "].");
+		return null;
+	}
+<%endtext%>
+<%endfor%>
+
+<%text%>
+}
+<%endtext%>

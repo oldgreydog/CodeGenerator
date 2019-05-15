@@ -1,0 +1,66 @@
+%%HEADER%% openingDelimiter=<% closingDelimiter=%>
+<%text%>/*
+ * This file was generated.
+ */
+
+package <%global.packageName%>.dao;
+
+
+
+import coreutil.logging.*;
+import <%global.packageName%>.dao.*;
+
+
+
+public abstract class <%global.databaseName%>DAOFactory {
+
+
+	static public final int		DAO_TYPE_SERVER		= 1;
+	static public final int		DAO_TYPE_CLIENT		= 2;
+
+
+	// Static members
+	static private <%global.databaseName%>DAOFactory	s_daoFactoryInstance	= null;
+
+
+	//===========================================
+	static public boolean Init(int p_factoryType) {
+		switch (p_factoryType) {
+			case DAO_TYPE_SERVER:
+				s_daoFactoryInstance = new <%global.databaseName%>ServerDAOFactory();
+				break;
+			case DAO_TYPE_CLIENT:
+				s_daoFactoryInstance = new <%global.databaseName%>ClientDAOFactory();
+				break;
+			default:
+				Logger.LogError("<%global.databaseName%>DAOFactory.Init() does not recognize the factory type ID [" + p_factoryType + "].");
+				return false;
+		}
+
+		return true;
+	}
+
+
+	//===========================================
+	static public <%global.databaseName%>DAOFactory GetInstance() {
+		if (s_daoFactoryInstance == null) {
+			Logger.LogError("<%global.databaseName%>DAOFactory.GetInstance() has not been initialized.");
+			return null;
+		}
+
+		return s_daoFactoryInstance;
+	}
+<%endtext%>
+
+
+
+<%foreach node=table%>
+	<%text%>
+
+	public abstract <%className%>DAO		Get<%className%>DAO();
+<%endtext%>
+<%endfor%>
+
+<%text%>
+}
+<%endtext%>

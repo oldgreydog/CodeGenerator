@@ -1,0 +1,51 @@
+%%HEADER%% openingDelimiter=<% closingDelimiter=%>
+<%text%>/*
+ * This file was generated.
+ */
+
+package <%global.packageName%>.dao;
+
+
+
+import java.util.*;
+import java.sql.*;
+
+import <%global.packageName%>.*;
+
+
+
+public interface <%className%>DAO {
+
+	public LinkedList<<%className%>> LoadAll<%className%>(Connection p_dbConnection);
+
+<%endtext%>
+
+
+<%foreach node=column%>
+	<%if <%isPrimaryKey%> = true%>
+		<%text%>	public <%^className%> Load<%^className%>For<%name%>(<%typeConvert targetLanguage = "java" sourceType = <%type%> groupID = "object" %> p_<%firstLetterToLowerCase value = <%name%>%>, Connection p_dbConnection);
+<%endtext%>
+	<%endif%>
+<%endfor%>
+
+<%text%>
+<%endtext%>
+
+<%foreach node=foreignKey%>
+	<%text%>	public LinkedList<<%^className%>> LoadAll<%^className%>For<%name%>(<%typeConvert targetLanguage = "java" sourceType = <%type%> groupID = "object" %> p_<%firstLetterToLowerCase value = <%name%>%>, Connection p_dbConnection);
+<%endtext%>
+<%endfor%>
+
+
+<%text%>
+	<%customCode key=CustomLoaders commentCharacters="//"%>
+
+	public LinkedList<<%className%>> Load<%className%>WithSQL(PreparedStatement p_preparedStatement, Connection p_dbConnection);
+
+	public boolean Create<%className%>(<%className%> p_new<%className%>,    Connection p_dbConnection);
+	public boolean Update<%className%>(<%className%> p_target<%className%>, Connection p_dbConnection);
+	public boolean Delete<%className%>(<%className%> p_target<%className%>, Connection p_dbConnection);
+
+	<%customCode key=Miscellaneous commentCharacters="//"%>
+}
+<%endtext%>
