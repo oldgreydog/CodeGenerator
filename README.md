@@ -1,3 +1,13 @@
+Hello!  I've been quite surprised to see that people have actually found this project!  I had not added an email address before but now that people are trying to use this, I think I should provide some way to contact me. Creating templates can be very complicated and I'm sure the documentation and examples can be improved.  If you have questions, please email me.
+
+helots54612 @ mypacks.net
+
+NOTE! Remove the spaces to use this address.  I don't know if that'll be enough to slow down email scrapers, but it's worth a try.  This address is part of an anonymous address service my provider offers, so its not pulled in by my email apps.  It looks like you can only check it on their web page, so I'll have to remember to do that.  That means that if I forget, it might be a few days before I see your email and respond.  Sorry if that happens.
+
+Thanks for stopping by!  I would also like to discuss some other topics such as creating your own custom tags and whether anyone would be interested in creating a repository of some kind to make their templates available to other users.
+
+
+
 ### Introduction
 
 I built this code generator because I couldn't find anything that would generate whatever code I wanted the way that I wanted. Even now, more than ten years later, most of the generators you will find are only able to output very specific files for very specific uses. This generator, on the other hand, should be thought more as text generator than just a code generator.
@@ -68,7 +78,7 @@ Template files are the hairier part of this equation. As you can see from the ex
 
 All of my templates started off as hand-coded files that I wound up copying and altering at least two or three times to make other instances (database access classes being a perfect example). By that point, I had tweaked and fixed enough that I had a reliable pattern that I could be confident that I wanted to templatize. Then I could make a new copy and start adding template tags, at each step running a generation to compare to the originals. That lets you build up the complexity instead of trying to create the template from scratch.
 
-While the example templates are going to be your best resource for seeing how to use the various tags, I've tried to give some useful documentaion for them in the `CodeGenerator/doc` javadocs. But there may be things I've missed or should reemphasize so I'll cover some of the ones that come to mind here.
+While the example templates are going to be your best resource for seeing how to use the various tags, I've tried to give some useful documentation for them in the `CodeGenerator/doc` javadocs. But there may be things I've missed or should reemphasize so I'll cover some of the ones that come to mind here.
 
 Probably the most important one is the one *required* element for a template: the header record. Here's the one in all of the examples:
 
