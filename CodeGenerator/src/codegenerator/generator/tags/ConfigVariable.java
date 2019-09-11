@@ -38,8 +38,7 @@ import coreutil.logging.*;
 	<p>	- Parent references: the caret ( ^ ) is used one or more times before the variable name to
 	indicate that it should be found that number of parent nodes above the current parent</p>
 
-	<p>	- Global path name: A fully specified variable name (one that has at least one dot (.) in
-	the name) will be dereferenced from the root node</p>
+	<p>	- Global path name: A fully specified variable name that starts with "root." will be dereferenced from the root node</p>
 
 	<h3>Examples</h3>
 
@@ -89,7 +88,7 @@ import coreutil.logging.*;
 
 	<p>	- A variable reference with one parent reference caret like <code>&lt;%^sqlName%&gt;</code> will be evaluated to <b><code>USER</code></b>.</p>
 
-	<p>	- A fully qualified variable reference like <code>&lt;%global.databaseName%&gt;</code> will be evaluated to <b><code>Operations</code></b>.</p>
+	<p>	- A fully qualified variable reference like <code>&lt;%root.global.databaseName%&gt;</code> will be evaluated to <b><code>Operations</code></b>.</p>
  */
 public class ConfigVariable extends TemplateBlock_Base {
 
@@ -99,12 +98,12 @@ public class ConfigVariable extends TemplateBlock_Base {
 	// Data members
 	protected	String		m_variableName			= null;
 	protected	int			m_parentReferenceCount	= 0;		// (i.e. "^varname") This count tells us how many levels up to go to reference the following variable name on a parent node (or a parent-of-a-parent node "^^varname", etc.)
-	protected	int			m_lineNumber			= 0;		// The line number in the template file where this instance of a tag was defined.
 
 
 	//*********************************
 	public ConfigVariable() {
 		super(BLOCK_NAME);
+		m_isSafeForTextBlock = true;
 	}
 
 
@@ -127,11 +126,18 @@ public class ConfigVariable extends TemplateBlock_Base {
 	public boolean Init(TagParser p_tagParser, int p_lineNumber) {
 		String t_variableName = p_tagParser.GetTagName();
 		if (t_variableName == null) {
-			Logger.LogError("ConfigVariable.Init() did not find the [node] attribute that is required for foreach tags at line [" + p_lineNumber + "].");
+			Logger.LogError("ConfigVariable.Init() did not find the required variable name at line [" + p_lineNumber + "].");
 			return false;
 		}
 
+		return Init(t_variableName, p_lineNumber);
+	}
+
+
+	//*********************************
+	public boolean Init(String p_variableName, int p_lineNumber) {
 		// Count (and remove) any parent references.
+		String t_variableName = p_variableName;
 		while (t_variableName.startsWith("^")) {
 			m_parentReferenceCount++;
 			t_variableName = t_variableName.substring(1);	// Chop off the leading ^.
@@ -162,8 +168,13 @@ public class ConfigVariable extends TemplateBlock_Base {
 
 	{
 		try {
-			ConfigNode t_currentNode = p_currentNode;
-			if (m_parentReferenceCount > 0) {
+			ConfigNode	t_currentNode	= p_currentNode;
+			String		t_variableName	= m_variableName;
+			if (t_variableName.startsWith("root.")) {
+				t_currentNode = p_rootNode;
+				t_variableName.replace("root.", "");	// Remove the "root." reference so that the variable name will work correctly below.
+			}
+			else if (m_parentReferenceCount > 0) {
 				// This will kick the node reference up the tree the specified number of times.
 				for (int i = 0; i < m_parentReferenceCount; i++) {
 					if (t_currentNode == null) {
@@ -182,11 +193,8 @@ public class ConfigVariable extends TemplateBlock_Base {
 
 			String t_value = t_currentNode.GetNodeValue(m_variableName);
 			if (t_value == null) {
-				t_value = p_rootNode.GetNodeValue(m_variableName);
-				if (t_value == null) {
-					Logger.LogError("ConfigVariable.Evaluate() could not find the variable named [" + m_variableName + "] defined in line [" + m_lineNumber + "] in either the current or root config nodes.");
-					return false;
-				}
+				Logger.LogError("ConfigVariable.Evaluate() could not find the variable named [" + m_variableName + "] defined in line [" + m_lineNumber + "] in either the current or root config nodes.");
+				return false;
 			}
 
 			p_writer.Write(t_value);

@@ -52,11 +52,14 @@ public class BlockFactory {
 			m_blocks.add(new If_Boolean.Or());
 			m_blocks.add(new If_Boolean.Not());
 
+		m_blocks.add(new OuterContext());
+		m_blocks.add(new OuterContextEval());
 		m_blocks.add(new TabMarker());
 		m_blocks.add(new TabSettings());
 		m_blocks.add(new TabStop());
 		m_blocks.add(new TextBlock());
 		m_blocks.add(new TypeConvert());
+		m_blocks.add(new TypeConvertLoadFile());
 		m_blocks.add(new VariableBlock());
 	}
 

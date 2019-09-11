@@ -67,38 +67,36 @@ public class TabSettings extends TemplateBlock_Base {
 	@Override
 	public boolean Init(TagParser p_tagParser) {
 		try {
+			m_lineNumber = p_tagParser.GetLineNumber();
+
 			TagAttributeParser t_nodeAttribute = p_tagParser.GetNamedAttribute(STOP_ATTRIBUTE_TAB_LENGTH);
 			if (t_nodeAttribute == null) {
-				Logger.LogError("TabSettings.Init() did not find the [" + STOP_ATTRIBUTE_TAB_LENGTH + "] attribute that is required for [" + BLOCK_NAME + "] tags.");
+				Logger.LogError("TabSettings.Init() did not find the [" + STOP_ATTRIBUTE_TAB_LENGTH + "] attribute that is required for [" + BLOCK_NAME + "] tags at line number [" + m_lineNumber + "].");
 				return false;
 			}
 
-			StringWriter	t_valueWriter		= new StringWriter();
-			Cursor			t_valueCursor		= new Cursor(t_valueWriter);
-			LoopCounter		t_iterationCounter	= new LoopCounter();
-			if (!t_nodeAttribute.GetValue().Evaluate(null, null, t_valueCursor, t_iterationCounter)) {
-				Logger.LogError("TabSettings.Evaluate() failed to evaluate the [" + STOP_ATTRIBUTE_TAB_LENGTH + "] value.");
+			String t_tabLengthString = t_nodeAttribute.GetAttributeValueAsString();
+			if (t_tabLengthString == null) {
+				Logger.LogError("TabSettings.Evaluate() failed to get the [" + STOP_ATTRIBUTE_TAB_LENGTH + "] value at line number [" + m_lineNumber + "].");
 				return false;
 			}
 
-			m_tabLength = Integer.parseInt(t_valueWriter.toString());
+			m_tabLength = Integer.parseInt(t_tabLengthString);
 
 
 			// The offset attribute is required for type "stop" but not for "marker".
 			t_nodeAttribute = p_tagParser.GetNamedAttribute(STOP_ATTRIBUTE_OUTPUT_TYPE);
 			if (t_nodeAttribute == null) {
-				Logger.LogError("TabSettings.Init() did not find the [" + STOP_ATTRIBUTE_OUTPUT_TYPE + "] attribute that is required for [" + BLOCK_NAME + "] tags.");
+				Logger.LogError("TabSettings.Init() did not find the [" + STOP_ATTRIBUTE_OUTPUT_TYPE + "] attribute that is required for [" + BLOCK_NAME + "] tags at line number [" + m_lineNumber + "].");
 				return false;
 			}
 
-			t_valueWriter	= new StringWriter();
-			t_valueCursor	= new Cursor(t_valueWriter);
-			if (!t_nodeAttribute.GetValue().Evaluate(null, null, t_valueCursor, t_iterationCounter)) {
-				Logger.LogError("TabSettings.Evaluate() failed to evaluate the [" + STOP_ATTRIBUTE_OUTPUT_TYPE + "] value.");
+			String t_outputType = t_nodeAttribute.GetAttributeValueAsString();
+			if (t_outputType == null) {
+				Logger.LogError("TabSettings.Evaluate() failed to get the [" + STOP_ATTRIBUTE_OUTPUT_TYPE + "] value at line number [" + m_lineNumber + "].");
 				return false;
 			}
 
-			String t_outputType = t_valueWriter.toString();
 			if (t_outputType.equalsIgnoreCase("tabs"))
 				m_outputType = TabStop.OUTPUT_TYPE_TABS;
 			else
@@ -107,7 +105,7 @@ public class TabSettings extends TemplateBlock_Base {
 			return true;
 		}
 		catch (Throwable t_error) {
-			Logger.LogError("TabSettings.Init() failed with error: ", t_error);
+			Logger.LogError("TabSettings.Init() failed with error at line number [" + m_lineNumber + "]: ", t_error);
 			return false;
 		}
 	}

@@ -3,14 +3,14 @@
  * This file was generated.
  */
 
-package <%global.packageName%>.dao;
+package <%root.global.packageName%>.dao;
 
 
 
 import java.util.*;
 import java.sql.*;
 
-import <%global.packageName%>.*;
+import <%root.global.packageName%>.*;
 
 
 

@@ -3,17 +3,17 @@
  * This file was generated.
  */
 
-package <%global.packageName%>.dao.factory;
+package <%root.global.packageName%>.dao.factory;
 
 
 
-import <%global.packageName%>.dao.*;
-import <%global.packageName%>.dao.db.*;
-import <%global.packageName%>.dao.cache.*;
+import <%root.global.packageName%>.dao.*;
+import <%root.global.packageName%>.dao.db.*;
+import <%root.global.packageName%>.dao.cache.*;
 
 
 
-public class <%global.databaseName%>ServerDAOFactory extends <%global.databaseName%>DAOFactory {
+public class <%root.global.databaseName%>ServerDAOFactory extends <%root.global.databaseName%>DAOFactory {
 
 	// Data members
 <%endtext%>

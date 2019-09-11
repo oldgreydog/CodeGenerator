@@ -35,6 +35,7 @@ public class TagParser {
 	private String									m_tagName;
 	private TreeMap<String, TagAttributeParser>		m_namedAttributes	= new TreeMap<>();
 	private Vector<TagAttributeParser>				m_tagAttributes		= new Vector<>();
+	private int										m_lineNumber		= -1;
 
 
 	//*********************************
@@ -56,8 +57,16 @@ public class TagParser {
 
 
 	//*********************************
+	public int GetLineNumber() {
+		return m_lineNumber;
+	}
+
+
+	//*********************************
 	public boolean Parse(TemplateTokenizer p_tokenizer) {
 		try {
+			m_lineNumber = p_tokenizer.GetLineCount();
+
 //			if (p_tokenizer.GetLineCount() == 235)
 //				Logger.LogVerbose("Pause");
 
@@ -91,11 +100,23 @@ public class TagParser {
 			String				t_attributeName;
 			while (t_nextAttribute.Parse(p_tokenizer)) {
 				// If the attribute name is NULL, then it is a ConfigVariable that can only be Evaluate()'d so it can't be put in the attribute map.
-				t_attributeName = t_nextAttribute.GetAttributeName().GetText();
+				t_attributeName = t_nextAttribute.GetAttributeNameAsString();
 				if (t_attributeName != null)
 					m_namedAttributes.put(t_attributeName, t_nextAttribute);
 
 				m_tagAttributes.add(t_nextAttribute);
+
+				// The last thing to do should be to eat the closing delimiter.
+				t_nextToken = p_tokenizer.GetNextToken();
+				if (t_nextToken == null) {
+					Logger.LogError("TagParser.Parse() failed to get the closing delimiter for the tag [" + m_tagName + "] at line [" + p_tokenizer.GetLineCount() + "].");
+					return false;
+				}
+
+				if (t_nextToken.m_tokenType == Token.TOKEN_TYPE_CLOSING_DELIMITER)
+					return true;
+
+				p_tokenizer.PushBackToken(t_nextToken);	// We didn't find the closing delimiter for the tag so we must have another attribute and we need to go around again.
 
 				t_nextAttribute = new TagAttributeParser();
 			}

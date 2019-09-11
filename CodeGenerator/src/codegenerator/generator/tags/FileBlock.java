@@ -36,13 +36,15 @@ import codegenerator.generator.utils.*;
 
 	<p>Here's an example of this tag:</p>
 
-	<pre><code>&lt;%file template=templates/cached_templates/marshalling/marshalling_interface.template	filename=&lt;%className%&gt;Marshalling.java	destDir=&lt;%global.outputPath%&gt;/marshalling%&gt;</code></pre>
+	<pre><code>&lt;%file template=templates/cached_templates/marshalling/marshalling_interface.template	filename=&lt;%className%&gt;Marshalling.java	destDir=&lt;%root.global.outputPath%&gt;/marshalling%&gt;</code></pre>
 
 	<p>As the example shows, you can use tags that evaluate to strings in the values of the attributes.</p>
 
 	<p>Refer to the files in the <code>Examples/codegenerator</code> folders to better understand its usage.</p>
  */
 public class FileBlock extends TemplateBlock_Base {
+
+	static public final String	BLOCK_NAME	= "file";
 
 	// Static members
 	static private int		s_fileCount		= 0;	// Simple way to count the number of files generated.
@@ -62,16 +64,16 @@ public class FileBlock extends TemplateBlock_Base {
 
 
 	// Data members
-	protected	String		m_templateFileName;
+	protected	String				m_templateFileName;
 
 	// These values can themselves be composites of evaluation-time config variables and text, so we have to store them in their TextBlock form and evaluate them at runtime to get their final values.
-	protected	TextBlock	m_fileNameBlock			= null;
-	protected	TextBlock	m_destDirectoryBlock	= null;
+	protected	TemplateBlock_Base	m_fileNameBlock			= null;
+	protected	TemplateBlock_Base	m_destDirectoryBlock	= null;
 
 
 	//*********************************
 	public FileBlock() {
-		super("file");
+		super(BLOCK_NAME);
 	}
 
 
@@ -91,7 +93,7 @@ public class FileBlock extends TemplateBlock_Base {
 			return false;
 		}
 
-		m_templateFileName = t_nodeAttribute.GetValue().GetText();
+		m_templateFileName = t_nodeAttribute.GetAttributeValueAsString();
 		if (m_templateFileName == null) {
 			Logger.LogError("FileBlock.Init() did not get the [template] string from attribute that is required for FileBlock tags.");
 			return false;
@@ -103,7 +105,7 @@ public class FileBlock extends TemplateBlock_Base {
 			return false;
 		}
 
-		m_fileNameBlock = t_nodeAttribute.GetValue();
+		m_fileNameBlock = t_nodeAttribute.GetAttributeValue();
 		if (m_fileNameBlock == null) {
 			Logger.LogError("FileBlock.Init() did not get the [filename] value from attribute that is required for FileBlock tags.");
 			return false;
@@ -115,7 +117,7 @@ public class FileBlock extends TemplateBlock_Base {
 			return false;
 		}
 
-		m_destDirectoryBlock = t_nodeAttribute.GetValue();
+		m_destDirectoryBlock = t_nodeAttribute.GetAttributeValue();
 		if (m_destDirectoryBlock == null) {
 			Logger.LogError("FileBlock.Init() did not get the [destDir] value from attribute that is required for FileBlock tags.");
 			return false;
@@ -129,14 +131,13 @@ public class FileBlock extends TemplateBlock_Base {
 	@Override
 	public boolean Parse(TemplateTokenizer p_tokenizer) {
 		try {
-			//!!!!!!!!NOTE!!!!!!!!  WE HAVE TO PARSE THE FILE TEMPLATE HERE BEFORE WE RETURN!
-			// Parse the template file.
 			File t_templateFile = new File(m_templateFileName);
 			if (!t_templateFile.exists()) {
 				Logger.LogFatal("FileBlock.Parse() could not open the template file [" + m_templateFileName + "].");
 				System.exit(1);
 			}
 
+			// Parse the template file.  The passed in p_tokenizer is from a parent file's contents, but here we are going to parse the indicated template file for this tag and add its execution tree to this tag object so that when the parent's execution tree is being evaluated, this template file's tree can also be evaluated.
 			TemplateParser t_parser = new TemplateParser();
 			TemplateBlock_Base t_template = t_parser.ParseTemplate(t_templateFile);
 			if (t_template == null) {
@@ -180,7 +181,7 @@ public class FileBlock extends TemplateBlock_Base {
 
 			File t_targetFile = new File(t_fileName.toString());
 			if (t_targetFile.exists() && !CustomCodeManager.ScanFile(t_targetFile)) {	// Check to see if the file has any custom code in it.  If it does, this will save it so that the CustomCode tags can re-insert it during the file generation.
-				Logger.LogError("FileBlock.Evaluate() failed to scan file [" + t_targetFile.getAbsolutePath() + "].");
+				Logger.LogError("FileBlock.Evaluate() failed to scan the file [" + t_targetFile.getAbsolutePath() + "] for custom code blocks.");
 				return false;
 			}
 

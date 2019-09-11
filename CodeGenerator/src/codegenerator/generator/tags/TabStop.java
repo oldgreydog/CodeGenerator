@@ -157,6 +157,7 @@ public class TabStop extends TemplateBlock_Base {
 	//*********************************
 	public TabStop() {
 		super(BLOCK_NAME);
+		m_isSafeForTextBlock = true;
 	}
 
 
@@ -164,27 +165,26 @@ public class TabStop extends TemplateBlock_Base {
 	@Override
 	public boolean Init(TagParser p_tagParser) {
 		try {
+			m_lineNumber = p_tagParser.GetLineNumber();
+
 			TagAttributeParser t_nodeAttribute = p_tagParser.GetNamedAttribute(STOP_ATTRIBUTE_STOP_TYPE);
 			if (t_nodeAttribute == null) {
-				Logger.LogError("TabStop.Init() did not find the [" + STOP_ATTRIBUTE_STOP_TYPE + "] attribute that is required for TabStop tags.");
+				Logger.LogError("TabStop.Init() did not find the [" + STOP_ATTRIBUTE_STOP_TYPE + "] attribute that is required for TabStop tags at line number [" + m_lineNumber + "].");
 				return false;
 			}
 
-			StringWriter	t_valueWriter		= new StringWriter();
-			Cursor			t_valueCursor		= new Cursor(t_valueWriter);
-			LoopCounter		t_iterationCounter	= new LoopCounter();
-			if (!t_nodeAttribute.GetValue().Evaluate(null, null, t_valueCursor, t_iterationCounter)) {
-				Logger.LogError("TabStop.Evaluate() failed to evaluate the [" + STOP_ATTRIBUTE_STOP_TYPE + "] value.");
+			String t_stopType = t_nodeAttribute.GetAttributeValueAsString();
+			if (t_stopType == null) {
+				Logger.LogError("TabStop.Evaluate() failed to get the [" + STOP_ATTRIBUTE_STOP_TYPE + "] value at line number [" + m_lineNumber + "].");
 				return false;
 			}
 
-			String t_value = t_valueWriter.toString();
-			if (t_value.equalsIgnoreCase(STOP_TYPE_lABEL_STOP))
+			if (t_stopType.equalsIgnoreCase(STOP_TYPE_lABEL_STOP))
 				m_stopType = STOP_TYPE_STOP;
-			else if (t_value.equalsIgnoreCase(STOP_TYPE_lABEL_MARKER))
+			else if (t_stopType.equalsIgnoreCase(STOP_TYPE_lABEL_MARKER))
 				m_stopType = STOP_TYPE_MARKER;
 			else {
-				Logger.LogError("TabStop.Init() received an invalid value [" + t_value + "]] for the attribute [" + STOP_ATTRIBUTE_STOP_TYPE + "].");
+				Logger.LogError("TabStop.Init() received an invalid value [" + t_stopType + "]] for the attribute [" + STOP_ATTRIBUTE_STOP_TYPE + "] at line number [" + m_lineNumber + "].");
 				return false;
 			}
 
@@ -192,25 +192,24 @@ public class TabStop extends TemplateBlock_Base {
 			// The offset attribute is required for type "stop" but not for "marker".
 			t_nodeAttribute = p_tagParser.GetNamedAttribute(STOP_ATTRIBUTE_OFFSET);
 			if ((m_stopType == STOP_TYPE_STOP) && (t_nodeAttribute == null)) {
-				Logger.LogError("TabStop.Init() did not find the [" + STOP_ATTRIBUTE_OFFSET + "] attribute that is required when the [" + STOP_ATTRIBUTE_STOP_TYPE + "] attribute is set to [" + STOP_TYPE_lABEL_STOP + "].");
+				Logger.LogError("TabStop.Init() did not find the [" + STOP_ATTRIBUTE_OFFSET + "] attribute that is required when the [" + STOP_ATTRIBUTE_STOP_TYPE + "] attribute is set to [" + STOP_TYPE_lABEL_STOP + "] at line number [" + m_lineNumber + "].");
 				return false;
 			}
 
 			if (t_nodeAttribute != null) {
-				t_valueWriter	= new StringWriter();
-				t_valueCursor	= new Cursor(t_valueWriter);
-				if (!t_nodeAttribute.GetValue().Evaluate(null, null, t_valueCursor, t_iterationCounter)) {
-					Logger.LogError("TabStop.Evaluate() failed to evaluate the [" + STOP_ATTRIBUTE_OFFSET + "] value.");
+				String t_offsetValue = t_nodeAttribute.GetAttributeValueAsString();
+				if (t_offsetValue == null) {
+					Logger.LogError("TabStop.Evaluate() failed to get the [" + STOP_ATTRIBUTE_OFFSET + "] value at line number [" + m_lineNumber + "].");
 					return false;
 				}
 
-				m_offset = Integer.parseInt(t_valueWriter.toString());
+				m_offset = Integer.parseInt(t_offsetValue.toString());
 			}
 
 			return true;
 		}
 		catch (Throwable t_error) {
-			Logger.LogError("TabStop.Init() failed with error: ", t_error);
+			Logger.LogError("TabStop.Init() failed with error at line number [" + m_lineNumber + "]: ", t_error);
 			return false;
 		}
 	}

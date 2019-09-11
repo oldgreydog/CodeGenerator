@@ -54,6 +54,7 @@ public class CamelCase extends TemplateBlock_Base {
 	//*********************************
 	public CamelCase() {
 		super(BLOCK_NAME);
+		m_isSafeForTextBlock = true;
 	}
 
 
@@ -61,23 +62,25 @@ public class CamelCase extends TemplateBlock_Base {
 	@Override
 	public boolean Init(TagParser p_tagParser) {
 		try {
+			m_lineNumber = p_tagParser.GetLineNumber();
+
 			TagAttributeParser t_nodeAttribute = p_tagParser.GetNamedAttribute("value");
 			if (t_nodeAttribute == null) {
-				Logger.LogError("CamelCase.Init() did not find the [value] attribute that is required for CamelCase tags.");
+				Logger.LogError("CamelCase.Init() did not find the [value] attribute that is required for CamelCase tags at line number [" + m_lineNumber + "].");
 				return false;
 			}
 
-			m_value = t_nodeAttribute.GetValue();
+			m_value = t_nodeAttribute.GetAttributeValue();
 			if (m_value == null) {
-				Logger.LogError("CamelCase.Init() did not get the [value] value from attribute that is required for CamelCase tags.");
+				Logger.LogError("CamelCase.Init() did not get the [value] value from attribute that is required for CamelCase tags at line number [" + m_lineNumber + "].");
 				return false;
 			}
 
 			t_nodeAttribute = p_tagParser.GetNamedAttribute("optionalSeparator");
 			if (t_nodeAttribute != null) {
-				m_optionalSeparator = t_nodeAttribute.GetValue().GetText();
+				m_optionalSeparator = t_nodeAttribute.GetAttributeValueAsString();
 				if (m_optionalSeparator == null) {
-					Logger.LogError("CamelCase.Init() did not get the value from the optional attribute [optionalSeparator].");
+					Logger.LogError("CamelCase.Init() did not get the value from the optional attribute [optionalSeparator] at line number [" + m_lineNumber + "].");
 					return false;
 				}
 			}
@@ -116,14 +119,14 @@ public class CamelCase extends TemplateBlock_Base {
 		try {
 			// If there are no child blocks, then this is a "leaf" node text object and we have to output its string.
 			if (m_value == null) {
-				Logger.LogError("CamelCase.Evaluate() was not initialized.");
+				Logger.LogError("CamelCase.Evaluate() was not initialized at line number [" + m_lineNumber + "].");
 				return false;
 			}
 
 			StringWriter	t_valueWriter	= new StringWriter();
 			Cursor			t_valueCursor	= new Cursor(t_valueWriter);
 			if (!m_value.Evaluate(p_currentNode, p_rootNode, t_valueCursor, p_iterationCounter)) {
-				Logger.LogError("CamelCase.Evaluate() failed to evaluate the value.");
+				Logger.LogError("CamelCase.Evaluate() failed to evaluate the value at line number [" + m_lineNumber + "].");
 				return false;
 			}
 

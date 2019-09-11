@@ -36,16 +36,9 @@ import coreutil.logging.*;
 	<p>Refer to {@link codegenerator.generator.tags.TypeConvert} for more discussion of the data type
 	file.</p>
 
-	<p>NOTE: Initializing this manager requires that an application config file is loaded into ConfigManager
-	and that it contains a block like this:</p>
+	<br><p>NOTE: Initializing this manager requires that one or more {@link codegenerator.generator.tags.TypeConvertLoadFile} tags
+	be added to the template files, where appropriate, to load the desired type config files.</p>
 
-	<pre><code>&lt;Node name="dataTypeManager"&gt;
-	&lt;Value name="typeFile"&gt;DataType_Conversion_SQL_Server_to_Java.xml&lt;/Value&gt;
-&lt;/Node&gt;
-</code></pre>
-
-	<p>The <code>dataTypeManager</code> block can contain as many <code>typeFile</code> values as you need
-	for the templates that will be evaluated.</p>
  */
 public class DataTypeManager {
 
@@ -67,43 +60,6 @@ public class DataTypeManager {
 
 	// Static members
 	static private TreeMap<String, TreeMap<String, TreeMap<String, String>>>		s_typeMap	= new TreeMap<String, TreeMap<String, TreeMap<String, String>>>();
-
-
-	//===========================================
-	static public boolean Init() {
-		try {
-			ConfigNode t_dataTypeManager = ConfigManager.GetNode(CONFIG_NODE_DATA_TYPE_MANAGER);
-			if (t_dataTypeManager == null) {
-				Logger.LogError("DataTypeManager.Init() failed to find the data type manager config node [" + CONFIG_NODE_DATA_TYPE_MANAGER + "].");
-				return false;
-			}
-
-			for (ConfigNode t_nextChildNode: t_dataTypeManager.GetChildNodeList()) {
-				if (t_nextChildNode.IsValue()) {
-					if (t_nextChildNode.GetName().equals(CONFIG_VALUE_TYPE_FILE)) {
-						if (!LoadConfigFile(((ConfigValue)t_nextChildNode).GetValue())) {
-							Logger.LogError("DataTypeManager.Init() failed to load the type file [" + ((ConfigValue)t_nextChildNode).GetValue() + "].");
-							return false;
-						}
-					}
-					else {
-						Logger.LogError("DataTypeManager.Init() does handle config values named [" + t_nextChildNode.GetName() + "].");
-						return false;
-					}
-				}
-				else {
-					Logger.LogError("DataTypeManager.Init() does handle config nodes named [" + t_nextChildNode.GetName() + "].");
-					return false;
-				}
-			}
-
-			return true;
-		}
-		catch (Throwable t_error) {
-			Logger.LogError("DataTypeManager.Init() failed with error: ", t_error);
-			return false;
-		}
-	}
 
 
 	//===========================================

@@ -25,6 +25,7 @@ package codegenerator.generator.tags;
 import coreutil.config.*;
 import coreutil.logging.*;
 
+import java.io.*;
 import java.util.*;
 
 import codegenerator.generator.utils.*;
@@ -37,39 +38,12 @@ import codegenerator.generator.utils.*;
 */
 public abstract class TemplateBlock_Base {
 
-	static public class LoopCounter {
-
-		// Static members
-		static private int		s_idSource	= 0;
-
-		static private synchronized int GetNextID() {
-			return ++s_idSource;
-		}
-
-		private int		m_counterID		= GetNextID();
-		private int		m_counter		= 1;
-
-		public int GetCounterID() {
-			return m_counterID;
-		}
-
-		public void IncrementCounter() {
-			++m_counter;
-		}
-
-		public void DecrementCounter() {
-			--m_counter;
-		}
-
-		public int GetCounter() {
-			return m_counter;
-		}
-	}
-
-	protected	String							m_name				= null;
-	protected	LinkedList<TemplateBlock_Base>	m_blockList			= new LinkedList<TemplateBlock_Base>();
-	protected	int								m_delimiterDepth	= 0;	// This keeps track of how deep we are into nested delimiters so that we can tell if we've found closing delimiters to match all of the opening delimiters we have passed.
-	protected	int								m_state				= -1;
+	// Data members
+	protected	String							m_name					= null;
+	protected	boolean							m_isSafeForTextBlock	= false;	// This is a simple flag that should elliminate the need to hard-code which tags are allowed inside a Text block.
+	protected	LinkedList<TemplateBlock_Base>	m_blockList				= new LinkedList<TemplateBlock_Base>();
+	protected	int								m_state					= -1;
+	protected	int								m_lineNumber			= -1;		// The line number in the template file where this instance of a tag was defined.
 
 
 
@@ -82,6 +56,12 @@ public abstract class TemplateBlock_Base {
 	//*********************************
 	public TemplateBlock_Base(String p_name) {
 		m_name = p_name;
+	}
+
+
+	//*********************************
+	public boolean IsSafeForTextBlock() {
+		return m_isSafeForTextBlock;
 	}
 
 
@@ -163,6 +143,40 @@ public abstract class TemplateBlock_Base {
 		}
 
 		return true;
+	}
+
+
+	//*********************************
+	/**
+	 * This is a helper function that can be used to evaluate attribute names and values and other instances where you know you need the string value locally and not in the p_writer stream.
+	 * @param p_currentNode
+	 * @param p_rootNode
+	 * @param p_writer
+	 * @param p_iterationCounter
+	 * @return
+	 */
+	static public String EvaluateToString(TemplateBlock_Base	p_evalBlock,
+										  ConfigNode			p_currentNode,
+										  ConfigNode			p_rootNode,
+										  LoopCounter			p_iterationCounter)	// There wasn't any good way to tell a CamelCase which iteration it was in that would be safe for arbitrary nesting, so I added this iteration counter to handle the problem.
+	{
+		try {
+			if (p_evalBlock == null) {
+				Logger.LogError("TemplateBlock_Base.EvaluateToString() received a NULL eval block.");
+				return null;
+			}
+
+			StringWriter	t_valueWriter	= new StringWriter();
+			Cursor			t_valueCursor	= new Cursor(t_valueWriter);
+			if (!p_evalBlock.Evaluate(p_currentNode, p_rootNode, t_valueCursor, p_iterationCounter))
+				return null;
+
+			return t_valueWriter.toString();
+		}
+		catch (Throwable t_error) {
+			Logger.LogError("TemplateBlock_Base.EvaluateToString() failed with error: ", t_error);
+			return null;
+		}
 	}
 
 

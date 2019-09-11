@@ -112,19 +112,10 @@ public class CodeGenerator {
 			long t_endConfigValuesParse = Calendar.getInstance().getTimeInMillis();
 
 
-			// Initialize the DataTypeManager.
-			if (!DataTypeManager.Init()) {
-				Logger.LogFatal("CodeGenerator.Execute() failed to initialize the DataTypeManager.");
-				Cleanup();
-
-				return false;
-			}
-
-
 			long t_startGenerate = Calendar.getInstance().getTimeInMillis();
 
 			// And finally, "evaluate" the template with the config to generate the all of the file outputs.
-			t_template.Evaluate(t_templateConfig, t_templateConfig, null, new LoopCounter());
+			t_template.Evaluate(t_templateConfig, t_templateConfig, null, new LoopCounter(null));
 
 			long t_endGenerate = Calendar.getInstance().getTimeInMillis();
 

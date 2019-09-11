@@ -5,17 +5,17 @@
  * This file was generated.
  */
 
-package <%global.packageName%>.dao.net;
+package <%root.global.packageName%>.dao.net;
 
 
 
 import java.sql.*;
 import java.util.*;
 
-import <%global.packageName%>.*;
-import <%global.packageName%>.dao.*;
-import <%global.packageName%>.dao.message.server.*;
-import <%global.packageName%>.marshalling.gson.*;
+import <%root.global.packageName%>.*;
+import <%root.global.packageName%>.dao.*;
+import <%root.global.packageName%>.dao.message.server.*;
+import <%root.global.packageName%>.marshalling.gson.*;
 import coreutil.logging.*;
 import coreutil.utils.message.*;
 

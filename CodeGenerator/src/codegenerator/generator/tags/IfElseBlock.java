@@ -25,7 +25,6 @@ package codegenerator.generator.tags;
 import coreutil.config.*;
 import coreutil.logging.*;
 
-import java.io.*;
 import java.util.*;
 
 import codegenerator.generator.utils.*;
@@ -91,7 +90,7 @@ import codegenerator.generator.utils.*;
 	<p><code>&lt;%[and/or]  [some tag that evaluates to a string] = [some string const] [...] %&gt;</code></p>
 
 	<p>Since <code>and/or</code> are simple tags that evaluate to a string (<code>true/false</code>),
-	then they can be used as the left side of <code>if</code> attributes, such as:</p>
+	then they can be used as the right side of <code>if</code> attributes, such as:</p>
 
 	<p><code>&lt;%if  &lt;%[and/or]  [some tag that evaluates to a string] = [some string const] [...] %&gt; = [true/false] %&gt;</code></p>
 
@@ -128,7 +127,8 @@ public class IfElseBlock extends TemplateBlock_Base {
 	static protected class IfCondition extends TemplateBlock_Base {
 		public boolean				m_testExists		= false;
 		public TemplateBlock_Base	m_sourceStringBlock	= null;
-		public String				m_compareValue		= null;
+		public TemplateBlock_Base	m_compareValue		= null;
+		public int					m_lineNumber		= -1;
 
 
 		//*********************************
@@ -163,14 +163,13 @@ public class IfElseBlock extends TemplateBlock_Base {
 						return false;
 					}
 
-					TemplateBlock_Base t_sourceStringBlock = t_nodeAttribute.GetAttributeName().m_blockList.getFirst();
+					TemplateBlock_Base t_sourceStringBlock = t_nodeAttribute.GetAttributeName();
 					if ((t_sourceStringBlock == null) ||
-						(!t_sourceStringBlock.GetName().equals(ConfigVariable.BLOCK_NAME) &&
-						 !t_sourceStringBlock.GetName().equals(TypeConvert.BLOCK_NAME) &&
-						 !t_sourceStringBlock.GetName().equals(If_Boolean.And.BLOCK_NAME) &&
+						(!t_sourceStringBlock.GetName().equals(If_Boolean.And.BLOCK_NAME) &&
 						 !t_sourceStringBlock.GetName().equals(If_Boolean.Or.BLOCK_NAME) &&
 						 !t_sourceStringBlock.GetName().equals(If_Boolean.Not.BLOCK_NAME) &&
-						 !t_sourceStringBlock.GetName().equals(VariableBlock.BLOCK_NAME))) {
+						 !t_sourceStringBlock.IsSafeForTextBlock()))
+					{
 						Logger.LogError("IfCondition.Init() did not get a config variable from attribute that is required for IfElseBlock tags.");
 						return false;
 					}
@@ -178,7 +177,8 @@ public class IfElseBlock extends TemplateBlock_Base {
 					m_sourceStringBlock	= t_sourceStringBlock;
 				}
 
-				m_compareValue = t_nodeAttribute.GetValue().GetText();
+				m_compareValue	= t_nodeAttribute.GetAttributeValue();
+				m_lineNumber	= p_tagParser.GetLineNumber();
 
 				return true;
 			}
@@ -197,20 +197,20 @@ public class IfElseBlock extends TemplateBlock_Base {
 		 */
 		public boolean Init(TagAttributeParser p_tagAttributeParser) {
 			try {
-				TextBlock t_attributeName = p_tagAttributeParser.GetAttributeName();
-				if (t_attributeName.GetName().equalsIgnoreCase("exists") ||
-					(t_attributeName.GetName().equalsIgnoreCase("text") && (t_attributeName.GetText() != null) && t_attributeName.GetText().equalsIgnoreCase("exists"))) {
+				String t_attributeName = p_tagAttributeParser.GetAttributeNameAsString();
+				if ((t_attributeName != null) && t_attributeName.equalsIgnoreCase("exists")) {
 					m_testExists = true;
 				}
 				else {
-					m_sourceStringBlock = t_attributeName.m_blockList.getFirst();
+					m_sourceStringBlock = p_tagAttributeParser.GetAttributeName();
 					if (m_sourceStringBlock == null) {
-						Logger.LogError("IfCondition.Init(TagAttributeParser) did not get a left-hand argument from attribute that is required for IfElseBlock tags.");
+						Logger.LogError("IfCondition.Init(TagAttributeParser) did not get a left-hand argument from attribute that is required for IfElseBlock tags at line number [" + p_tagAttributeParser.GetLineNumber() + "].");
 						return false;
 					}
 				}
 
-				m_compareValue = p_tagAttributeParser.GetValue().GetText();
+				m_compareValue	= p_tagAttributeParser.GetAttributeValue();
+				m_lineNumber	= p_tagAttributeParser.GetLineNumber();
 
 				return true;
 			}
@@ -241,49 +241,48 @@ public class IfElseBlock extends TemplateBlock_Base {
 				return true;
 			}
 
+			String t_righthandValue = TemplateBlock_Base.EvaluateToString(m_compareValue, p_currentNode, p_rootNode, p_iterationCounter);
+			if (t_righthandValue == null) {
+				Logger.LogError("IfCondition.Test(TagAttributeParser) failed to evaluate the righthand value of its attribute at line number [" + m_lineNumber + "].");
+				return false;
+			}
+
 			// If we are testing for the existence of a child node type, then we have a completely different test to do.
 			if (m_testExists) {
 				try {
-					if (m_compareValue.contains(".")) {
-						if (p_rootNode.GetNodeValue(m_compareValue) != null)
-							return true;
+					ConfigNode t_nextConfigNode	= p_currentNode;
+					if (t_righthandValue.startsWith("root.")) {
+						t_nextConfigNode = p_rootNode;
+						t_righthandValue = t_righthandValue.replace("root.", "");	// Remove the "root." from the reference so that it will work correctly below.
 					}
-					else if (m_compareValue.contains("^")) {
+					else if (t_righthandValue.contains("^")) {
 						// This allows us to use the "parent" reference character '^' to check for the existence of nodes in any level of parent.
-						ConfigNode t_nextConfigNode	= p_currentNode;
 						int			t_currentIndex	= -1;
-						while ((t_currentIndex = m_compareValue.indexOf('^', t_currentIndex + 1)) >= 0)
+						while ((t_currentIndex = t_righthandValue.indexOf('^', t_currentIndex + 1)) >= 0)
 							t_nextConfigNode = t_nextConfigNode.GetParentNode();
 
-						String t_cleanCompareValue = m_compareValue.replace("^", "");
-						if (t_nextConfigNode.GetNodeValue(t_cleanCompareValue) != null)
-							return true;
+						// Remove the carrets ("^") from the value so that it will work correctly below.
+						t_righthandValue = t_righthandValue.replace("^", "");
 					}
-					else {
-						for (ConfigNode t_nextConfigNode: p_currentNode.GetChildNodeList()) {
-							// !!!!NOTE!!!! We only have to find the first example of the target child node to know that we need to execute the tag block, so we're done!
-							if (t_nextConfigNode.GetName().compareToIgnoreCase(m_compareValue) == 0)
-								return true;
-						}
-					}
+
+					if (t_nextConfigNode.GetNode(t_righthandValue) != null)
+						return true;
 
 					return false;
 				}
 				catch (Throwable t_error) {
-					Logger.LogError("IfExistsBlock.Evaluate() failed with error: ", t_error);
+					Logger.LogError("IfExistsBlock.Evaluate() failed with error at line number [" + m_lineNumber + "]: ", t_error);
 					return null;
 				}
 			}
 			else {	// Otherwise, do the default test.
-				// An if() or elseif() will have a m_configVariable and m_compareValue so we can compare them to get the result;
-				StringWriter	t_configVariableValue	= new StringWriter();
-				Cursor			t_configVariableCursor	= new Cursor(t_configVariableValue);
-				if (!m_sourceStringBlock.Evaluate(p_currentNode, p_rootNode, t_configVariableCursor, p_iterationCounter)) {
-					Logger.LogError("IfCondition.Test() failed to evaluate its source string block.");
-					return null;
+				String t_lefthandValue = TemplateBlock_Base.EvaluateToString(m_sourceStringBlock, p_currentNode, p_rootNode, p_iterationCounter);
+				if (t_lefthandValue == null) {
+					Logger.LogError("IfCondition.Test(TagAttributeParser) failed to evaluate the lefthand value of its attribute at line number [" + m_lineNumber + "].");
+					return false;
 				}
 
-				return t_configVariableValue.toString().compareToIgnoreCase(m_compareValue) == 0;
+				return t_lefthandValue.equalsIgnoreCase(t_righthandValue);
 			}
 		}
 
@@ -328,10 +327,12 @@ public class IfElseBlock extends TemplateBlock_Base {
 
 	//===========================================
 
+	static public final String	BLOCK_NAME	= "if";
+
 
 	//*********************************
 	public IfElseBlock() {
-		super("if");
+		super(BLOCK_NAME);
 	}
 
 

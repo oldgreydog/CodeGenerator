@@ -24,77 +24,102 @@ package codegenerator.generator.tags;
 
 import coreutil.config.*;
 import coreutil.logging.*;
-
 import codegenerator.generator.utils.*;
 
 
 
 /**
-This lets you output the counter value.
+	This lets you output the counter value.
 
-<pre><code>&lt;%counter%&gt;</code></pre>
+	<pre><code>&lt;%counter  optionalCounterName = "loop1" %&gt;</code></pre>
+
+	<p>The optionalCounterName attribute lets you specify using a named loop counter from a foreach block other than the
+	one directly containing this counter block.</p>
 */
 public class Counter extends TemplateBlock_Base {
 
-	static public final String		BLOCK_NAME			= "counter";
+	static public final String	BLOCK_NAME	= "counter";
+
+	// Data members
+	private	String	m_optionalCounterName	= null;	// Providing a name for the loop counter lets you specify using a named loop counter from a foreach block other than the one directly containing this first block.
 
 
-
-//*********************************
-public Counter() {
-	super("counter");
-}
-
-
-//*********************************
-@Override
-public boolean Init(TagParser p_tagParser) {
-	// No action needs to be taken here.
-	return true;
-}
-
-
-//*********************************
-@Override
-public Counter GetInstance() {
-	return new Counter();
-}
-
-
-//*********************************
-@Override
-public boolean Parse(TemplateTokenizer p_tokenizer) {
-	// Nothing to do here.
-	return true;
-}
-
-
-//*********************************
-@Override
-public boolean Evaluate(ConfigNode		p_currentNode,
-						ConfigNode		p_rootNode,
-						Cursor 			p_writer,
-						LoopCounter		p_iterationCounter)
-{
-	try {
-		p_writer.Write(Integer.toString(p_iterationCounter.GetCounter()));
-	}
-	catch (Throwable t_error) {
-		Logger.LogError("Counter.Evaluate() failed with error: ", t_error);
-		return false;
+	//*********************************
+	public Counter() {
+		super("counter");
+		m_isSafeForTextBlock = true;
 	}
 
-	return true;
-}
+
+	//*********************************
+	@Override
+	public boolean Init(TagParser p_tagParser) {
+		m_lineNumber = p_tagParser.GetLineNumber();
+
+		// The attribute "optionalCounterName" is, obviously, optional, so we need to handle it that way.
+		TagAttributeParser t_nodeAttribute = p_tagParser.GetNamedAttribute("optionalCounterName");
+		if (t_nodeAttribute != null) {
+			m_optionalCounterName = t_nodeAttribute.GetAttributeValueAsString();
+			if (m_optionalCounterName == null) {
+				Logger.LogError("Counter.Init() did not get the value from the [optionalCounterName] attribute.");
+				return false;
+			}
+		}
+
+		return true;
+	}
 
 
-//*********************************
-@Override
-public String Dump(String p_tabs) {
-	StringBuilder t_dump = new StringBuilder();
+	//*********************************
+	@Override
+	public Counter GetInstance() {
+		return new Counter();
+	}
 
-	t_dump.append(p_tabs + "Block type name :  counter\n");
 
-	return t_dump.toString();
-}
+	//*********************************
+	@Override
+	public boolean Parse(TemplateTokenizer p_tokenizer) {
+		// Nothing to do here.
+		return true;
+	}
+
+
+	//*********************************
+	@Override
+	public boolean Evaluate(ConfigNode		p_currentNode,
+							ConfigNode		p_rootNode,
+							Cursor 			p_writer,
+							LoopCounter		p_iterationCounter)
+	{
+		try {
+			LoopCounter t_iterationCounter = p_iterationCounter;
+			if (m_optionalCounterName != null)
+				t_iterationCounter = p_iterationCounter.GetNamedCounter(m_optionalCounterName);
+
+			if (t_iterationCounter == null) {
+				Logger.LogError("Counter.Evaluate() failed to find a loop counter with name [" + m_optionalCounterName + "] at line number [" + m_lineNumber + "].");
+				return false;
+			}
+
+			p_writer.Write(Integer.toString(t_iterationCounter.GetCounter()));
+		}
+		catch (Throwable t_error) {
+			Logger.LogError("Counter.Evaluate() failed with error: ", t_error);
+			return false;
+		}
+
+		return true;
+	}
+
+
+	//*********************************
+	@Override
+	public String Dump(String p_tabs) {
+		StringBuilder t_dump = new StringBuilder();
+
+		t_dump.append(p_tabs + "Block type name :  counter\n");
+
+		return t_dump.toString();
+	}
 }

@@ -1,0 +1,47 @@
+
+
+# Remove any existing jars so that we get a clean build.
+rm lib/code_generator.jar
+
+
+# Build the code generator java code.
+
+source java_build clean
+source java_build
+
+
+# Create the temp zip directory, fill it and then zip it up.
+mkdir zip
+mkdir zip/code_generator
+mkdir zip/code_generator/examples
+mkdir zip/code_generator/lib
+mkdir zip/code_generator/logs
+
+
+cp -prL Examples/*				zip/code_generator/examples
+cp -pL  lib/*.*					zip/code_generator/lib
+cp -pL  VendorLib/*				zip/code_generator/lib
+cp -pL  CodeGeneratorConfig.xml zip/code_generator
+cp -pL  generate				zip/code_generator
+cp -pL  generate.cmd			zip/code_generator
+cp -pL  RELEASE					zip/code_generator
+
+
+# The zip folder should be completely populated at this point so we are now ready to create the tar file from it.
+rm code_generator.zip
+
+pushd zip
+zip -r ../code_generator.zip *
+popd
+
+
+
+
+# Clean everything up.
+rm -fr zip
+
+rm lib/*.jar
+
+source java_build clean
+
+

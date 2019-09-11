@@ -29,7 +29,9 @@ import coreutil.logging.*;
 
 
 /**
-	A helper class used by tags that can contain child tags.
+	A helper class used by tags that can contain child tags.  It will parse the block contents until it finds a tag that is not a defined opening tag name (i.e. "unknown").
+	That "unknown" tag should the the end tag for the block.  You can get it from the general block and check its name to be sure.  This can also be an intermediate tag
+	such as "else" or "elseif".  FirstElseBlock is a good example of its usage.
  */
 public class GeneralBlock extends TemplateBlock_Base {
 

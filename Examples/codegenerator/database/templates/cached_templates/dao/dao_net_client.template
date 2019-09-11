@@ -1,19 +1,21 @@
 %%HEADER%% openingDelimiter=<% closingDelimiter=%>
+<%tabSettings tabLength = "4" outputType = "tabs" %>
+
 <%text%>/*
  * This file was generated.
  */
 
-package <%global.packageName%>.dao.net;
+package <%root.global.packageName%>.dao.net;
 
 
 
 import java.sql.*;
 import java.util.*;
 
-import <%global.packageName%>.*;
-import <%global.packageName%>.dao.*;
-import <%global.packageName%>.dao.message.server.*;
-import <%global.packageName%>.marshalling.gson.*;
+import <%root.global.packageName%>.*;
+import <%root.global.packageName%>.dao.*;
+import <%root.global.packageName%>.dao.message.server.*;
+import <%root.global.packageName%>.marshalling.gson.*;
 import coreutil.logging.*;
 import coreutil.utils.message.*;
 
@@ -107,8 +109,8 @@ public class <%className%>DAO_NET extends Request_Base implements <%className%>D
 
 
 <%foreach node=column%>
-<%if <%isPrimaryKey%> = true%>
-<%text%>
+	<%if <%isPrimaryKey%> = true%>
+		<%text%>
 
 
 	//*********************************
@@ -157,12 +159,12 @@ public class <%className%>DAO_NET extends Request_Base implements <%className%>D
 		}
 	}<%endtext%>
 
-<%endif%>
+	<%endif%>
 <%endfor%>
 
 
 <%foreach node=foreignKey%>
-<%text%>
+	<%text%>
 
 
 	//*********************************
@@ -269,10 +271,10 @@ public class <%className%>DAO_NET extends Request_Base implements <%className%>D
 <%endtext%>
 
 <%foreach node=column%>
-<%if <%isPrimaryKey%> = true%>
-<%text%>			p_new<%^className%>.Set<%name%>(t_result.Get<%name%>());
+	<%if <%isPrimaryKey%> = true%>
+		<%text%>			p_new<%^className%>.Set<%name%>(t_result.Get<%name%>());
 <%endtext%>
-<%endif%>
+	<%endif%>
 <%endfor%>
 
 <%text%>		}

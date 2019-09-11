@@ -39,7 +39,7 @@ import codegenerator.generator.utils.*;
 	so you need to control when, in that example, you insert commas.  The <code>first</code>-<code>else</code>
 	tags let you do that.  For example:</p>
 
-	<pre><code>&lt;%foreach node=member%&gt;
+	<pre><code>&lt;%foreach node = member  optionalCounterName = "loop1" %&gt;
 	&lt;%first%&gt;
 		&lt;%text%&gt;&lt;%endtext%&gt;
 	&lt;%else%&gt;
@@ -54,26 +54,43 @@ import codegenerator.generator.utils.*;
 	<p>The first pass through this loop that is iterating over "member" nodes, the loop will add an
 	empty text block in front of the parameter definition.  But for every iteration after that, the
 	<code>else</code> block will add a comma and a new-line in front of the parameter definition.</p>
+
+	<p>The optionalCounterName attribute lets you specify using a named loop counter from a foreach block other than the
+	one directly containing this first block.</p>
  */
 public class FirstElseBlock extends TemplateBlock_Base {
 
-	private GeneralBlock		m_firstBlock	= null;
-	private GeneralBlock		m_elseBlock		= null;
+	static public final String	BLOCK_NAME	= "first";
+
+	private GeneralBlock		m_firstBlock			= null;
+	private GeneralBlock		m_elseBlock				= null;
+	private	String				m_optionalCounterName	= null;	// Providing a name for the loop counter lets you specify using a named loop counter from a foreach block other than the one directly containing this first block.
 
 //	private ArrayList<Integer>	m_parentIterationCountList	= null;
-	private final TreeMap<Integer, Integer>		m_counterIDMap	= new TreeMap<>();
+	private final TreeMap<String, LoopCounter>		m_counterIDMap	= new TreeMap<>();
 
 
 	//*********************************
 	public FirstElseBlock() {
-		super("first");
+		super(BLOCK_NAME);
 	}
 
 
 	//*********************************
 	@Override
 	public boolean Init(TagParser p_tagParser) {
-		// No action needs to be taken here.
+		m_lineNumber = p_tagParser.GetLineNumber();
+
+		// The attribute "optionalCounterName" is, obviously, optional, so we need to handle it that way.
+		TagAttributeParser t_nodeAttribute = p_tagParser.GetNamedAttribute("optionalCounterName");
+		if (t_nodeAttribute != null) {
+			m_optionalCounterName = t_nodeAttribute.GetAttributeValueAsString();
+			if (m_optionalCounterName == null) {
+				Logger.LogError("FirstElseBlock.Init() did not get the value from the [optionalCounterName] attribute.");
+				return false;
+			}
+		}
+
 		return true;
 	}
 
@@ -135,20 +152,35 @@ public class FirstElseBlock extends TemplateBlock_Base {
 							LoopCounter		p_iterationCounter)
 	{
 		try {
-			// I think (!hope!) that using a tree map to keep the internal counter for each counter ID that we see will let us use variable blocks inside various levels of nested <foreach> loops and <if> blocks without having to worry about looking up the stack of counters to figure out if a particular evaluation is the first one or not for that particular counter.
-			Integer t_internalCounter = m_counterIDMap.get(p_iterationCounter.GetCounterID());
-			if (t_internalCounter == null) {
-				m_counterIDMap.put(p_iterationCounter.GetCounterID(), 1);
-				t_internalCounter	= 1;
-			}
-			else
-				m_counterIDMap.put(p_iterationCounter.GetCounterID(), ++t_internalCounter);
+			LoopCounter t_iterationCounter = p_iterationCounter;
+			if (m_optionalCounterName != null) {
+				t_iterationCounter = p_iterationCounter.GetNamedCounter(m_optionalCounterName);
 
-			if (t_internalCounter == 1) {
-				m_firstBlock.Evaluate(p_currentNode, p_rootNode, p_writer, p_iterationCounter);
+				if (t_iterationCounter == null) {
+					Logger.LogError("FirstElseBlock.Evaluate() failed to find a loop counter with name [" + m_optionalCounterName + "] at line number [" + m_lineNumber + "].");
+					return false;
+				}
+
+				// Since optionally "named" counters ID's don't change each iteration of an outer loop re-evaluates the foreach, we have to check to see if the named loop counter is a new instance reference and, if it is, count it as a new start of the loop.
+				LoopCounter t_existingLoopCounter = m_counterIDMap.get(t_iterationCounter.GetCounterID());
+				if (t_existingLoopCounter != t_iterationCounter)	// Since optionally "named" counters ID's don't change each iteration of an outer loop re-evaluates the foreach, we have to check to see if the named loop counter is a new instance reference and, if it is, count it as a new start of the loop.
+					m_counterIDMap.remove(t_iterationCounter.GetCounterID());
+			}
+
+			// I think (!hope!) that using a tree map to keep the internal counter for each counter ID that we see will let us use variable blocks inside various levels of nested <foreach> loops and <if> blocks without having to worry about looking up the stack of counters to figure out if a particular evaluation is the first one or not for that particular counter.
+			LoopCounter t_internalCounter = m_counterIDMap.get(t_iterationCounter.GetCounterID());
+			boolean		t_firstTimeThrough	= false;
+			if (t_internalCounter == null)
+			{
+				m_counterIDMap.put(t_iterationCounter.GetCounterID(), t_iterationCounter);
+				t_firstTimeThrough	= true;
+			}
+
+			if (t_firstTimeThrough) {
+				m_firstBlock.Evaluate(p_currentNode, p_rootNode, p_writer, t_iterationCounter);
 			}
 			else if (m_elseBlock != null) {
-				m_elseBlock.Evaluate(p_currentNode, p_rootNode, p_writer, p_iterationCounter);
+				m_elseBlock.Evaluate(p_currentNode, p_rootNode, p_writer, t_iterationCounter);
 			}
 		}
 		catch (Throwable t_error) {

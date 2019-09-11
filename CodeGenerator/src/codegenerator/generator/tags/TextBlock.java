@@ -66,6 +66,8 @@ import coreutil.logging.*;
  */
 public class TextBlock extends TemplateBlock_Base {
 
+	static public final String	BLOCK_NAME		= "text";
+
 	// Data members
 	boolean		m_parsingTagElement		= false;
 	boolean		m_expectClosingQuotes	= false;
@@ -165,17 +167,7 @@ public class TextBlock extends TemplateBlock_Base {
 						}
 						else {
 							// Other than ConfigVariables, these are the only tag types that can appear inside of a TextBlock.  This forces you to keep text blocks simpler which will keep templates simpler (hopefully).
-							if (t_newBlock.GetName().equalsIgnoreCase(CamelCase.BLOCK_NAME) ||
-								t_newBlock.GetName().equalsIgnoreCase(Counter.BLOCK_NAME) ||
-								t_newBlock.GetName().equalsIgnoreCase(FirstLetterToLowerCase.BLOCK_NAME) ||
-								t_newBlock.GetName().equalsIgnoreCase(CustomCodeBlock.BLOCK_NAME) ||
-								t_newBlock.GetName().equalsIgnoreCase(TabMarker.BLOCK_NAME) ||
-								t_newBlock.GetName().equalsIgnoreCase(TabStop.BLOCK_NAME) ||
-								t_newBlock.GetName().equalsIgnoreCase(TypeConvert.BLOCK_NAME) ||
-								t_newBlock.GetName().equalsIgnoreCase(VariableBlock.BLOCK_NAME) ||
-								t_newBlock.GetName().equalsIgnoreCase(If_Boolean.And.BLOCK_NAME) ||
-								t_newBlock.GetName().equalsIgnoreCase(If_Boolean.Or.BLOCK_NAME) ||
-								t_newBlock.GetName().equalsIgnoreCase(If_Boolean.Not.BLOCK_NAME))
+							if (t_newBlock.IsSafeForTextBlock())
 							{
 								if (!t_newBlock.Init(t_tagParser)) {
 									Logger.LogError("TextBlock.Parse() failed to initialize the block [" + t_newBlock.GetName() + "] at line [" + p_tokenizer.GetLineCount() + "].");

@@ -3,4 +3,4 @@
 # Uncomment  this "declare -x" line and change it to the correct path if you are using a JDK other than the default one installed on your system.
 # declare -x JAVA_HOME=/home/kaylor/opt/jdk1.8.0_141
 
-java -cp ../../../VendorLib/coreutil.jar:../../../lib/code_generator.jar codegenerator.generator.CodeGenerator_Main CodeGeneratorConfig.xml templates/cached_templates/database_class.top.template Test_Database_Config_Values.xml
+java -cp ../../../lib/coreutil.jar:../../../lib/code_generator.jar codegenerator.generator.CodeGenerator_Main CodeGeneratorConfig.xml templates/cached_templates/database_class.top.template Test_Database_Config_Values.xml

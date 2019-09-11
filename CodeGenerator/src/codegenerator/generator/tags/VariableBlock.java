@@ -73,6 +73,7 @@ public class VariableBlock extends TemplateBlock_Base {
 	//*********************************
 	public VariableBlock() {
 		super(BLOCK_NAME);
+		m_isSafeForTextBlock = true;
 	}
 
 
@@ -86,15 +87,31 @@ public class VariableBlock extends TemplateBlock_Base {
 	//*********************************
 	@Override
 	public boolean Init(TagParser p_tagParser) {
-		TagAttributeParser t_nodeAttribute = p_tagParser.GetNamedAttribute(ATTRIBUTE_EVAL_MODE);
+		m_lineNumber = p_tagParser.GetLineNumber();
+
+		TagAttributeParser t_nodeAttribute = p_tagParser.GetNamedAttribute(ATTRIBUTE_NAME);
 		if (t_nodeAttribute == null) {
-			Logger.LogError("VariableBlock.Init() did not find the [" + ATTRIBUTE_EVAL_MODE + "] attribute that is required for variable tags.");
+			Logger.LogError("VariableBlock.Init() did not find the [" + ATTRIBUTE_NAME + "] attribute that is required for variable tags at line number [" + m_lineNumber + "].");
 			return false;
 		}
 
-		String t_evalMode = t_nodeAttribute.GetValue().GetText();
+		m_variableName = t_nodeAttribute.GetAttributeValueAsString();
+		if (m_variableName == null) {
+			Logger.LogError("VariableBlock.Init() did not get the value from attribute that is required for variable tags at line number [" + m_lineNumber + "].");
+			return false;
+		}
+
+
+
+		t_nodeAttribute = p_tagParser.GetNamedAttribute(ATTRIBUTE_EVAL_MODE);
+		if (t_nodeAttribute == null) {
+			Logger.LogError("VariableBlock.Init() did not find the [" + ATTRIBUTE_EVAL_MODE + "] attribute that is required for variable tags at line number [" + m_lineNumber + "].");
+			return false;
+		}
+
+		String t_evalMode = t_nodeAttribute.GetAttributeValueAsString();
 		if (t_evalMode == null) {
-			Logger.LogError("VariableBlock.Init() did not get the value from attribute that is required for variable tags.");
+			Logger.LogError("VariableBlock.Init() did not get the value from attribute that is required for variable tags at line number [" + m_lineNumber + "].");
 			return false;
 		}
 
@@ -104,18 +121,6 @@ public class VariableBlock extends TemplateBlock_Base {
 			m_evalMode = EVAL_MODE_EVALUATE;
 		else {
 			Logger.LogError("VariableBlock.Init() received and invalid evalmode value [" + t_evalMode + "].");
-			return false;
-		}
-
-		t_nodeAttribute = p_tagParser.GetNamedAttribute(ATTRIBUTE_NAME);
-		if (t_nodeAttribute == null) {
-			Logger.LogError("VariableBlock.Init() did not find the [" + ATTRIBUTE_NAME + "] attribute that is required for variable tags.");
-			return false;
-		}
-
-		m_variableName = t_nodeAttribute.GetValue().GetText();
-		if (m_variableName == null) {
-			Logger.LogError("VariableBlock.Init() did not get the value from attribute that is required for variable tags.");
 			return false;
 		}
 
@@ -148,7 +153,7 @@ public class VariableBlock extends TemplateBlock_Base {
 			return true;
 		}
 		catch (Throwable t_error) {
-			Logger.LogError("VariableBlock.Parse() failed with error at line [" + p_tokenizer.GetLineCount() + "]: ", t_error);
+			Logger.LogError("VariableBlock.Parse() failed with error at line [" + m_lineNumber + "]: ", t_error);
 			return false;
 		}
 	}
@@ -167,7 +172,7 @@ public class VariableBlock extends TemplateBlock_Base {
 			else if (m_evalMode == EVAL_MODE_EVALUATE) {
 				TemplateBlock_Base t_evalBlock = m_variableMap.get(m_variableName);
 				if (t_evalBlock == null) {
-					Logger.LogError("VariableBlock.Evaluate() did not find a evaluation block for variable [" + m_variableName + "].");
+					Logger.LogError("VariableBlock.Evaluate() did not find a evaluation block for variable [" + m_variableName + "] at line [" + m_lineNumber + "].");
 					return false;
 				}
 
@@ -175,12 +180,12 @@ public class VariableBlock extends TemplateBlock_Base {
 					return false;
 			}
 			else {
-				Logger.LogError("VariableBlock.Evaluate() found an invalid value [" + m_evalMode + "] for the evaluation mode.");
+				Logger.LogError("VariableBlock.Evaluate() found an invalid value [" + m_evalMode + "] for the evaluation mode at line [" + m_lineNumber + "].");
 				return false;
 			}
 		}
 		catch (Throwable t_error) {
-			Logger.LogError("VariableBlock.Evaluate() failed with error: ", t_error);
+			Logger.LogError("VariableBlock.Evaluate() failed with error at line [" + m_lineNumber + "]: ", t_error);
 			return false;
 		}
 

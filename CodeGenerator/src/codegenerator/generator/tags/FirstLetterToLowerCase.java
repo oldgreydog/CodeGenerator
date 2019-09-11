@@ -54,6 +54,7 @@ public class FirstLetterToLowerCase extends TemplateBlock_Base {
 	//*********************************
 	public FirstLetterToLowerCase() {
 		super(BLOCK_NAME);
+		m_isSafeForTextBlock = true;
 	}
 
 
@@ -67,7 +68,7 @@ public class FirstLetterToLowerCase extends TemplateBlock_Base {
 				return false;
 			}
 
-			m_value = t_nodeAttribute.GetValue();
+			m_value = t_nodeAttribute.GetAttributeValue();
 			if (m_value == null) {
 				Logger.LogError("FirstLetterToLowerCase.Init() did not get the [value] value from attribute that is required for FirstLetterToLowerCase tags.");
 				return false;

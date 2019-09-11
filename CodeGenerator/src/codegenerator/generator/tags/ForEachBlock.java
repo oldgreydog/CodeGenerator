@@ -32,7 +32,7 @@ import codegenerator.generator.utils.*;
 /**
 	<p>Provides the looping mechanism that iterates over child nodes of the specified name.</p>
 
-	<pre><code>&lt;%foreach node=column %&gt;
+	<pre><code>&lt;%foreach node = column  optionalCounterName = "loop1" %&gt;
 ...
 &lt;%endfor%&gt;</code></pre>
 
@@ -52,6 +52,12 @@ import codegenerator.generator.utils.*;
 	If there are child nodes with different names, only the ones with the name specified in the tag will
 	be iterated over in that particular <code>foreach</code> block.  Therefore, if you have multiple
 	child node groups, you can use multiple <code>foreach</code> blocks to iterate over them.</p>
+
+	<p>The optionalCounterName attribute is just that: optional.  It lets you give the <code>foreach</code> block's counter
+	a user-controlled name so that it can be accessed by name inside nested <code>foreach</code> blocks to achieve more
+	controlled behavior.  For example, if you have two nested <code>foreach</code> loops and you want a <code>first</code> block in the
+	inner loop to only run the first time that the inner block runs regardless of how many times the outer loop
+	has stepped through, then you can put the same optionalCounterName on the outer <code>foreach</code> and the inner <code>first</code> tag.</p>
 
 	<p>Let's start with an example of a config value XML tree (truncated in places for brevity):</p>
 
@@ -110,26 +116,25 @@ import codegenerator.generator.utils.*;
 	<pre><code>
 %%HEADER%% openingDelimiter=&lt;% closingDelimiter=%&gt;
 
-// This is dummy text to make sure the parser ignores it since it isn't in a text block.
 &lt;%foreach node=table%&gt;
-	&lt;%file template=database_class.template                      filename=&lt;%tableName%&gt;.java                       destDir=&lt;%global.outputPath%&gt;%&gt;
+	&lt;%file template=database_class.template                      filename="&lt;%tableName%&gt;.java"                       destDir="&lt;%root.global.outputPath%&gt;"%&gt;
 
-	&lt;%file template=marshalling/marshalling_interface.template   filename=&lt;%tableName%&gt;Marshalling.java            destDir=&lt;%global.outputPath%&gt;/marshalling%&gt;
-	&lt;%file template=marshalling/marshalling_gson.template        filename=Gson&lt;%tableName%&gt;Marshalling.java        destDir=&lt;%global.outputPath%&gt;/marshalling/gson%&gt;
-	&lt;%file template=marshalling/marshalling_dmapi.template       filename=DMAPIJson&lt;%tableName%&gt;Marshalling.java   destDir=&lt;%global.outputPath%&gt;/marshalling/dmapijson%&gt;
+	&lt;%file template=marshalling/marshalling_interface.template   filename="&lt;%tableName%&gt;Marshalling.java"            destDir="&lt;%root.global.outputPath%&gt;/marshalling"%&gt;
+	&lt;%file template=marshalling/marshalling_gson.template        filename="Gson&lt;%tableName%&gt;Marshalling.java"        destDir="&lt;%root.global.outputPath%&gt;/marshalling/gson"%&gt;
+	&lt;%file template=marshalling/marshalling_dmapi.template       filename="DMAPIJson&lt;%tableName%&gt;Marshalling.java"   destDir="&lt;%root.global.outputPath%&gt;/marshalling/dmapijson"%&gt;
 
-	&lt;%file template=dao/dao_interface.template                   filename=&lt;%tableName%&gt;DAO.java                    destDir=&lt;%global.outputPath%&gt;/dao%&gt;
-	&lt;%file template=dao/dao_db.template                          filename=&lt;%tableName%&gt;DAO_DB.java                 destDir=&lt;%global.outputPath%&gt;/dao/db%&gt;
-	&lt;%file template=dao/dao_cache.template                       filename=&lt;%tableName%&gt;DAO_Cache.java              destDir=&lt;%global.outputPath%&gt;/dao/cache%&gt;
+	&lt;%file template=dao/dao_interface.template                   filename="&lt;%tableName%&gt;DAO.java"                    destDir="&lt;%root.global.outputPath%&gt;/dao"%&gt;
+	&lt;%file template=dao/dao_db.template                          filename="&lt;%tableName%&gt;DAO_DB.java"                 destDir="&lt;%root.global.outputPath%&gt;/dao/db"%&gt;
+	&lt;%file template=dao/dao_cache.template                       filename="&lt;%tableName%&gt;DAO_Cache.java"              destDir="&lt;%root.global.outputPath%&gt;/dao/cache"%&gt;
 
-	&lt;%file template=dao/dao_net_client.template                  filename=&lt;%tableName%&gt;DAO_NET.java                destDir=&lt;%global.outputPath%&gt;/dao/net%&gt;
-	&lt;%file template=dao/dao_net_server.template                  filename=&lt;%tableName%&gt;DAO_NET_Server.java         destDir=&lt;%global.outputPath%&gt;/dao/net/server%&gt;
+	&lt;%file template=dao/dao_net_client.template                  filename="&lt;%tableName%&gt;DAO_NET.java"                destDir="&lt;%root.global.outputPath%&gt;/dao/net"%&gt;
+	&lt;%file template=dao/dao_net_server.template                  filename="&lt;%tableName%&gt;DAO_NET_Server.java"         destDir="&lt;%root.global.outputPath%&gt;/dao/net/server"%&gt;
 &lt;%endfor%&gt;
 
-&lt;%file template=marshalling/marshalling_factory.template         filename=&lt;%global.databaseName%&gt;MarshallingFactory.java  destDir=&lt;%global.outputPath%&gt;/marshalling%&gt;
-&lt;%file template=dao/dao_factory_interface.template               filename=&lt;%global.databaseName%&gt;DAOFactory.java          destDir=&lt;%global.outputPath%&gt;/dao/factory%&gt;
-&lt;%file template=dao/dao_server_factory.template                  filename=&lt;%global.databaseName%&gt;ClientDAOFactory.java    destDir=&lt;%global.outputPath%&gt;/dao/factory%&gt;
-&lt;%file template=dao/dao_server_factory.template                  filename=&lt;%global.databaseName%&gt;ServerDAOFactory.java    destDir=&lt;%global.outputPath%&gt;/dao/factory%&gt;
+&lt;%file template=marshalling/marshalling_factory.template         filename="&lt;%root.global.databaseName%&gt;MarshallingFactory.java"  destDir="&lt;%root.global.outputPath%&gt;/marshalling"%&gt;
+&lt;%file template=dao/dao_factory_interface.template               filename="&lt;%root.global.databaseName%&gt;DAOFactory.java"          destDir="&lt;%root.global.outputPath%&gt;/dao/factory"%&gt;
+&lt;%file template=dao/dao_server_factory.template                  filename="&lt;%root.global.databaseName%&gt;ClientDAOFactory.java"    destDir="&lt;%root.global.outputPath%&gt;/dao/factory"%&gt;
+&lt;%file template=dao/dao_server_factory.template                  filename="&lt;%root.global.databaseName%&gt;ServerDAOFactory.java"    destDir="&lt;%root.global.outputPath%&gt;/dao/factory"%&gt;
 </code></pre>
 
 	<p>When the generator starts up with these two files, the "current" node pointer points to "root".
@@ -144,7 +149,7 @@ import codegenerator.generator.utils.*;
 	<p>After <code>foreach</code> has iterated over all of the "table" child nodes that it can find,
 	it exits its block at the <code>endfor</code> tag and from there the current node is again "root".
 	That's why the <code>file</code> tags after the <code>foreach</code> block use fully-qualified
-	value names like <code>global.outputPath</code> to access the "global" values.</p>
+	value names like <code>root.global.outputPath</code> to access the "global" values.</p>
 
 	<p>However, all of the <code>file</code> tags inside the <code>foreach</code> block start their
 	evaluation with a current pointer pointing to a "table" node, not "root".  So when you are looking
@@ -159,14 +164,18 @@ import codegenerator.generator.utils.*;
  */
 public class ForEachBlock extends TemplateBlock_Base {
 
+	static public final String	BLOCK_NAME		= "foreach";
+
 
 	// Data members
-	protected	String		m_nodeName;	// This is the name of the config node that will be the temporary "root" node for each iteration of the loop.  For example, if this is == "class", then when we enter Evaluate(), we will run through the loop once for each "class" child node we find on the passed-in p_currentNode.
+	private	String		m_nodeName;						// This is the name of the config node that will be the temporary "root" node for each iteration of the loop.  For example, if this is == "class", then when we enter Evaluate(), we will run through the loop once for each "class" child node we find on the passed-in p_currentNode.
+	private	int			m_parentReferenceCount	= 0;	// (i.e. "^nodename") This count tells us how many levels up to go to reference the following variable name on a parent node (or a parent-of-a-parent node "^^varname", etc.)
+	private	String		m_optionalCounterName	= null;	// Providing a name for the loop counter lets you access it inside inner loops to achieve finer control over <%first%> blocks and other counter uses.
 
 
 	//*********************************
 	public ForEachBlock() {
-		super("foreach");
+		super(BLOCK_NAME);
 	}
 
 
@@ -187,10 +196,27 @@ public class ForEachBlock extends TemplateBlock_Base {
 				return false;
 			}
 
-			m_nodeName = t_nodeAttribute.GetValue().GetText();
+			m_nodeName = t_nodeAttribute.GetAttributeValueAsString();
 			if (m_nodeName == null) {
 				Logger.LogError("ForEachBlock.Init() did not get the value from attribute that is required for foreach tags.");
 				return false;
+			}
+
+			// Count (and remove) any parent references.
+			while (m_nodeName.startsWith("^")) {
+				++m_parentReferenceCount;
+				m_nodeName = m_nodeName.substring(1);	// Chop off the leading ^.
+			}
+
+
+			// The attribute "optionalCounterName" is, obviously, optional, so we need to handle it that way.
+			t_nodeAttribute = p_tagParser.GetNamedAttribute("optionalCounterName");
+			if (t_nodeAttribute != null) {
+				m_optionalCounterName = t_nodeAttribute.GetAttributeValueAsString();
+				if (m_optionalCounterName == null) {
+					Logger.LogError("ForEachBlock.Init() did not get the value from attribute that is required for foreach tags.");
+					return false;
+				}
 			}
 
 			return true;
@@ -237,10 +263,32 @@ public class ForEachBlock extends TemplateBlock_Base {
 							LoopCounter		p_iterationCounter)
 	{
 		try {
-			LoopCounter t_iterationCount = new LoopCounter();
+			// You can use parent references (i.e. "^") in the node name to jump this ForEach block's context up one or more parent nodes.
+			// This will probably always be used inside one or more OuterContext blocks.
+			ConfigNode t_currentNode = p_currentNode;
+			if (m_parentReferenceCount > 0) {
+				// This will kick the node reference up the tree the specified number of times.
+				for (int i = 0; i < m_parentReferenceCount; i++) {
+					if (t_currentNode == null) {
+						Logger.LogError("ForEachBlock.Evaluate() appears to have too many parent references [" + m_parentReferenceCount + "] to the node name [" + m_nodeName + "].  It ran off the top of the tree.");
+						return false;
+					}
 
-			for (ConfigNode t_nextConfigNode: p_currentNode.GetChildNodeList()) {
-				// For each child config node of the name m_nodeName, we will re-evaluate all of our child blocks.
+					t_currentNode = t_currentNode.GetParentNode();
+				}
+			}
+
+			if (t_currentNode == null) {
+				Logger.LogError("ForEachBlock.Evaluate() appears to have too many parent references [" + m_parentReferenceCount + "] to the node name [" + m_nodeName + "].  It ran off the top of the tree.");
+				return false;
+			}
+
+			LoopCounter t_iterationCount = new LoopCounter(p_iterationCounter);
+			if (m_optionalCounterName != null)
+				t_iterationCount.SetOptionalCounterName(m_optionalCounterName);
+
+			for (ConfigNode t_nextConfigNode: t_currentNode.GetChildNodeList()) {
+				// For each child config node of the name t_nodeName, we will re-evaluate all of our child blocks.
 				if (t_nextConfigNode.GetName().compareToIgnoreCase(m_nodeName) == 0) {
 					for (TemplateBlock_Base t_nextBlock: m_blockList) {
 						if (!t_nextBlock.Evaluate(t_nextConfigNode, p_rootNode, p_writer, t_iterationCount)) {

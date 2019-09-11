@@ -155,14 +155,15 @@ public class TypeConvert extends TemplateBlock_Base {
 
 
 	// Data members
-	protected	TextBlock		m_targetLanguage	= null;
-	protected	TextBlock		m_sourceType		= null;
-	protected	TextBlock		m_groupID			= null;
+	protected	String				m_targetLanguage	= null;
+	protected	TemplateBlock_Base	m_sourceType		= null;
+	protected	String				m_groupID			= null;
 
 
 	//*********************************
 	public TypeConvert() {
 		super(BLOCK_NAME);
+		m_isSafeForTextBlock = true;
 	}
 
 
@@ -170,37 +171,42 @@ public class TypeConvert extends TemplateBlock_Base {
 	@Override
 	public boolean Init(TagParser p_tagParser) {
 		try {
+			// The target language should be a string constant.
 			TagAttributeParser t_nodeAttribute = p_tagParser.GetNamedAttribute("targetLanguage");
 			if (t_nodeAttribute == null) {
 				Logger.LogError("TypeConvert.Init() did not find the [targetLanguage] attribute that is required for TypeConvert tags.");
 				return false;
 			}
 
-			m_targetLanguage = t_nodeAttribute.GetValue();
+			m_targetLanguage = t_nodeAttribute.GetAttributeValueAsString();
 			if (m_targetLanguage == null) {
 				Logger.LogError("TypeConvert.Init() did not get the [targetLanguage] value from attribute that is required for TypeConvert tags.");
 				return false;
 			}
 
+
+			// Only the source type should require evaluation.
 			t_nodeAttribute = p_tagParser.GetNamedAttribute("sourceType");
 			if (t_nodeAttribute == null) {
 				Logger.LogError("TypeConvert.Init() did not find the [sourceType] attribute that is required for TypeConvert tags.");
 				return false;
 			}
 
-			m_sourceType = t_nodeAttribute.GetValue();
+			m_sourceType = t_nodeAttribute.GetAttributeValue();
 			if (m_sourceType == null) {
 				Logger.LogError("TypeConvert.Init() did not get the [sourceType] value from attribute that is required for TypeConvert tags.");
 				return false;
 			}
 
+
+			// The group ID should be a string constant.
 			t_nodeAttribute = p_tagParser.GetNamedAttribute("groupID");
 			if (t_nodeAttribute == null) {
 				Logger.LogError("TypeConvert.Init() did not find the [groupID] attribute that is required for TypeConvert tags.");
 				return false;
 			}
 
-			m_groupID = t_nodeAttribute.GetValue();
+			m_groupID = t_nodeAttribute.GetAttributeValueAsString();
 			if (m_groupID == null) {
 				Logger.LogError("TypeConvert.Init() did not get the [groupID] value from attribute that is required for TypeConvert tags.");
 				return false;
@@ -242,36 +248,14 @@ public class TypeConvert extends TemplateBlock_Base {
 				return false;
 			}
 
-			StringWriter	t_valueWriter	= new StringWriter();
-			Cursor			t_valueCursor	= new Cursor(t_valueWriter);
-			if (!m_targetLanguage.Evaluate(p_currentNode, p_rootNode, t_valueCursor, p_iterationCounter)) {
-				Logger.LogError("TypeConvert.Evaluate() failed to evaluate the [targetLanguage] value.");
-				return false;
-			}
-
-			String t_targetLanguageValue = t_valueWriter.toString();
-
-
-			t_valueWriter	= new StringWriter();
-			t_valueCursor	= new Cursor(t_valueWriter);
-			if (!m_sourceType.Evaluate(p_currentNode, p_rootNode, t_valueCursor, p_iterationCounter)) {
+			// Only the source type should require evaluation.  The target language and group IDs should both be string constants.
+			String t_sourceTypeValue = TemplateBlock_Base.EvaluateToString(m_sourceType, p_currentNode, p_rootNode, p_iterationCounter);
+			if (t_sourceTypeValue == null) {
 				Logger.LogError("TypeConvert.Evaluate() failed to evaluate the [sourceType] value.");
 				return false;
 			}
 
-			String t_sourceValue = t_valueWriter.toString();
-
-
-			t_valueWriter	= new StringWriter();
-			t_valueCursor	= new Cursor(t_valueWriter);
-			if (!m_groupID.Evaluate(p_currentNode, p_rootNode, t_valueCursor, p_iterationCounter)) {
-				Logger.LogError("TypeConvert.Evaluate() failed to evaluate the [groupID] value.");
-				return false;
-			}
-
-			String t_groupIDValue	= t_valueWriter.toString();
-
-			String t_convertedType = DataTypeManager.GetTypeConversion(t_targetLanguageValue, t_sourceValue, t_groupIDValue);
+			String t_convertedType = DataTypeManager.GetTypeConversion(m_targetLanguage, t_sourceTypeValue, m_groupID);
 
 			if ((t_convertedType != null) && !t_convertedType.isEmpty())
 				p_writer.Write(t_convertedType);

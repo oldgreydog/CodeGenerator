@@ -3,7 +3,7 @@
  * This file was generated.
  */
 
-package <%global.packageName%>.marshalling.gson;
+package <%root.global.packageName%>.marshalling.gson;
 
 
 
@@ -14,8 +14,8 @@ import com.google.gson.*;
 import com.google.gson.reflect.*;
 
 import coreutil.logging.*;
-import <%global.packageName%>.*;
-import <%global.packageName%>.marshalling.*;
+import <%root.global.packageName%>.*;
+import <%root.global.packageName%>.marshalling.*;
 
 
 

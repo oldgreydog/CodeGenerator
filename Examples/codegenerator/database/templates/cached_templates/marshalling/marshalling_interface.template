@@ -3,12 +3,12 @@
  * This file was generated.
  */
 
-package <%global.packageName%>.marshalling;
+package <%root.global.packageName%>.marshalling;
 
 
 
 import java.util.*;
-import <%global.packageName%>.*;
+import <%root.global.packageName%>.*;
 
 
 

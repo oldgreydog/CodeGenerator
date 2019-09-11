@@ -53,7 +53,8 @@ public class CustomCodeManager {
 			m_keyCodeMap.clear();	// We have to clear the map when we start a new file.  We do not want to accidently cross-contaminate code into other files.
 
 			String			t_line;
-			String			t_key;
+			String			t_startKey;
+			String			t_endKey;		// Detecting nested "start" of custom code blocks is easy, if someone copied in an "end" custom code line without the matching start, then the only way to know that the "end" is a nesting error is to check its key against the start key we already have.
 			StringBuilder	t_customCode	= new StringBuilder();
 			int				t_lineCount		= 0;
 
@@ -61,14 +62,14 @@ public class CustomCodeManager {
 			while ((t_line = t_lineReader.readLine()) != null) {
 				t_lineCount++;
 				if (t_line.contains(START_CUSTOM_CODE)) {
-					t_key = t_line.substring(t_line.indexOf(":") + 1);
+					t_startKey = t_line.substring(t_line.indexOf(":") + 1);
 
 					// Now that custom code comments can have closing comment characters, we have to trim them off here so that we have just the key and nothing else.
-					if (t_key.indexOf("\t") > 0)
-						t_key = t_key.substring(0, t_key.indexOf("\t"));
+					if (t_startKey.indexOf("\t") > 0)
+						t_startKey = t_startKey.substring(0, t_startKey.indexOf("\t"));
 
-					if (m_keyCodeMap.containsKey(t_key)) {
-						Logger.LogError("CustomeCodeManager.ScanFile() already found a custom code tag of [" + t_key + "] in the file.  Duplicates are not allowed because that will lead to code loss.");
+					if (m_keyCodeMap.containsKey(t_startKey)) {
+						Logger.LogError("CustomeCodeManager.ScanFile() found a duplicate custom code marker key [" + t_startKey + "] in file [" + p_targetFile.getAbsolutePath() + "] at line [" + t_lineCount + "].  Duplicates are not allowed because that will lead to code loss.");
 						return false;
 					}
 
@@ -81,12 +82,27 @@ public class CustomCodeManager {
 						}
 
 						if (t_line.contains(END_CUSTOM_CODE)) {
-							m_keyCodeMap.put(t_key, t_customCode.toString());
+							t_endKey = t_line.substring(t_line.indexOf(":") + 1);
+
+							// Now that custom code comments can have closing comment characters, we have to trim them off here so that we have just the key and nothing else.
+							if (t_endKey.indexOf("\t") > 0)
+								t_endKey = t_endKey.substring(0, t_endKey.indexOf("\t"));
+
+							if (!t_endKey.equals(t_startKey)) {
+								Logger.LogError("CustomeCodeManager.ScanFile() found a nested custom code block end marker key [" + t_startKey + "] in file [" + p_targetFile.getAbsolutePath() + "] at line [" + t_lineCount + "] that doesn't match the start marker key [" + t_startKey + "].");
+								return false;
+							}
+
+							m_keyCodeMap.put(t_startKey, t_customCode.toString());
 							break;
 						}
 
 						t_customCode.append(t_line + "\n");
 					}
+				}
+				else if (t_line.contains(END_CUSTOM_CODE)) {
+					Logger.LogError("CustomeCodeManager.ScanFile() found a custom code block end marker without a matching start marker in file [" + p_targetFile.getAbsolutePath() + "] at line [" + t_lineCount + "].");
+					return false;
 				}
 			}
 

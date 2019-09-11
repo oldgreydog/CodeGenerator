@@ -1,0 +1,137 @@
+This contains important info about each release.
+
+To run the code generator using the contents of the code_generator.zip file, extract the file into the folder of your choice.
+
+
+
+1.4
+
+	This release has a few changes, some of which will potentially break existing templates.
+
+		a) Added the OuterContext tags:
+			- outerContext
+			- outerContextEval
+		b) The outerContext tags required changes to the tag attribute parser and forEach tag.
+		c) Moved the initialization of the DataTypeManager from the executable's config file to a new tag:
+			- typeConvertLoadFile
+		d) Global config value references now require the prefix "root.".
+			- i.e. an old global value reference such as <%global.outputPath%> needs to be changed to <%root.global.outputPath%>
+		e) Counters now can be given optional names so that they can be referenced inside nested forEach loops. This affects the following tags:
+			- counter
+			- --counter
+			- forEach
+			- first
+		f) Improved release zip file.
+
+
+	a) The outer context tags are such special-case tags that you may never find a use for them.  I have a certain type of
+		relationship between database tables that I define in my config value files and I wanted to use that relationship info
+		to generate deletions in my cached DAO's.  But to do that, I needed to be able to jump a forEach to a node ABOVE the current
+		one the template was pointing at in the config values tree.  And I needed to be able to reference values from both contexts in the
+		template code inside the forEach that was pointed outside the parent forEach.  That's where the outer context tags come in.
+
+		There are two tags.  The first is "outerContext".  This one is used to basically set a virtual maker in the loops to grab the
+		node context wherever it is placed in the template.
+
+		The second tag is "outerContextEval".  This one is used inside the inner forEach loop(s) so that you can access a value that's
+		in the outer node context held by the "OuterContext" tag.
+
+		To take advantage of this new functionality, the forEach tag's "node" attribute can now take the parent reference characters ("^")
+		in its value.  Here's an abbreviated example of the usage of these tags (the 1., 2., 3. and 4. are for reference in the explanation below):
+
+
+		< At this point in the template, we are inside a <%foreach node = "table" %> tag, so the current
+			node context is pointing to a particular "table" node >
+
+			<%outerContext contextname = "parentTable" %>
+
+		.1		<%foreach node = "^table"  optionalCounterName = "innerTable" %>
+
+		.2			<%foreach node = column %>
+
+						<%foreach node = foreignKey %>
+
+		.3					<%if <%and <%parentTableName%> = <%outerContextEval contextname = "parentTable" targetvalue = sqlName %>
+										<%not <%parentTableName%> = <%^^sqlName%> %> == true %> == true %>
+
+								<%text%>...<%endtext%>
+
+							<%endif%>
+
+						<%endfor%>
+
+					<%endfor%>
+
+					<%foreach node = tableRelationship %>
+
+						<%if <%and <%parentTableName%> = <%outerContextEval contextname = "parentTable" targetvalue = sqlName %>
+									<%not <%parentTableName%> = <%^sqlName%> %> == true %> == true %>
+
+		.4					<%first  optionalCounterName = "innerTable" %>
+
+								<%text%>...<%endtext%>
+
+							<%endfirst%>
+
+								<%text%>...<%endtext%>
+
+						<%endif%>
+
+					<%endfor%>
+
+				<%endfor%>
+
+			<%endcontext%>
+
+		Once the outerContext tag is hit, you can then jump the node pointer to a different context with a forEach as shown at 1.
+		Since that forEach's node attribute value is "^table", that tells the forEach to jump up ("^") one parent (which is the "root"
+		node in my database config values file) and start iterating over the "table" nodes under that parent.
+
+		!!It is super important to note that now that we are inside the new parent context at 1., all node and value references inside
+		that forEach (i.e. 2.) are in that context, so you don't have to use the "^" with them!!
+
+		3. shows how to use outerContextEval to access a value in the outer context from inside the new inner context.
+
+		This example also shows one possible usage (4.) of the "optionalCounterName" discussed in e).
+
+
+	b) The outer context tags required that I make the tag attribute parser a little more flexible.  The down side is that it potentially
+		breaks existing templates a little.  Any tags attributes that have tags in their values are now required to have double quotes around
+		them.  For example, this tag was fine before:
+
+		<%file template=ddl.template filename=<%root.global.databaseName%>.ddl destDir=<%root.global.outputPath%>/ddl %>
+
+		It now has to have quotes:
+
+		<%file template=ddl.template filename="<%root.global.databaseName%>.ddl" destDir="<%root.global.outputPath%>/ddl" %>
+
+		Note that the "template" attribute doesn't have an embedded tag in its value so that value doesn't have to have quotes.
+
+		The other change was in the forEach tag.  Its "node" attribute value now allows you to use the parent reference character: "^"
+		As explained for line 1. in section a) above, this is how you jump the context out to a parent level.
+
+
+	c) I was never happy with the way I originally set up the DataTypeManager initialization.  I decided to fix that, so now there is a
+		typeConvertLoadFile tag to do the job.  Most of the time, you'll put this tag in the root template file since most, if not all,
+		of the file templates in that set will use the same type conversion config file.  But you can put the tag in any individual
+		template file if only that file needs that type conversion (although technically, the tag only needs to be used once and any
+		template file that happens to get executed after the tag can use that conversion).
+
+	e) Until now, the counter mechanism was always sort of hidden under the forEach block.  Each new forEach creates a new counter for
+		its context and passes that in the Evaluate() of its child templates.  If you were in a nested forEach, then you couldn't access
+		the counter in any of the outer contexts, but by adding the "optionalCounterName" attribute to the relevant tags, you can now
+		name the counter for one or more of the forEach blocks and then access it even in nested forEach loops.
+
+
+	f) I really have to apologize for not doing a better job with the release zip file(s) originally.  I didn't provide a runnable
+		environment that you could use right out of the box.  I think I have corrected that.  Now the code_generator.zip can be
+		extracted in folder and you can use the generate/generate.cmd batch files (one for Linux, the other for Windows) to run the
+		generator.  I included the examples in that zip file, but the javadocs are still separate.
+
+
+
+
+1.3
+
+	The big change for this release was that I removed the code for the config manager and logging that are used in the
+	code generator.  I thought about it for a long time and I just didn't think that anyone would ever care about that code.

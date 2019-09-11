@@ -24,7 +24,6 @@ package codegenerator.generator.tags;
 
 import coreutil.config.*;
 import coreutil.logging.*;
-
 import codegenerator.generator.utils.*;
 
 
@@ -37,7 +36,7 @@ import codegenerator.generator.utils.*;
 
 	<pre><code>&lt;%foreach node=member%&gt;
 	&lt;%if &lt;%isPrimaryKey%&gt; = true%&gt;
-		&lt;%--counter%&gt;	<!-- This trick lets us skip over the primary keys AND adjust the counter
+		&lt;%--counter  optionalCounterName = "loop1" %&gt;	<!-- This trick lets us skip over the primary keys AND adjust the counter
 		so that we still get the correct code built in the "else" that follows. -->
 	&lt;%else%&gt;
 		&lt;%first%&gt;
@@ -64,17 +63,33 @@ import codegenerator.generator.utils.*;
  */
 public class DecrementCounter extends TemplateBlock_Base {
 
+	static public final String	BLOCK_NAME	= "--counter";
+
+	// Data members
+	private	String	m_optionalCounterName	= null;	// Providing a name for the loop counter lets you specify using a named loop counter from a foreach block other than the one directly containing this first block.
+
 
 	//*********************************
 	public DecrementCounter() {
-		super("--counter");
+		super(BLOCK_NAME);
 	}
 
 
 	//*********************************
 	@Override
 	public boolean Init(TagParser p_tagParser) {
-		// No action needs to be taken here.
+		m_lineNumber = p_tagParser.GetLineNumber();
+
+		// The attribute "optionalCounterName" is, obviously, optional, so we need to handle it that way.
+		TagAttributeParser t_nodeAttribute = p_tagParser.GetNamedAttribute("optionalCounterName");
+		if (t_nodeAttribute != null) {
+			m_optionalCounterName = t_nodeAttribute.GetAttributeValueAsString();
+			if (m_optionalCounterName == null) {
+				Logger.LogError("DecrementCounter.Init() did not get the value from the [optionalCounterName] attribute.");
+				return false;
+			}
+		}
+
 		return true;
 	}
 
@@ -102,7 +117,16 @@ public class DecrementCounter extends TemplateBlock_Base {
 							LoopCounter		p_iterationCounter)
 	{
 		try {
-			p_iterationCounter.DecrementCounter();
+			LoopCounter t_iterationCounter = p_iterationCounter;
+			if (m_optionalCounterName != null)
+				t_iterationCounter = p_iterationCounter.GetNamedCounter(m_optionalCounterName);
+
+			if (t_iterationCounter == null) {
+				Logger.LogError("DecrementCounter.Evaluate() failed to find a loop counter with name [" + m_optionalCounterName + "] at line number [" + m_lineNumber + "].");
+				return false;
+			}
+
+			t_iterationCounter.DecrementCounter();
 		}
 		catch (Throwable t_error) {
 			Logger.LogError("DecrementCounter.Evaluate() failed with error: ", t_error);

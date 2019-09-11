@@ -3,17 +3,17 @@
  * This file was generated.
  */
 
-package <%global.packageName%>.marshalling;
+package <%root.global.packageName%>.marshalling;
 
 
 
 import coreutil.logging.*;
-import <%global.packageName%>.marshalling.dmapijson.*;
-import <%global.packageName%>.marshalling.gson.*;
+import <%root.global.packageName%>.marshalling.dmapijson.*;
+import <%root.global.packageName%>.marshalling.gson.*;
 
 
 
-public class <%global.databaseName%>MarshallingFactory {
+public class <%root.global.databaseName%>MarshallingFactory {
 
 	static public final String		MARCHALLING_TYPE_GSON			= "gson";
 	static public final String		MARCHALLING_TYPE_DM_API_JSON	= "dmApiJson";
@@ -29,7 +29,7 @@ public class <%global.databaseName%>MarshallingFactory {
 		else if (p_marshallingType.equalsIgnoreCase(MARCHALLING_TYPE_DM_API_JSON))
 			return new DMAPIJson<%className%>Marshalling();
 
-		Logger.LogError("<%global.databaseName%>MarshallingFactory.<%className%>Marshalling() does not handle the marshalling type [" + p_marshallingType + "].");
+		Logger.LogError("<%root.global.databaseName%>MarshallingFactory.<%className%>Marshalling() does not handle the marshalling type [" + p_marshallingType + "].");
 		return null;
 	}
 <%endtext%>

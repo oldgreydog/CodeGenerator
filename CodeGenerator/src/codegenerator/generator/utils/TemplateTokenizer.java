@@ -312,7 +312,7 @@ NextSym:for (SpecialSymbol t_nextSymbol: m_symbolList) {
 			String t_headerLine = m_fileReader.readLine();
 			m_lineCount++;
 
-			String t_headerParts[] = t_headerLine.split("[ \\t]+");
+			String t_headerParts[] = t_headerLine.trim().split("[ \\t]+");
 			if ((t_headerParts.length < 3) || !t_headerParts[0].startsWith("%%HEADER%%")) {
 				Logger.LogError("ReadHeader() did not find a HEADER record in the first line of the template file.");
 				return false;

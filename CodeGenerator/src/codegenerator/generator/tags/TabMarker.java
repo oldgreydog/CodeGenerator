@@ -50,6 +50,7 @@ public class TabMarker extends TemplateBlock_Base {
 	//*********************************
 	public TabMarker() {
 		super(BLOCK_NAME);
+		m_isSafeForTextBlock = true;
 	}
 
 

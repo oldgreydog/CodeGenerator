@@ -1,18 +1,19 @@
 %%HEADER%% openingDelimiter=<% closingDelimiter=%>
+
 <%text%>/*
  * This file was generated.
  */
 
-package <%global.packageName%>.dao.cache;
+package <%root.global.packageName%>.dao.cache;
 
 
 
 import java.sql.*;
 import java.util.*;
 
-import <%global.packageName%>.*;
-import <%global.packageName%>.dao.*;
-import <%global.packageName%>.dao.db.*;
+import <%root.global.packageName%>.*;
+import <%root.global.packageName%>.dao.*;
+import <%root.global.packageName%>.dao.db.*;
 import coreutil.config.*;
 import coreutil.logging.*;
 import coreutil.utils.cache.*;
@@ -193,7 +194,8 @@ public class <%className%>DAO_Cache extends CacheDAO implements <%className%>DAO
 
 
 <%foreach node=column%>
-<%if <%isPrimaryKey%> = true%>
+
+	<%if <%isPrimaryKey%> = true%>
 <%text%>
 
 
@@ -212,7 +214,7 @@ public class <%className%>DAO_Cache extends CacheDAO implements <%className%>DAO
 			}
 
 			<%^className%> t_result = null;
-			<%customCode key=Load<%^className%>For<%name%> openingCommentCharacters="//"%>
+			<%customCode key="Load<%^className%>For<%name%>" openingCommentCharacters="//"%>
 
 			return t_result;
 		}
@@ -226,12 +228,13 @@ public class <%className%>DAO_Cache extends CacheDAO implements <%className%>DAO
 		}
 	}<%endtext%>
 
-<%endif%>
+	<%endif%>
+
 <%endfor%>
 
 
 <%foreach node=foreignKey%>
-<%text%>
+	<%text%>
 
 
 	//*********************************
@@ -249,7 +252,7 @@ public class <%className%>DAO_Cache extends CacheDAO implements <%className%>DAO
 			}
 
 			LinkedList<<%^className%>> t_results = new LinkedList<<%^className%>>();
-			<%customCode key=LoadAll<%^className%>For<%name%> openingCommentCharacters="//"%>
+			<%customCode key="LoadAll<%^className%>For<%name%>" openingCommentCharacters="//"%>
 
 			return t_results;
 		}
@@ -263,6 +266,8 @@ public class <%className%>DAO_Cache extends CacheDAO implements <%className%>DAO
 		}
 	}<%endtext%>
 <%endfor%>
+
+
 <%text%>
 
 

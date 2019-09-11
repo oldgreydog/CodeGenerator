@@ -3,7 +3,7 @@
  * This file was generated.
  */
 
-package <%global.packageName%>.marshalling.dmapijson;
+package <%root.global.packageName%>.marshalling.dmapijson;
 
 
 
@@ -12,8 +12,8 @@ import java.util.*;
 import com.google.gson.*;
 
 import coreutil.logging.*;
-import <%global.packageName%>.*;
-import <%global.packageName%>.marshalling.*;
+import <%root.global.packageName%>.*;
+import <%root.global.packageName%>.marshalling.*;
 
 
 

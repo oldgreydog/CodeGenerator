@@ -84,14 +84,15 @@ public class CustomCodeBlock extends TemplateBlock_Base {
 
 
 	// Data members
-	protected	TextBlock	m_key							= null;
-	protected	String		m_openingCommentCharacters		= null;
-	protected	String		m_closingCommentCharacters		= null;
+	protected	TemplateBlock_Base	m_key							= null;
+	protected	String				m_openingCommentCharacters		= null;
+	protected	String				m_closingCommentCharacters		= null;
 
 
 	//*********************************
 	public CustomCodeBlock() {
 		super(BLOCK_NAME);
+		m_isSafeForTextBlock = true;
 	}
 
 
@@ -111,7 +112,7 @@ public class CustomCodeBlock extends TemplateBlock_Base {
 			return false;
 		}
 
-		m_key = t_nodeAttribute.GetValue();
+		m_key = t_nodeAttribute.GetAttributeValue();
 		if (m_key == null) {
 			Logger.LogError("CustomCodeBlock.Init() did not get the [key] string from attribute that is required for CustomCodeBlock tags.");
 			return false;
@@ -123,7 +124,7 @@ public class CustomCodeBlock extends TemplateBlock_Base {
 			return false;
 		}
 
-		m_openingCommentCharacters = t_nodeAttribute.GetValue().GetText();
+		m_openingCommentCharacters = t_nodeAttribute.GetAttributeValueAsString();
 		if (m_openingCommentCharacters == null) {
 			Logger.LogError("CustomCodeBlock.Init() did not get the [openingCommentCharacters] value from attribute that is required for CustomCodeBlock tags.");
 			return false;
@@ -131,7 +132,7 @@ public class CustomCodeBlock extends TemplateBlock_Base {
 
 		t_nodeAttribute = p_tagParser.GetNamedAttribute("closingCommentCharacters");
 		if (t_nodeAttribute != null) {
-			m_closingCommentCharacters = t_nodeAttribute.GetValue().GetText();
+			m_closingCommentCharacters = t_nodeAttribute.GetAttributeValueAsString();
 			if (m_closingCommentCharacters == null) {
 				Logger.LogError("CustomCodeBlock.Init() did not get the [closingCommentCharacters] value from attribute that is required for CustomCodeBlock tags.");
 				return false;

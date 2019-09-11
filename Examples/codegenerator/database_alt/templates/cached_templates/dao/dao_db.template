@@ -3,7 +3,7 @@
  * This file was generated.
  */
 
-package <%global.packageName%>.dao.db;
+package <%root.global.packageName%>.dao.db;
 
 
 
@@ -11,8 +11,8 @@ import java.io.*;
 import java.sql.*;
 import java.util.*;
 
-import <%global.packageName%>.*;
-import <%global.packageName%>.dao.*;
+import <%root.global.packageName%>.*;
+import <%root.global.packageName%>.dao.*;
 import coreutil.logging.*;
 import coreutil.utils.database.*;
 

@@ -3,15 +3,15 @@
  * This file was generated.
  */
 
-package <%global.packageName%>.dao.message.server;
+package <%root.global.packageName%>.dao.message.server;
 
 
 
 import java.util.*;
 
-import <%global.packageName%>.*;
-import <%global.packageName%>.dao.*;
-import <%global.packageName%>.marshalling.gson.*;
+import <%root.global.packageName%>.*;
+import <%root.global.packageName%>.dao.*;
+import <%root.global.packageName%>.marshalling.gson.*;
 import coreutil.logging.*;
 import coreutil.utils.database.*;
 import coreutil.utils.database.DBConnectionManager.*;
@@ -186,7 +186,7 @@ public class <%className%>DAO_NET_Server extends Request_Base {
 				return false;
 			}
 
-			<%className%>DAO t_<%className%>DAO = <%global.databaseName%>DAOFactory.GetInstance().Get<%className%>DAO();
+			<%className%>DAO t_<%className%>DAO = <%root.global.databaseName%>DAOFactory.GetInstance().Get<%className%>DAO();
 			LinkedList<<%className%>> t_results	= t_<%className%>DAO.LoadAll<%className%>(t_dbConnection);
 
 			if (t_results == null) {
@@ -259,7 +259,7 @@ public class <%className%>DAO_NET_Server extends Request_Base {
 <%endif%>
 <%text%>("<%memberName%>");
 
-			<%^className%>DAO t_<%^className%>DAO = <%global.databaseName%>DAOFactory.GetInstance().Get<%^className%>DAO();
+			<%^className%>DAO t_<%^className%>DAO = <%root.global.databaseName%>DAOFactory.GetInstance().Get<%^className%>DAO();
 			<%^className%> t_results	= t_<%^className%>DAO.Load<%^className%>For<%name%>(t_<%memberName%>, t_dbConnection);
 
 			if (t_results == null) {
@@ -334,7 +334,7 @@ public class <%className%>DAO_NET_Server extends Request_Base {
 <%endif%>
 <%text%>("<%memberName%>");
 
-			<%^className%>DAO t_<%^className%>DAO = <%global.databaseName%>DAOFactory.GetInstance().Get<%^className%>DAO();
+			<%^className%>DAO t_<%^className%>DAO = <%root.global.databaseName%>DAOFactory.GetInstance().Get<%^className%>DAO();
 			LinkedList<<%^className%>> t_results	= t_<%^className%>DAO.LoadAll<%^className%>For<%name%>(t_<%memberName%>, t_dbConnection);
 
 			if (t_results == null) {
@@ -395,7 +395,7 @@ public class <%className%>DAO_NET_Server extends Request_Base {
 			Gson<%className%>Marshalling	t_marshaler		= new Gson<%className%>Marshalling();
 			<%className%>					t_new<%className%>	= t_marshaler.UnMarshal(t_new<%className%>JSON);
 
-			<%className%>DAO t_<%className%>DAO = <%global.databaseName%>DAOFactory.GetInstance().Get<%className%>DAO();
+			<%className%>DAO t_<%className%>DAO = <%root.global.databaseName%>DAOFactory.GetInstance().Get<%className%>DAO();
 			if (!t_<%className%>DAO.Create<%className%>(t_new<%className%>, t_dbConnection)) {
 				t_response.SetMessageProperty(NetMessage.NM_HEADER_RESPONSE_STATUS, NetMessage.RESPONSE_FAIL);	// The default response status is "success".  We have to set it to "fail" here.
 				t_response.SetMessageProperty(NetMessage.NM_HEADER_RESPONSE_MESSAGE, "Create<%className%>() failed to create the new Create<%className%>:\n" + t_new<%className%>.toString());
@@ -446,7 +446,7 @@ public class <%className%>DAO_NET_Server extends Request_Base {
 			Gson<%className%>Marshalling	t_marshaler		= new Gson<%className%>Marshalling();
 			<%className%>					t_new<%className%>	= t_marshaler.UnMarshal(t_new<%className%>JSON);
 
-			<%className%>DAO t_<%className%>DAO = <%global.databaseName%>DAOFactory.GetInstance().Get<%className%>DAO();
+			<%className%>DAO t_<%className%>DAO = <%root.global.databaseName%>DAOFactory.GetInstance().Get<%className%>DAO();
 			if (!t_<%className%>DAO.Update<%className%>(t_new<%className%>, t_dbConnection)) {
 				t_response.SetMessageProperty(NetMessage.NM_HEADER_RESPONSE_STATUS, NetMessage.RESPONSE_FAIL);	// The default response status is "success".  We have to set it to "fail" here.
 				t_response.SetMessageProperty(NetMessage.NM_HEADER_RESPONSE_MESSAGE, "Update<%className%>() failed to create the new Update<%className%>:\n" + t_new<%className%>.toString());
@@ -495,7 +495,7 @@ public class <%className%>DAO_NET_Server extends Request_Base {
 			Gson<%className%>Marshalling	t_marshaler		= new Gson<%className%>Marshalling();
 			<%className%>					t_new<%className%>	= t_marshaler.UnMarshal(t_new<%className%>JSON);
 
-			<%className%>DAO t_<%className%>DAO = <%global.databaseName%>DAOFactory.GetInstance().Get<%className%>DAO();
+			<%className%>DAO t_<%className%>DAO = <%root.global.databaseName%>DAOFactory.GetInstance().Get<%className%>DAO();
 			if (!t_<%className%>DAO.Delete<%className%>(t_new<%className%>, t_dbConnection)) {
 				t_response.SetMessageProperty(NetMessage.NM_HEADER_RESPONSE_STATUS, NetMessage.RESPONSE_FAIL);	// The default response status is "success".  We have to set it to "fail" here.
 				t_response.SetMessageProperty(NetMessage.NM_HEADER_RESPONSE_MESSAGE, "Delete<%className%>() failed to create the new Delete<%className%>:\n" + t_new<%className%>.toString());

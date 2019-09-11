@@ -3,16 +3,16 @@
  * This file was generated.
  */
 
-package <%global.packageName%>.dao;
+package <%root.global.packageName%>.dao;
 
 
 
 import coreutil.logging.*;
-import <%global.packageName%>.dao.*;
+import <%root.global.packageName%>.dao.*;
 
 
 
-public abstract class <%global.databaseName%>DAOFactory {
+public abstract class <%root.global.databaseName%>DAOFactory {
 
 
 	static public final int		DAO_TYPE_SERVER		= 1;
@@ -20,20 +20,20 @@ public abstract class <%global.databaseName%>DAOFactory {
 
 
 	// Static members
-	static private <%global.databaseName%>DAOFactory	s_daoFactoryInstance	= null;
+	static private <%root.global.databaseName%>DAOFactory	s_daoFactoryInstance	= null;
 
 
 	//===========================================
 	static public boolean Init(int p_factoryType) {
 		switch (p_factoryType) {
 			case DAO_TYPE_SERVER:
-				s_daoFactoryInstance = new <%global.databaseName%>ServerDAOFactory();
+				s_daoFactoryInstance = new <%root.global.databaseName%>ServerDAOFactory();
 				break;
 			case DAO_TYPE_CLIENT:
-				s_daoFactoryInstance = new <%global.databaseName%>ClientDAOFactory();
+				s_daoFactoryInstance = new <%root.global.databaseName%>ClientDAOFactory();
 				break;
 			default:
-				Logger.LogError("<%global.databaseName%>DAOFactory.Init() does not recognize the factory type ID [" + p_factoryType + "].");
+				Logger.LogError("<%root.global.databaseName%>DAOFactory.Init() does not recognize the factory type ID [" + p_factoryType + "].");
 				return false;
 		}
 
@@ -42,9 +42,9 @@ public abstract class <%global.databaseName%>DAOFactory {
 
 
 	//===========================================
-	static public <%global.databaseName%>DAOFactory GetInstance() {
+	static public <%root.global.databaseName%>DAOFactory GetInstance() {
 		if (s_daoFactoryInstance == null) {
-			Logger.LogError("<%global.databaseName%>DAOFactory.GetInstance() has not been initialized.");
+			Logger.LogError("<%root.global.databaseName%>DAOFactory.GetInstance() has not been initialized.");
 			return null;
 		}
 

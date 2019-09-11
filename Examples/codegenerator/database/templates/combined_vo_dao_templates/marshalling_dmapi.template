@@ -3,7 +3,7 @@
  * This file was generated.
  */
 
-package <%global.packageName%>.marshalling.dmapijson;
+package <%root.global.packageName%>.marshalling.dmapijson;
 
 
 
@@ -12,8 +12,8 @@ import java.util.*;
 import com.google.gson.*;
 
 import coreutil.logging.*;
-import <%global.packageName%>.*;
-import <%global.packageName%>.marshalling.*;
+import <%root.global.packageName%>.*;
+import <%root.global.packageName%>.marshalling.*;
 
 
 
@@ -102,7 +102,7 @@ public class DMAPIJson<%className%>Marshalling implements <%className%>Marshalli
 			// Next we'll iterate through any names of nodes connected to this entry and add them to the new DMAPIJson<%className%>Marshalling.
 			t_jsonElement = t_jsonObject.get("sites");
 			if (t_jsonElement == null) {
-				Logger.LogError("DMAPIJson<%className%>Marshalling.UnMarshalList() received an invalid object that does not have a [sites] value.");
+				Logger.LogError("DMAPIJson<%className%>Marshalling.UnMarshalList() received an invalid object that does not have a [<%className%>] value.");
 				return null;
 			}
 
@@ -113,7 +113,7 @@ public class DMAPIJson<%className%>Marshalling implements <%className%>Marshalli
 			for (int i = 0; i < t_jsonArray.size(); ++i) {
 				t_new<%className%> = UnMarshalJsonObject(t_jsonArray.get(i).getAsJsonObject());
 				if (t_new<%className%> == null) {
-					Logger.LogError("DMAPIJson<%className%>Marshalling.UnMarshalList() failed to parse a site object from the json.");
+					Logger.LogError("DMAPIJson<%className%>Marshalling.UnMarshalList() failed to parse a <%className%> object from the json.");
 					return null;
 				}
 

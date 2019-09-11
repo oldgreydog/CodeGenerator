@@ -4,16 +4,16 @@
  * This file was generated.
  */
 
-package <%global.packageName%>.dao.cache;
+package <%root.global.packageName%>.dao.cache;
 
 
 
 import java.sql.*;
 import java.util.*;
 
-import <%global.packageName%>.*;
-import <%global.packageName%>.dao.*;
-import <%global.packageName%>.dao.db.*;
+import <%root.global.packageName%>.*;
+import <%root.global.packageName%>.dao.*;
+import <%root.global.packageName%>.dao.db.*;
 import coreutil.config.*;
 import coreutil.logging.*;
 import coreutil.utils.cache.*;
@@ -230,6 +230,7 @@ public class <%className%>DAO_Cache extends CacheDAO implements <%className%>DAO
 
 <%text%>
 
+
 	//*********************************
 	@Override
 	public <%className%> Load<%className%>For<%variable name = "primaryKeyNames" evalmode = "evaluate" %>(<%variable name = "primaryKeyParameters" evalmode = "evaluate" %>, Connection p_dbConnection)
@@ -245,7 +246,7 @@ public class <%className%>DAO_Cache extends CacheDAO implements <%className%>DAO
 			}
 
 			<%className%> t_result = null;
-			<%customCode key=Load<%className%>ForPrimaryKeys openingCommentCharacters="//"%>
+			<%customCode key="Load<%className%>For<%variable name = "primaryKeyNames" evalmode = "evaluate" %>" openingCommentCharacters="//"%>
 
 			return t_result;
 		}
@@ -280,7 +281,7 @@ public class <%className%>DAO_Cache extends CacheDAO implements <%className%>DAO
 			}
 
 			LinkedList<<%^className%>> t_results = new LinkedList<<%^className%>>();
-			<%customCode key=LoadAll<%^className%>For<%name%> openingCommentCharacters="//"%>
+			<%customCode key="LoadAll<%^className%>For<%name%>" openingCommentCharacters="//"%>
 
 			return t_results;
 		}

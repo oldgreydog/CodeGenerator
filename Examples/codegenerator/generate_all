@@ -1,0 +1,20 @@
+
+
+pushd database
+
+source generate_cached
+echo
+source generate_combined
+
+popd
+
+echo
+
+pushd database_alt
+
+source generate_cached
+echo
+source generate_combined
+
+popd
+

@@ -3,7 +3,7 @@
  * This file was generated.
  */
 
-package <%global.packageName%>;
+package <%root.global.packageName%>;
 
 
 
@@ -116,7 +116,7 @@ public class <%className%> {
 <%endtext%>
 <%endif%>
 <%text%>
-			<%customCode key=Validate<%name%> openingCommentCharacters="//"%>
+			<%customCode key="Validate<%name%>" openingCommentCharacters="//"%>
 		}
 		catch (Exception t_error) {
 			Logger.LogError("<%^className%>.Validate<%name%>() failed with error: ", t_error);

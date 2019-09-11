@@ -50,6 +50,7 @@ public abstract class If_Boolean extends TemplateBlock_Base {
 
 		public And() {
 			super(BLOCK_NAME);
+			m_isSafeForTextBlock = true;
 		}
 
 		public And(String p_blockName) {
@@ -97,6 +98,7 @@ public abstract class If_Boolean extends TemplateBlock_Base {
 
 		public Or() {
 			super(BLOCK_NAME);
+			m_isSafeForTextBlock = true;
 		}
 
 		public Or(String p_blockName) {
@@ -144,6 +146,7 @@ public abstract class If_Boolean extends TemplateBlock_Base {
 
 		public Not() {
 			super(BLOCK_NAME);
+			m_isSafeForTextBlock = true;
 		}
 
 		public Not(String p_blockName) {
