@@ -33,11 +33,18 @@ To run the code generator using the contents of the code_generator.zip file, ext
 		There are two tags.  The first is "outerContext".  This one is used to basically set a virtual maker in the loops to grab the
 		node context wherever it is placed in the template.
 
+		<%outerContext contextname = parentTable  optionalJumpToParentContext = "^^" %>
+
 		The second tag is "outerContextEval".  This one is used inside the inner forEach loop(s) so that you can access a value that's
 		in the outer node context held by the "OuterContext" tag.
 
-		To take advantage of this new functionality, the forEach tag's "node" attribute can now take the parent reference characters ("^")
-		in its value.  Here's an abbreviated example of the usage of these tags (the 1., 2., 3. and 4. are for reference in the explanation below):
+		<%outerContextEval contextname = parentTable targetvalue = sqlName %>
+
+		There are two ways to take advantage of this new functionality.  The forEach tag's "node" attribute can now take the parent reference characters ("^")
+		in its value.  That will jump the context up one parent node per carret and then execute the forEach loop from that context.  The other way is to use
+		the optionalJumpToParentContext attribute on the outerContext tag to jump the context up.  That option is discussed below.
+
+		Here's an abbreviated example of the usage of these tags (the 1., 2., 3. and 4. are for reference in the explanation below):
 
 
 		< At this point in the template, we are inside a <%foreach node = "table" %> tag, so the current
@@ -93,6 +100,34 @@ To run the code generator using the contents of the code_generator.zip file, ext
 		3. shows how to use outerContextEval to access a value in the outer context from inside the new inner context.
 
 		This example also shows one possible usage (4.) of the "optionalCounterName" discussed in e).
+
+		Now let's go back to the optionalJumpToParentContext attribute on the outerContext tag.  The driver
+		for adding this attribute was that I had one or more files that I only wanted to generate once based on a flag value used on my
+		API config.  To do that, I needed to be able to jump the parent context up some number of levels without being forced to use a
+		forEach loop.  An inner forEach would make it impossible to generate the file since the file template needs
+		to do the forEach internally to generate its content but you would be in the wrong context to do that.
+
+		Here's an example of this usage:
+
+		<%foreach node=manager%>
+			<%file template=manager.template						filename="<%className%>Manager.java"				destDir="<%root.global.outputPath%>/<%firstLetterToLowerCase value = <%className%> %>" %>
+
+			<%foreach node=api%>
+				<%file template=manager_net_client.template		filename="<%apiName%>_NET.java"						destDir="<%root.global.outputPath%>/<%firstLetterToLowerCase value = <%^className%> %>" %>
+				<%file template=manager_net_server.template		filename="<%apiName%>_NET_Server.java"				destDir="<%root.global.outputPath%>/<%firstLetterToLowerCase value = <%^className%> %>" %>
+			<%endfor%>
+
+			<%if <%accessType%> = "transparent" %>
+				<%file template=manager_interface.template		filename = "<%className%>Manager_Interface.java"		destDir = "<%root.global.outputPath%>/<%firstLetterToLowerCase value = <%className%> %>" %>
+
+				<%first%>
+					<%outerContext contextname = root  optionalJumpToParentContext = "^" %>
+						<%file template=manager_factory.template				filename = "<%root.global.serviceGroupName%>ManagerFactory.java"		destDir = "<%root.global.outputPath%>/factory" %>
+						<%file template=manager_factory_config.template		filename = "<%root.global.serviceGroupName%>ManagerFactoryConfig.xml"	destDir = "<%root.global.outputPath%>/factory" %>
+					<%endcontext%>
+				<%endFirst%>
+			<%endif%>
+		<%endfor%><
 
 
 	b) The outer context tags required that I make the tag attribute parser a little more flexible.  The down side is that it potentially
