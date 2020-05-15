@@ -146,7 +146,7 @@ public class CodeGenerator {
 		}
 		catch (Throwable t_error)
 		{
-			Logger.LogError("CodeGenerator.Cleanup() failed with error: ", t_error);
+			Logger.LogException("CodeGenerator.Cleanup() failed with error: ", t_error);
 		}
 	}
 }

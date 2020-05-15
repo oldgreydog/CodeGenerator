@@ -46,10 +46,10 @@ import coreutil.logging.*;
  */
 public class TabSettings extends TemplateBlock_Base {
 
-	static public final String		BLOCK_NAME					= "tabSettings";
+	static public final String		BLOCK_NAME				= "tabSettings";
 
-	static private final String		STOP_ATTRIBUTE_TAB_LENGTH	= "tabLength";
-	static private final String		STOP_ATTRIBUTE_OUTPUT_TYPE	= "outputType";
+	static private final String		ATTRIBUTE_TAB_LENGTH	= "tabLength";
+	static private final String		ATTRIBUTE_OUTPUT_TYPE	= "outputType";
 
 
 	// Data members
@@ -67,17 +67,20 @@ public class TabSettings extends TemplateBlock_Base {
 	@Override
 	public boolean Init(TagParser p_tagParser) {
 		try {
-			m_lineNumber = p_tagParser.GetLineNumber();
+			if (!super.Init(p_tagParser)) {
+				Logger.LogError("TabSettings.Init() failed in the parent Init().");
+				return false;
+			}
 
-			TagAttributeParser t_nodeAttribute = p_tagParser.GetNamedAttribute(STOP_ATTRIBUTE_TAB_LENGTH);
+			TagAttributeParser t_nodeAttribute = p_tagParser.GetNamedAttribute(ATTRIBUTE_TAB_LENGTH);
 			if (t_nodeAttribute == null) {
-				Logger.LogError("TabSettings.Init() did not find the [" + STOP_ATTRIBUTE_TAB_LENGTH + "] attribute that is required for [" + BLOCK_NAME + "] tags at line number [" + m_lineNumber + "].");
+				Logger.LogError("TabSettings.Init() did not find the [" + ATTRIBUTE_TAB_LENGTH + "] attribute that is required for [" + BLOCK_NAME + "] tags at line number [" + m_lineNumber + "].");
 				return false;
 			}
 
 			String t_tabLengthString = t_nodeAttribute.GetAttributeValueAsString();
 			if (t_tabLengthString == null) {
-				Logger.LogError("TabSettings.Evaluate() failed to get the [" + STOP_ATTRIBUTE_TAB_LENGTH + "] value at line number [" + m_lineNumber + "].");
+				Logger.LogError("TabSettings.Evaluate() failed to get the [" + ATTRIBUTE_TAB_LENGTH + "] value at line number [" + m_lineNumber + "].");
 				return false;
 			}
 
@@ -85,15 +88,15 @@ public class TabSettings extends TemplateBlock_Base {
 
 
 			// The offset attribute is required for type "stop" but not for "marker".
-			t_nodeAttribute = p_tagParser.GetNamedAttribute(STOP_ATTRIBUTE_OUTPUT_TYPE);
+			t_nodeAttribute = p_tagParser.GetNamedAttribute(ATTRIBUTE_OUTPUT_TYPE);
 			if (t_nodeAttribute == null) {
-				Logger.LogError("TabSettings.Init() did not find the [" + STOP_ATTRIBUTE_OUTPUT_TYPE + "] attribute that is required for [" + BLOCK_NAME + "] tags at line number [" + m_lineNumber + "].");
+				Logger.LogError("TabSettings.Init() did not find the [" + ATTRIBUTE_OUTPUT_TYPE + "] attribute that is required for [" + BLOCK_NAME + "] tags at line number [" + m_lineNumber + "].");
 				return false;
 			}
 
 			String t_outputType = t_nodeAttribute.GetAttributeValueAsString();
 			if (t_outputType == null) {
-				Logger.LogError("TabSettings.Evaluate() failed to get the [" + STOP_ATTRIBUTE_OUTPUT_TYPE + "] value at line number [" + m_lineNumber + "].");
+				Logger.LogError("TabSettings.Evaluate() failed to get the [" + ATTRIBUTE_OUTPUT_TYPE + "] value at line number [" + m_lineNumber + "].");
 				return false;
 			}
 
@@ -105,7 +108,7 @@ public class TabSettings extends TemplateBlock_Base {
 			return true;
 		}
 		catch (Throwable t_error) {
-			Logger.LogError("TabSettings.Init() failed with error at line number [" + m_lineNumber + "]: ", t_error);
+			Logger.LogException("TabSettings.Init() failed with error at line number [" + m_lineNumber + "]: ", t_error);
 			return false;
 		}
 	}
@@ -147,7 +150,7 @@ public class TabSettings extends TemplateBlock_Base {
 			TabStop.SetOutputType(m_outputType);
 		}
 		catch (Throwable t_error) {
-			Logger.LogError("TabSettings.Evaluate() failed with error: ", t_error);
+			Logger.LogException("TabSettings.Evaluate() failed with error: ", t_error);
 			return false;
 		}
 

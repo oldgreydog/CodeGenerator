@@ -51,7 +51,7 @@ public class TemplateParser {
 			return t_generalBlock;
 		}
 		catch (Throwable t_error) {
-			Logger.LogError("TemplateParser.ParseTemplate() failed with error : ", t_error);
+			Logger.LogException("TemplateParser.ParseTemplate() failed with error : ", t_error);
 			return null;
 		}
 	}

@@ -59,11 +59,11 @@ public class TabStop extends TemplateBlock_Base {
 
 	static public final String		BLOCK_NAME					= "tabStop";
 
-	static private final String		STOP_ATTRIBUTE_STOP_TYPE	= "stopType";
-	static private final String		STOP_ATTRIBUTE_OFFSET		= "offset";
+	static private final String		ATTRIBUTE_STOP_TYPE			= "stopType";
+	static private final String		ATTRIBUTE_OFFSET			= "offset";
 
-	static private final String		STOP_TYPE_lABEL_STOP		= "stop";
-	static private final String		STOP_TYPE_lABEL_MARKER		= "marker";
+	static private final String		STOP_TYPE_LABEL_STOP		= "stop";
+	static private final String		STOP_TYPE_LABEL_MARKER		= "marker";
 
 	static public  final int		OUTPUT_TYPE_UNDEFINED		= -1;
 	static public  final int		OUTPUT_TYPE_TABS			= 1;
@@ -165,41 +165,44 @@ public class TabStop extends TemplateBlock_Base {
 	@Override
 	public boolean Init(TagParser p_tagParser) {
 		try {
-			m_lineNumber = p_tagParser.GetLineNumber();
+			if (!super.Init(p_tagParser)) {
+				Logger.LogError("TabStop.Init() failed in the parent Init().");
+				return false;
+			}
 
-			TagAttributeParser t_nodeAttribute = p_tagParser.GetNamedAttribute(STOP_ATTRIBUTE_STOP_TYPE);
+			TagAttributeParser t_nodeAttribute = p_tagParser.GetNamedAttribute(ATTRIBUTE_STOP_TYPE);
 			if (t_nodeAttribute == null) {
-				Logger.LogError("TabStop.Init() did not find the [" + STOP_ATTRIBUTE_STOP_TYPE + "] attribute that is required for TabStop tags at line number [" + m_lineNumber + "].");
+				Logger.LogError("TabStop.Init() did not find the [" + ATTRIBUTE_STOP_TYPE + "] attribute that is required for TabStop tags at line number [" + m_lineNumber + "].");
 				return false;
 			}
 
 			String t_stopType = t_nodeAttribute.GetAttributeValueAsString();
 			if (t_stopType == null) {
-				Logger.LogError("TabStop.Evaluate() failed to get the [" + STOP_ATTRIBUTE_STOP_TYPE + "] value at line number [" + m_lineNumber + "].");
+				Logger.LogError("TabStop.Evaluate() failed to get the [" + ATTRIBUTE_STOP_TYPE + "] value at line number [" + m_lineNumber + "].");
 				return false;
 			}
 
-			if (t_stopType.equalsIgnoreCase(STOP_TYPE_lABEL_STOP))
+			if (t_stopType.equalsIgnoreCase(STOP_TYPE_LABEL_STOP))
 				m_stopType = STOP_TYPE_STOP;
-			else if (t_stopType.equalsIgnoreCase(STOP_TYPE_lABEL_MARKER))
+			else if (t_stopType.equalsIgnoreCase(STOP_TYPE_LABEL_MARKER))
 				m_stopType = STOP_TYPE_MARKER;
 			else {
-				Logger.LogError("TabStop.Init() received an invalid value [" + t_stopType + "]] for the attribute [" + STOP_ATTRIBUTE_STOP_TYPE + "] at line number [" + m_lineNumber + "].");
+				Logger.LogError("TabStop.Init() received an invalid value [" + t_stopType + "]] for the attribute [" + ATTRIBUTE_STOP_TYPE + "] at line number [" + m_lineNumber + "].");
 				return false;
 			}
 
 
 			// The offset attribute is required for type "stop" but not for "marker".
-			t_nodeAttribute = p_tagParser.GetNamedAttribute(STOP_ATTRIBUTE_OFFSET);
+			t_nodeAttribute = p_tagParser.GetNamedAttribute(ATTRIBUTE_OFFSET);
 			if ((m_stopType == STOP_TYPE_STOP) && (t_nodeAttribute == null)) {
-				Logger.LogError("TabStop.Init() did not find the [" + STOP_ATTRIBUTE_OFFSET + "] attribute that is required when the [" + STOP_ATTRIBUTE_STOP_TYPE + "] attribute is set to [" + STOP_TYPE_lABEL_STOP + "] at line number [" + m_lineNumber + "].");
+				Logger.LogError("TabStop.Init() did not find the [" + ATTRIBUTE_OFFSET + "] attribute that is required when the [" + ATTRIBUTE_STOP_TYPE + "] attribute is set to [" + STOP_TYPE_LABEL_STOP + "] at line number [" + m_lineNumber + "].");
 				return false;
 			}
 
 			if (t_nodeAttribute != null) {
 				String t_offsetValue = t_nodeAttribute.GetAttributeValueAsString();
 				if (t_offsetValue == null) {
-					Logger.LogError("TabStop.Evaluate() failed to get the [" + STOP_ATTRIBUTE_OFFSET + "] value at line number [" + m_lineNumber + "].");
+					Logger.LogError("TabStop.Evaluate() failed to get the [" + ATTRIBUTE_OFFSET + "] value at line number [" + m_lineNumber + "].");
 					return false;
 				}
 
@@ -209,7 +212,7 @@ public class TabStop extends TemplateBlock_Base {
 			return true;
 		}
 		catch (Throwable t_error) {
-			Logger.LogError("TabStop.Init() failed with error at line number [" + m_lineNumber + "]: ", t_error);
+			Logger.LogException("TabStop.Init() failed with error at line number [" + m_lineNumber + "]: ", t_error);
 			return false;
 		}
 	}
@@ -308,7 +311,7 @@ public class TabStop extends TemplateBlock_Base {
 			}
 		}
 		catch (Throwable t_error) {
-			Logger.LogError("TabStop.Evaluate() failed with error: ", t_error);
+			Logger.LogException("TabStop.Evaluate() failed with error: ", t_error);
 			return false;
 		}
 

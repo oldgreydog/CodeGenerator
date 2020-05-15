@@ -43,7 +43,10 @@ The input value can be any mix of upper and lower case.
 */
 public class CamelCase extends TemplateBlock_Base {
 
-	static public final String		BLOCK_NAME		= "camelCase";
+	static public final String		BLOCK_NAME						= "camelCase";
+
+	static public final String		ATTRIBUTE_VALUE					= "value";
+	static public final String		ATTRIBUTE_OPTIONAL_SEPARATOR	= "optionalSeparator";
 
 
 	// Data members
@@ -62,25 +65,28 @@ public class CamelCase extends TemplateBlock_Base {
 	@Override
 	public boolean Init(TagParser p_tagParser) {
 		try {
-			m_lineNumber = p_tagParser.GetLineNumber();
+			if (!super.Init(p_tagParser)) {
+				Logger.LogError("CamelCase.Init() failed in the parent Init() at line number [" + p_tagParser.GetLineNumber() + "].");
+				return false;
+			}
 
-			TagAttributeParser t_nodeAttribute = p_tagParser.GetNamedAttribute("value");
+			TagAttributeParser t_nodeAttribute = p_tagParser.GetNamedAttribute(ATTRIBUTE_VALUE);
 			if (t_nodeAttribute == null) {
-				Logger.LogError("CamelCase.Init() did not find the [value] attribute that is required for CamelCase tags at line number [" + m_lineNumber + "].");
+				Logger.LogError("CamelCase.Init() did not find the [" + ATTRIBUTE_VALUE + "] attribute that is required for CamelCase tags at line number [" + m_lineNumber + "].");
 				return false;
 			}
 
 			m_value = t_nodeAttribute.GetAttributeValue();
 			if (m_value == null) {
-				Logger.LogError("CamelCase.Init() did not get the [value] value from attribute that is required for CamelCase tags at line number [" + m_lineNumber + "].");
+				Logger.LogError("CamelCase.Init() did not get the [" + ATTRIBUTE_VALUE + "] value from attribute that is required for CamelCase tags at line number [" + m_lineNumber + "].");
 				return false;
 			}
 
-			t_nodeAttribute = p_tagParser.GetNamedAttribute("optionalSeparator");
+			t_nodeAttribute = p_tagParser.GetNamedAttribute(ATTRIBUTE_OPTIONAL_SEPARATOR);
 			if (t_nodeAttribute != null) {
 				m_optionalSeparator = t_nodeAttribute.GetAttributeValueAsString();
 				if (m_optionalSeparator == null) {
-					Logger.LogError("CamelCase.Init() did not get the value from the optional attribute [optionalSeparator] at line number [" + m_lineNumber + "].");
+					Logger.LogError("CamelCase.Init() did not get the value from the optional attribute [" + ATTRIBUTE_OPTIONAL_SEPARATOR + "] at line number [" + m_lineNumber + "].");
 					return false;
 				}
 			}
@@ -88,7 +94,7 @@ public class CamelCase extends TemplateBlock_Base {
 			return true;
 		}
 		catch (Throwable t_error) {
-			Logger.LogError("CamelCase.Init() failed with error: ", t_error);
+			Logger.LogException("CamelCase.Init() failed with error: ", t_error);
 			return false;
 		}
 	}
@@ -133,7 +139,7 @@ public class CamelCase extends TemplateBlock_Base {
 			p_writer.Write(CreateCamelCaseName(t_valueWriter.toString()));
 		}
 		catch (Throwable t_error) {
-			Logger.LogError("CamelCase.Evaluate() failed with error: ", t_error);
+			Logger.LogException("CamelCase.Evaluate() failed with error: ", t_error);
 			return false;
 		}
 

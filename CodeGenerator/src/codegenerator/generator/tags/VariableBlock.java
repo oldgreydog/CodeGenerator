@@ -46,19 +46,26 @@ up and simplified.</p>
 block set for that variable name at that location.  Obviously, all of the config value references must
 also be valid for that location.</p>
 
-<pre><code>&lt;%variable name = "primeNames" evalmode = "evaluate" %&gt;</code></pre>
+<pre><code>&lt;%variable name = "primeNames" evalmode = "evaluate" optionalContextName = "outer1" %&gt;</code></pre>
+
+<p> !!NOTE!! The attribute "optionalContextName" is optional!  Now that outer contexts exist, I had to add this so that
+variables could be made to work even inside inner contexts.
 
 */
 public class VariableBlock extends TemplateBlock_Base {
 
-	static public final String		BLOCK_NAME				= "variable";
+	static public final String		BLOCK_NAME							= "variable";
 
-	static public final String		ATTRIBUTE_NAME			= "name";
-	static public final String		ATTRIBUTE_EVAL_MODE		= "evalmode";
+	static public final String		ATTRIBUTE_NAME						= "name";
+	static public final String		ATTRIBUTE_EVAL_MODE					= "evalMode";
+	static public final String		ATTRIBUTE_OPTIONAL_CONTEXT_NAME		= "optionalContextName";
 
-	static public final int			EVAL_MODE_UNDEFINED		= -1;
-	static public final int			EVAL_MODE_SET			= 1;
-	static public final int			EVAL_MODE_EVALUATE		= 2;
+	static public final String		EVAL_MODE_LABEL_SET					= "set";
+	static public final String		EVAL_MODE_LABEL_EVALUATE			= "evaluate";
+
+	static public final int			EVAL_MODE_VALUE_UNDEFINED			= -1;
+	static public final int			EVAL_MODE_VALUE_SET					= 1;
+	static public final int			EVAL_MODE_VALUE_EVALUATE			= 2;
 
 
 	// Static members
@@ -66,8 +73,9 @@ public class VariableBlock extends TemplateBlock_Base {
 
 
 	// Data members
-	protected String	m_variableName	= null;
-	protected int		m_evalMode		= EVAL_MODE_UNDEFINED;	// This is the name of the config node that will be the temporary "root" node for each iteration of the loop.  For example, if this is == "class", then when we enter Evaluate(), we will run through the loop once for each "class" child node we find on the passed-in p_currentNode.
+	private String		m_variableName	= null;
+	private int			m_evalMode		= EVAL_MODE_VALUE_UNDEFINED;	// This is the name of the config node that will be the temporary "root" node for each iteration of the loop.  For example, if this is == "class", then when we enter Evaluate(), we will run through the loop once for each "class" child node we find on the passed-in p_currentNode.
+	private	String		m_contextName	= null;					// The optional outer context in which to evaluate this variable.
 
 
 	//*********************************
@@ -87,7 +95,10 @@ public class VariableBlock extends TemplateBlock_Base {
 	//*********************************
 	@Override
 	public boolean Init(TagParser p_tagParser) {
-		m_lineNumber = p_tagParser.GetLineNumber();
+		if (!super.Init(p_tagParser)) {
+			Logger.LogError("VariableBlock.Init() failed in the parent Init().");
+			return false;
+		}
 
 		TagAttributeParser t_nodeAttribute = p_tagParser.GetNamedAttribute(ATTRIBUTE_NAME);
 		if (t_nodeAttribute == null) {
@@ -111,18 +122,25 @@ public class VariableBlock extends TemplateBlock_Base {
 
 		String t_evalMode = t_nodeAttribute.GetAttributeValueAsString();
 		if (t_evalMode == null) {
-			Logger.LogError("VariableBlock.Init() did not get the value from attribute that is required for variable tags at line number [" + m_lineNumber + "].");
+			Logger.LogError("VariableBlock.Init() did not get the value from attribute [" + ATTRIBUTE_EVAL_MODE + "] that is required for variable tags at line number [" + m_lineNumber + "].");
 			return false;
 		}
 
-		if (t_evalMode.equalsIgnoreCase("set"))
-			m_evalMode = EVAL_MODE_SET;
-		else if (t_evalMode.equalsIgnoreCase("evaluate"))
-			m_evalMode = EVAL_MODE_EVALUATE;
+		if (t_evalMode.equalsIgnoreCase(EVAL_MODE_LABEL_SET))
+			m_evalMode = EVAL_MODE_VALUE_SET;
+		else if (t_evalMode.equalsIgnoreCase(EVAL_MODE_LABEL_EVALUATE))
+			m_evalMode = EVAL_MODE_VALUE_EVALUATE;
 		else {
 			Logger.LogError("VariableBlock.Init() received and invalid evalmode value [" + t_evalMode + "].");
 			return false;
 		}
+
+
+		// The "contextname" attribute is optional, so it's fine if it doesn't exist.
+		t_nodeAttribute = p_tagParser.GetNamedAttribute(ATTRIBUTE_OPTIONAL_CONTEXT_NAME);
+		if (t_nodeAttribute != null)
+			m_contextName = t_nodeAttribute.GetAttributeValueAsString();
+
 
 		return true;
 	}
@@ -133,18 +151,18 @@ public class VariableBlock extends TemplateBlock_Base {
 	public boolean Parse(TemplateTokenizer p_tokenizer) {
 		try {
 			// We only parse the variable block in "set" mode.  Otherwise, there is nothing after the opening tag.
-			if (m_evalMode != EVAL_MODE_SET)
+			if (m_evalMode != EVAL_MODE_VALUE_SET)
 				return true;
 
 			GeneralBlock t_generalBlock	= new GeneralBlock();
 			if (!t_generalBlock.Parse(p_tokenizer)) {
-				Logger.LogError("VariableBlock.Parse() general block parser failed.");
+				Logger.LogError("VariableBlock.Parse() general block parser failed in the block starting at [" + m_lineNumber + "].");
 				return false;
 			}
 
 			String t_endingTagName = t_generalBlock.GetUnknownTag().GetTagName();
 			if (!t_endingTagName.equalsIgnoreCase("endvariable")) {
-				Logger.LogError("VariableBlock.Parse() general block ended on a tag named [" + t_endingTagName + "] at line [" + p_tokenizer.GetLineCount() + "].  The closing tag [endfor] was expected.");
+				Logger.LogError("VariableBlock.Parse() general block ended on a tag named [" + t_endingTagName + "] at line [" + p_tokenizer.GetLineCount() + "] in the block starting at [" + m_lineNumber + "].  The closing tag [endfor] was expected.");
 				return false;
 			}
 
@@ -153,7 +171,7 @@ public class VariableBlock extends TemplateBlock_Base {
 			return true;
 		}
 		catch (Throwable t_error) {
-			Logger.LogError("VariableBlock.Parse() failed with error at line [" + m_lineNumber + "]: ", t_error);
+			Logger.LogException("VariableBlock.Parse() failed with error at line [" + p_tokenizer.GetLineCount() + "] in the block starting at [" + m_lineNumber + "]: ", t_error);
 			return false;
 		}
 	}
@@ -167,16 +185,26 @@ public class VariableBlock extends TemplateBlock_Base {
 							LoopCounter		p_iterationCounter)
 	{
 		try {
-			if (m_evalMode == EVAL_MODE_SET)		// Don't do anything for instances that are "set"s.  Those are never "evaluated".
+			if (m_evalMode == EVAL_MODE_VALUE_SET)		// Don't do anything for instances that are "set"s.  Those are never "evaluated".
 				return true;
-			else if (m_evalMode == EVAL_MODE_EVALUATE) {
+			else if (m_evalMode == EVAL_MODE_VALUE_EVALUATE) {
 				TemplateBlock_Base t_evalBlock = m_variableMap.get(m_variableName);
 				if (t_evalBlock == null) {
 					Logger.LogError("VariableBlock.Evaluate() did not find a evaluation block for variable [" + m_variableName + "] at line [" + m_lineNumber + "].");
 					return false;
 				}
 
-				if (!t_evalBlock.Evaluate(p_currentNode, p_rootNode, p_writer, p_iterationCounter))
+				// The addition of outer contexts means that if you use a variable inside an inner context, you may need to point it to the outer context to get the correct values in the evaluation of the variable.
+				ConfigNode t_currentNode = p_currentNode;
+				if (m_contextName != null) {
+					t_currentNode = OuterContextManager.GetOuterContext(m_contextName);
+					if (t_currentNode == null) {
+						Logger.LogError("VariableBlock.Evaluate() failed to find the outer context [" + m_contextName + "] for the evaluation mode at line [" + m_lineNumber + "].");
+						return false;
+					}
+				}
+
+				if (!t_evalBlock.Evaluate(t_currentNode, p_rootNode, p_writer, p_iterationCounter))
 					return false;
 			}
 			else {
@@ -185,7 +213,7 @@ public class VariableBlock extends TemplateBlock_Base {
 			}
 		}
 		catch (Throwable t_error) {
-			Logger.LogError("VariableBlock.Evaluate() failed with error at line [" + m_lineNumber + "]: ", t_error);
+			Logger.LogException("VariableBlock.Evaluate() failed with error at line [" + m_lineNumber + "]: ", t_error);
 			return false;
 		}
 

@@ -38,7 +38,9 @@ import codegenerator.generator.utils.*;
 */
 public class Counter extends TemplateBlock_Base {
 
-	static public final String	BLOCK_NAME	= "counter";
+	static public final String		BLOCK_NAME							= "counter";
+
+	static public final String		ATTRIBUTE_OPTIONAL_COUNTER_NAME		= "optionalCounterName";
 
 	// Data members
 	private	String	m_optionalCounterName	= null;	// Providing a name for the loop counter lets you specify using a named loop counter from a foreach block other than the one directly containing this first block.
@@ -54,14 +56,17 @@ public class Counter extends TemplateBlock_Base {
 	//*********************************
 	@Override
 	public boolean Init(TagParser p_tagParser) {
-		m_lineNumber = p_tagParser.GetLineNumber();
+		if (!super.Init(p_tagParser)) {
+			Logger.LogError("Counter.Init() failed in the parent Init() at line number [" + p_tagParser.GetLineNumber() + "].");
+			return false;
+		}
 
 		// The attribute "optionalCounterName" is, obviously, optional, so we need to handle it that way.
-		TagAttributeParser t_nodeAttribute = p_tagParser.GetNamedAttribute("optionalCounterName");
+		TagAttributeParser t_nodeAttribute = p_tagParser.GetNamedAttribute(ATTRIBUTE_OPTIONAL_COUNTER_NAME);
 		if (t_nodeAttribute != null) {
 			m_optionalCounterName = t_nodeAttribute.GetAttributeValueAsString();
 			if (m_optionalCounterName == null) {
-				Logger.LogError("Counter.Init() did not get the value from the [optionalCounterName] attribute.");
+				Logger.LogError("Counter.Init() did not get the value from the [" + ATTRIBUTE_OPTIONAL_COUNTER_NAME + "] attribute.");
 				return false;
 			}
 		}
@@ -105,7 +110,7 @@ public class Counter extends TemplateBlock_Base {
 			p_writer.Write(Integer.toString(t_iterationCounter.GetCounter()));
 		}
 		catch (Throwable t_error) {
-			Logger.LogError("Counter.Evaluate() failed with error: ", t_error);
+			Logger.LogException("Counter.Evaluate() failed with error: ", t_error);
 			return false;
 		}
 

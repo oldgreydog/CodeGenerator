@@ -109,7 +109,7 @@ public class CustomCodeManager {
 			return true;
 		}
 		catch (Throwable t_error) {
-			Logger.LogError("CustomeCodeManager.ScanFile() failed with error: ", t_error);
+			Logger.LogException("CustomeCodeManager.ScanFile() failed with error: ", t_error);
 			return false;
 		}
 		finally {

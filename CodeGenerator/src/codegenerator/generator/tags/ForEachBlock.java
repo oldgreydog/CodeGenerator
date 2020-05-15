@@ -164,7 +164,10 @@ import codegenerator.generator.utils.*;
  */
 public class ForEachBlock extends TemplateBlock_Base {
 
-	static public final String	BLOCK_NAME		= "foreach";
+	static public final String		BLOCK_NAME							= "foreach";
+
+	static public final String		ATTRIBUTE_NODE						= "node";
+	static public final String		ATTRIBUTE_OPTIONAL_COUNTER_NAME		= "optionalCounterName";
 
 
 	// Data members
@@ -190,15 +193,20 @@ public class ForEachBlock extends TemplateBlock_Base {
 	@Override
 	public boolean Init(TagParser p_tagParser) {
 		try {
-			TagAttributeParser t_nodeAttribute = p_tagParser.GetNamedAttribute("node");
+			if (!super.Init(p_tagParser)) {
+				Logger.LogError("ForEachBlock.Init() failed in the parent Init() at line number [" + p_tagParser.GetLineNumber() + "].");
+				return false;
+			}
+
+			TagAttributeParser t_nodeAttribute = p_tagParser.GetNamedAttribute(ATTRIBUTE_NODE);
 			if (t_nodeAttribute == null) {
-				Logger.LogError("ForEachBlock.Init() did not find the [node] attribute that is required for foreach tags.");
+				Logger.LogError("ForEachBlock.Init() did not find the [" + ATTRIBUTE_NODE + "] attribute that is required for foreach tags.");
 				return false;
 			}
 
 			m_nodeName = t_nodeAttribute.GetAttributeValueAsString();
 			if (m_nodeName == null) {
-				Logger.LogError("ForEachBlock.Init() did not get the value from attribute that is required for foreach tags.");
+				Logger.LogError("ForEachBlock.Init() did not get the value from attribute [" + ATTRIBUTE_NODE + "] that is required for foreach tags.");
 				return false;
 			}
 
@@ -210,11 +218,11 @@ public class ForEachBlock extends TemplateBlock_Base {
 
 
 			// The attribute "optionalCounterName" is, obviously, optional, so we need to handle it that way.
-			t_nodeAttribute = p_tagParser.GetNamedAttribute("optionalCounterName");
+			t_nodeAttribute = p_tagParser.GetNamedAttribute(ATTRIBUTE_OPTIONAL_COUNTER_NAME);
 			if (t_nodeAttribute != null) {
 				m_optionalCounterName = t_nodeAttribute.GetAttributeValueAsString();
 				if (m_optionalCounterName == null) {
-					Logger.LogError("ForEachBlock.Init() did not get the value from attribute that is required for foreach tags.");
+					Logger.LogError("ForEachBlock.Init() did not get the value from attribute [" + ATTRIBUTE_OPTIONAL_COUNTER_NAME + "] that is required for foreach tags.");
 					return false;
 				}
 			}
@@ -222,7 +230,7 @@ public class ForEachBlock extends TemplateBlock_Base {
 			return true;
 		}
 		catch (Throwable t_error) {
-			Logger.LogError("ForEachBlock.Init() failed with error: ", t_error);
+			Logger.LogException("ForEachBlock.Init() failed with error: ", t_error);
 			return false;
 		}
 	}
@@ -234,13 +242,13 @@ public class ForEachBlock extends TemplateBlock_Base {
 		try {
 			GeneralBlock t_generalBlock	= new GeneralBlock();
 			if (!t_generalBlock.Parse(p_tokenizer)) {
-				Logger.LogError("ForEachBlock.Parse() general block parser failed.");
+				Logger.LogError("ForEachBlock.Parse() general block parser failed at line [" + p_tokenizer.GetLineCount() + "] in the block starting at [" + m_lineNumber + "].");
 				return false;
 			}
 
 			String t_endingTagName = t_generalBlock.GetUnknownTag().GetTagName();
 			if (!t_endingTagName.equalsIgnoreCase("endfor")) {
-				Logger.LogError("ForEachBlock.Parse() general block ended on a tag named [" + t_endingTagName + "] at line [" + p_tokenizer.GetLineCount() + "].  The closing tag [endfor] was expected.");
+				Logger.LogError("ForEachBlock.Parse() general block ended on a tag named [" + t_endingTagName + "] at line [" + p_tokenizer.GetLineCount() + "] in the block starting at [" + m_lineNumber + "].  The closing tag [endfor] was expected.");
 				return false;
 			}
 
@@ -249,7 +257,7 @@ public class ForEachBlock extends TemplateBlock_Base {
 			return true;
 		}
 		catch (Throwable t_error) {
-			Logger.LogError("ForEachBlock.Parse() failed with error at line [" + p_tokenizer.GetLineCount() + "]: ", t_error);
+			Logger.LogException("ForEachBlock.Parse() failed with error at line [" + p_tokenizer.GetLineCount() + "] in the block starting at [" + m_lineNumber + "]: ", t_error);
 			return false;
 		}
 	}
@@ -301,7 +309,7 @@ public class ForEachBlock extends TemplateBlock_Base {
 			}
 		}
 		catch (Throwable t_error) {
-			Logger.LogError("ForEachBlock.Evaluate() failed with error: ", t_error);
+			Logger.LogException("ForEachBlock.Evaluate() failed with error: ", t_error);
 			return false;
 		}
 

@@ -66,7 +66,7 @@ public class TagAttributeParser {
 			return null;
 		}
 		catch (Throwable t_error) {
-			Logger.LogError("TagAttributeParser.GetAttributeValueAsString() failed with error: ", t_error);
+			Logger.LogException("TagAttributeParser.GetAttributeValueAsString() failed with error: ", t_error);
 			return null;
 		}
 	}
@@ -95,7 +95,7 @@ public class TagAttributeParser {
 			return null;
 		}
 		catch (Throwable t_error) {
-			Logger.LogError("TagAttributeParser.GetAttributeValueAsString() failed with error: ", t_error);
+			Logger.LogException("TagAttributeParser.GetAttributeValueAsString() failed with error: ", t_error);
 			return null;
 		}
 	}
@@ -229,7 +229,7 @@ public class TagAttributeParser {
 			return false;
 		}
 		catch (Throwable t_error) {
-			Logger.LogError("TagAttributeParser.Parse() failed with error at line [" + p_tokenizer.GetLineCount() + "]: ", t_error);
+			Logger.LogException("TagAttributeParser.Parse() failed with error at line [" + p_tokenizer.GetLineCount() + "]: ", t_error);
 			return false;
 		}
 	}

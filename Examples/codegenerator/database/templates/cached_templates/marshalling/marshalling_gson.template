@@ -30,7 +30,7 @@ public class Gson<%className%>Marshalling implements <%className%>Marshalling {
 			return t_gson.toJson(p_<%firstLetterToLowerCase value = <%className%>%>);
 		}
 		catch (Exception t_error) {
-			Logger.LogError("Gson<%className%>Marshalling.Marshal(<%className%>) failed with error: ", t_error);
+			Logger.LogException("Gson<%className%>Marshalling.Marshal(<%className%>) failed with error: ", t_error);
 			return null;
 		}
 	}
@@ -44,7 +44,7 @@ public class Gson<%className%>Marshalling implements <%className%>Marshalling {
 			return t_gson.toJson(p_<%firstLetterToLowerCase value = <%className%>%>List);
 		}
 		catch (Exception t_error) {
-			Logger.LogError("Gson<%className%>Marshalling.Marshal(LinkedList<<%className%>>) failed with error: ", t_error);
+			Logger.LogException("Gson<%className%>Marshalling.Marshal(LinkedList<<%className%>>) failed with error: ", t_error);
 			return null;
 		}
 	}
@@ -58,7 +58,7 @@ public class Gson<%className%>Marshalling implements <%className%>Marshalling {
 			return t_gson.fromJson(p_string, <%className%>.class);
 		}
 		catch (Exception t_error) {
-			Logger.LogError("Gson<%className%>Marshalling.UnMarshal() failed with error: ", t_error);
+			Logger.LogException("Gson<%className%>Marshalling.UnMarshal() failed with error: ", t_error);
 			return null;
 		}
 	}
@@ -73,7 +73,7 @@ public class Gson<%className%>Marshalling implements <%className%>Marshalling {
 			return t_gson.fromJson(p_string, t_collectionType);
 		}
 		catch (Exception t_error) {
-			Logger.LogError("Gson<%className%>Marshalling.UnMarshalList() failed with error: ", t_error);
+			Logger.LogException("Gson<%className%>Marshalling.UnMarshalList() failed with error: ", t_error);
 			return null;
 		}
 	}

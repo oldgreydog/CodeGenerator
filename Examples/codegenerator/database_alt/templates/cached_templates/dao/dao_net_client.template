@@ -102,7 +102,7 @@ public class <%className%>DAO_NET extends Request_Base implements <%className%>D
 			return t_resultList;
 		}
 		catch (Exception t_error) {
-			Logger.LogError("<%className%>DAO_NET.LoadAll<%className%>() failed with error: ", t_error);
+			Logger.LogException("<%className%>DAO_NET.LoadAll<%className%>() failed with error: ", t_error);
 			return null;
 		}
 	}<%endtext%>
@@ -154,7 +154,7 @@ public class <%className%>DAO_NET extends Request_Base implements <%className%>D
 			return t_result;
 		}
 		catch (Exception t_error) {
-			Logger.LogError("<%^className%>DAO_NET.Load<%^className%>For<%name%>() failed with error: ", t_error);
+			Logger.LogException("<%^className%>DAO_NET.Load<%^className%>For<%name%>() failed with error: ", t_error);
 			return null;
 		}
 	}<%endtext%>
@@ -208,7 +208,7 @@ public class <%className%>DAO_NET extends Request_Base implements <%className%>D
 			return t_resultList;
 		}
 		catch (Exception t_error) {
-			Logger.LogError("<%^className%>DAO_NET.LoadAll<%^className%>For<%name%>() failed with error: ", t_error);
+			Logger.LogException("<%^className%>DAO_NET.LoadAll<%^className%>For<%name%>() failed with error: ", t_error);
 			return null;
 		}
 	}<%endtext%>
@@ -279,7 +279,7 @@ public class <%className%>DAO_NET extends Request_Base implements <%className%>D
 
 <%text%>		}
 		catch (Exception t_error) {
-			Logger.LogError("<%className%>DAO_NET.Create<%className%>() failed with error: ", t_error);
+			Logger.LogException("<%className%>DAO_NET.Create<%className%>() failed with error: ", t_error);
 			return false;
 		}
 
@@ -315,7 +315,7 @@ public class <%className%>DAO_NET extends Request_Base implements <%className%>D
 											true);	<%tabStop stopType = "stop" offset = "100" %>// boolean	p_removeThisHandlerAfterEachCall
 		}
 		catch (Exception t_error) {
-			Logger.LogError("<%className%>DAO_NET.Update<%className%>() failed with error: ", t_error);
+			Logger.LogException("<%className%>DAO_NET.Update<%className%>() failed with error: ", t_error);
 			return false;
 		}
 	}
@@ -349,7 +349,7 @@ public class <%className%>DAO_NET extends Request_Base implements <%className%>D
 											true);	<%tabStop stopType = "stop" offset = "100" %>// boolean	p_removeThisHandlerAfterEachCall
 		}
 		catch (Exception t_error) {
-			Logger.LogError("<%className%>DAO_NET.Delete<%className%>() failed with error: ", t_error);
+			Logger.LogException("<%className%>DAO_NET.Delete<%className%>() failed with error: ", t_error);
 			return false;
 		}
 	}

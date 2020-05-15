@@ -60,7 +60,9 @@ import codegenerator.generator.utils.*;
  */
 public class FirstElseBlock extends TemplateBlock_Base {
 
-	static public final String	BLOCK_NAME	= "first";
+	static public final String		BLOCK_NAME							= "first";
+
+	static public final String		ATTRIBUTE_OPTIONAL_COUNTER_NAME		= "optionalCounterName";
 
 	private GeneralBlock		m_firstBlock			= null;
 	private GeneralBlock		m_elseBlock				= null;
@@ -79,14 +81,17 @@ public class FirstElseBlock extends TemplateBlock_Base {
 	//*********************************
 	@Override
 	public boolean Init(TagParser p_tagParser) {
-		m_lineNumber = p_tagParser.GetLineNumber();
+		if (!super.Init(p_tagParser)) {
+			Logger.LogError("FirstElseBlock.Init() failed in the parent Init() at line number [" + p_tagParser.GetLineNumber() + "].");
+			return false;
+		}
 
 		// The attribute "optionalCounterName" is, obviously, optional, so we need to handle it that way.
-		TagAttributeParser t_nodeAttribute = p_tagParser.GetNamedAttribute("optionalCounterName");
+		TagAttributeParser t_nodeAttribute = p_tagParser.GetNamedAttribute(ATTRIBUTE_OPTIONAL_COUNTER_NAME);
 		if (t_nodeAttribute != null) {
 			m_optionalCounterName = t_nodeAttribute.GetAttributeValueAsString();
 			if (m_optionalCounterName == null) {
-				Logger.LogError("FirstElseBlock.Init() did not get the value from the [optionalCounterName] attribute.");
+				Logger.LogError("FirstElseBlock.Init() did not get the value from the [" + ATTRIBUTE_OPTIONAL_COUNTER_NAME + "] attribute.");
 				return false;
 			}
 		}
@@ -109,7 +114,7 @@ public class FirstElseBlock extends TemplateBlock_Base {
 			// Get the general block of tags for the <if> tag.
 			GeneralBlock t_generalBlock	= new GeneralBlock();
 			if (!t_generalBlock.Parse(p_tokenizer)) {
-				Logger.LogError("FirstElseBlock.Parse() general block parser failed.");
+				Logger.LogError("FirstElseBlock.Parse() general block parser failed in the block starting at [" + m_lineNumber + "].");
 				return false;
 			}
 
@@ -121,7 +126,7 @@ public class FirstElseBlock extends TemplateBlock_Base {
 			if (t_endingTagName.equalsIgnoreCase("else")) {
 				t_generalBlock	= new GeneralBlock();
 				if (!t_generalBlock.Parse(p_tokenizer)) {
-					Logger.LogError("FirstElseBlock.Parse() general block parser failed in elseif block.");
+					Logger.LogError("FirstElseBlock.Parse() general block parser failed in elseif block in the block starting at [" + t_generalBlock.m_lineNumber + "].");
 					return false;
 				}
 
@@ -131,12 +136,12 @@ public class FirstElseBlock extends TemplateBlock_Base {
 			}
 
 			if (!t_endingTagName.equalsIgnoreCase("endfirst")) {
-				Logger.LogError("FirstElseBlock.Parse() general block ended on a tag named [" + t_endingTagName + "] at line [" + p_tokenizer.GetLineCount() + "].  The closing tag [endif] was expected.");
+				Logger.LogError("FirstElseBlock.Parse() general block ended on a tag named [" + t_endingTagName + "] at line [" + p_tokenizer.GetLineCount() + "] in the block starting at [" + t_generalBlock.m_lineNumber + "].  The closing tag [endif] was expected.");
 				return false;
 			}
 		}
 		catch (Throwable t_error) {
-			Logger.LogError("FirstElseBlock.Parse() failed with error: ", t_error);
+			Logger.LogException("FirstElseBlock.Parse() failed with error in the block starting at [" + m_lineNumber + "]: ", t_error);
 			return false;
 		}
 
@@ -184,7 +189,7 @@ public class FirstElseBlock extends TemplateBlock_Base {
 			}
 		}
 		catch (Throwable t_error) {
-			Logger.LogError("FirstElseBlock.Evaluate() failed with error: ", t_error);
+			Logger.LogException("FirstElseBlock.Evaluate() failed with error: ", t_error);
 			return false;
 		}
 

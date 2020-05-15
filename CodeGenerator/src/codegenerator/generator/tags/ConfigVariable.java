@@ -124,6 +124,11 @@ public class ConfigVariable extends TemplateBlock_Base {
 
 	//*********************************
 	public boolean Init(TagParser p_tagParser, int p_lineNumber) {
+		if (!super.Init(p_tagParser)) {
+			Logger.LogError("ConfigVariable.Init() failed in the parent Init(). at line number [" + p_tagParser.GetLineNumber() + "]");
+			return false;
+		}
+
 		String t_variableName = p_tagParser.GetTagName();
 		if (t_variableName == null) {
 			Logger.LogError("ConfigVariable.Init() did not find the required variable name at line [" + p_lineNumber + "].");
@@ -200,7 +205,7 @@ public class ConfigVariable extends TemplateBlock_Base {
 			p_writer.Write(t_value);
 		}
 		catch (Throwable t_error) {
-			Logger.LogError("ConfigVariable.Evaluate() failed with error at line [" + m_lineNumber + "]: ", t_error);
+			Logger.LogException("ConfigVariable.Evaluate() failed with error at line [" + m_lineNumber + "]: ", t_error);
 			return false;
 		}
 

@@ -41,7 +41,9 @@ import coreutil.logging.*;
  */
 public class TypeConvertLoadFile extends TemplateBlock_Base {
 
-	static public final String		BLOCK_NAME		= "typeConvertLoadFile";
+	static public final String		BLOCK_NAME			= "typeConvertLoadFile";
+
+	static public final String		ATTRIBUTE_FILE		= "file";
 
 
 	// Data members
@@ -57,29 +59,34 @@ public class TypeConvertLoadFile extends TemplateBlock_Base {
 	@Override
 	public boolean Init(TagParser p_tagParser) {
 		try {
+			if (!super.Init(p_tagParser)) {
+				Logger.LogError("TypeConvertLoadFile.Init() failed in the parent Init() at line number [" + p_tagParser.GetLineNumber() + "].");
+				return false;
+			}
+
 			// The target language should be a string constant.
-			TagAttributeParser t_nodeAttribute = p_tagParser.GetNamedAttribute("file");
+			TagAttributeParser t_nodeAttribute = p_tagParser.GetNamedAttribute(ATTRIBUTE_FILE);
 			if (t_nodeAttribute == null) {
-				Logger.LogError("TypeConvertLoadFile.Init() did not find the [file] attribute that is required for TypeConvertLoadFile tags.");
+				Logger.LogError("TypeConvertLoadFile.Init() did not find the [" + ATTRIBUTE_FILE + "] attribute that is required for TypeConvertLoadFile tags at line number [" + p_tagParser.GetLineNumber() + "].");
 				return false;
 			}
 
 			m_filePath = t_nodeAttribute.GetAttributeValueAsString();
 			if (m_filePath == null) {
-				Logger.LogError("TypeConvertLoadFile.Init() did not get the [file] value as a string from attribute.");
+				Logger.LogError("TypeConvertLoadFile.Init() did not get the [" + ATTRIBUTE_FILE + "] value as a string from attribute at line number [" + p_tagParser.GetLineNumber() + "].");
 				return false;
 			}
 
 
 			if (!DataTypeManager.LoadConfigFile(m_filePath)) {
-				Logger.LogError("TypeConvertLoadFile.Init() failed to load the file [" + m_filePath +"] into the DataTypeManager.");
+				Logger.LogError("TypeConvertLoadFile.Init() failed to load the file [" + m_filePath +"] into the DataTypeManager at line number [" + p_tagParser.GetLineNumber() + "].");
 				return false;
 			}
 
 			return true;
 		}
 		catch (Throwable t_error) {
-			Logger.LogError("TypeConvertLoadFile.Init() failed with error: ", t_error);
+			Logger.LogException("TypeConvertLoadFile.Init() failed with error at line number [" + p_tagParser.GetLineNumber() + "]: ", t_error);
 			return false;
 		}
 	}

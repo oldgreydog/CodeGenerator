@@ -44,7 +44,10 @@ import coreutil.logging.*;
 */
 public class OuterContextEval extends TemplateBlock_Base {
 
-	static public final String		BLOCK_NAME		= "outerContextEval";
+	static public final String		BLOCK_NAME					= "outerContextEval";
+
+	static public final String		ATTRIBUTE_CONTEXT_NAME		= "contextName";
+	static public final String		ATTRIBUTE_TARGET_VALUE		= "targetValue";
 
 
 	// Data members
@@ -63,37 +66,40 @@ public class OuterContextEval extends TemplateBlock_Base {
 	@Override
 	public boolean Init(TagParser p_tagParser) {
 		try {
-			m_lineNumber = p_tagParser.GetLineNumber();
+			if (!super.Init(p_tagParser)) {
+				Logger.LogError("OuterContextEval.Init() failed in the parent Init() at line number [" + p_tagParser.GetLineNumber() + "].");
+				return false;
+			}
 
-			TagAttributeParser t_nodeAttribute = p_tagParser.GetNamedAttribute("contextname");
+			TagAttributeParser t_nodeAttribute = p_tagParser.GetNamedAttribute(ATTRIBUTE_CONTEXT_NAME);
 			if (t_nodeAttribute == null) {
-				Logger.LogError("OuterContextEval.Init() did not find the [contextname] attribute that is required for OuterContextEval tags at line number [" + m_lineNumber + "].");
+				Logger.LogError("OuterContextEval.Init() did not find the [" + ATTRIBUTE_CONTEXT_NAME + "] attribute that is required for OuterContextEval tags at line number [" + m_lineNumber + "].");
 				return false;
 			}
 
 			m_contextName = t_nodeAttribute.GetAttributeValueAsString();
 			if (m_contextName == null) {
-				Logger.LogError("OuterContextEval.Init() did not get the value from the optional attribute [optionalSeparator] at line number [" + m_lineNumber + "].");
+				Logger.LogError("OuterContextEval.Init() did not get the value from the attribute [" + ATTRIBUTE_CONTEXT_NAME + "] at line number [" + m_lineNumber + "].");
 				return false;
 			}
 
 
-			t_nodeAttribute = p_tagParser.GetNamedAttribute("targetvalue");
+			t_nodeAttribute = p_tagParser.GetNamedAttribute(ATTRIBUTE_TARGET_VALUE);
 			if (t_nodeAttribute == null) {
-				Logger.LogError("OuterContextEval.Init() did not find the [targetvalue] attribute that is required for OuterContextEval tags at line number [" + m_lineNumber + "].");
+				Logger.LogError("OuterContextEval.Init() did not find the [" + ATTRIBUTE_TARGET_VALUE + "] attribute that is required for OuterContextEval tags at line number [" + m_lineNumber + "].");
 				return false;
 			}
 
 			m_valuePath = t_nodeAttribute.GetAttributeValueAsString();
 			if (m_valuePath == null) {
-				Logger.LogError("OuterContextEval.Init() did not get the [targetvalue] attribute value from that is required for OuterContextEval at line number [" + m_lineNumber + "].");
+				Logger.LogError("OuterContextEval.Init() did not get the [" + ATTRIBUTE_TARGET_VALUE + "] attribute value from that is required for OuterContextEval at line number [" + m_lineNumber + "].");
 				return false;
 			}
 
 			return true;
 		}
 		catch (Throwable t_error) {
-			Logger.LogError("OuterContextEval.Init() failed with error at line number [" + m_lineNumber + "]: ", t_error);
+			Logger.LogException("OuterContextEval.Init() failed with error at line number [" + m_lineNumber + "]: ", t_error);
 			return false;
 		}
 	}
@@ -143,7 +149,7 @@ public class OuterContextEval extends TemplateBlock_Base {
 			}
 		}
 		catch (Throwable t_error) {
-			Logger.LogError("OuterContextEval.Evaluate() failed with error: ", t_error);
+			Logger.LogException("OuterContextEval.Evaluate() failed with error: ", t_error);
 			return false;
 		}
 

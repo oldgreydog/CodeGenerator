@@ -151,7 +151,11 @@ import coreutil.logging.*;
  */
 public class TypeConvert extends TemplateBlock_Base {
 
-	static public final String		BLOCK_NAME			= "typeConvert";
+	static public final String		BLOCK_NAME						= "typeConvert";
+
+	static private final String		ATTRIBUTE_TARGET_LANGUAGE		= "targetLanguage";
+	static private final String		ATTRIBUTE_SOURCE_TYPE			= "sourceType";
+	static private final String		ATTRIBUTE_GROUP_ID				= "groupID";
 
 
 	// Data members
@@ -171,51 +175,56 @@ public class TypeConvert extends TemplateBlock_Base {
 	@Override
 	public boolean Init(TagParser p_tagParser) {
 		try {
+			if (!super.Init(p_tagParser)) {
+				Logger.LogError("TypeConvert.Init() failed in the parent Init() at line number [" + p_tagParser.GetLineNumber() + "].");
+				return false;
+			}
+
 			// The target language should be a string constant.
-			TagAttributeParser t_nodeAttribute = p_tagParser.GetNamedAttribute("targetLanguage");
+			TagAttributeParser t_nodeAttribute = p_tagParser.GetNamedAttribute(ATTRIBUTE_TARGET_LANGUAGE);
 			if (t_nodeAttribute == null) {
-				Logger.LogError("TypeConvert.Init() did not find the [targetLanguage] attribute that is required for TypeConvert tags.");
+				Logger.LogError("TypeConvert.Init() did not find the [" + ATTRIBUTE_TARGET_LANGUAGE + "] attribute that is required for TypeConvert tags at line number [" + p_tagParser.GetLineNumber() + "].");
 				return false;
 			}
 
 			m_targetLanguage = t_nodeAttribute.GetAttributeValueAsString();
 			if (m_targetLanguage == null) {
-				Logger.LogError("TypeConvert.Init() did not get the [targetLanguage] value from attribute that is required for TypeConvert tags.");
+				Logger.LogError("TypeConvert.Init() did not get the value from attribute [" + ATTRIBUTE_TARGET_LANGUAGE + "] that is required for TypeConvert tags at line number [" + p_tagParser.GetLineNumber() + "].");
 				return false;
 			}
 
 
 			// Only the source type should require evaluation.
-			t_nodeAttribute = p_tagParser.GetNamedAttribute("sourceType");
+			t_nodeAttribute = p_tagParser.GetNamedAttribute(ATTRIBUTE_SOURCE_TYPE);
 			if (t_nodeAttribute == null) {
-				Logger.LogError("TypeConvert.Init() did not find the [sourceType] attribute that is required for TypeConvert tags.");
+				Logger.LogError("TypeConvert.Init() did not find the [" + ATTRIBUTE_SOURCE_TYPE + "] attribute that is required for TypeConvert tags at line number [" + p_tagParser.GetLineNumber() + "].");
 				return false;
 			}
 
 			m_sourceType = t_nodeAttribute.GetAttributeValue();
 			if (m_sourceType == null) {
-				Logger.LogError("TypeConvert.Init() did not get the [sourceType] value from attribute that is required for TypeConvert tags.");
+				Logger.LogError("TypeConvert.Init() did not get the value from attribute [" + ATTRIBUTE_SOURCE_TYPE + "] that is required for TypeConvert tags at line number [" + p_tagParser.GetLineNumber() + "].");
 				return false;
 			}
 
 
 			// The group ID should be a string constant.
-			t_nodeAttribute = p_tagParser.GetNamedAttribute("groupID");
+			t_nodeAttribute = p_tagParser.GetNamedAttribute(ATTRIBUTE_GROUP_ID);
 			if (t_nodeAttribute == null) {
-				Logger.LogError("TypeConvert.Init() did not find the [groupID] attribute that is required for TypeConvert tags.");
+				Logger.LogError("TypeConvert.Init() did not find the [" + ATTRIBUTE_GROUP_ID + "] attribute that is required for TypeConvert tags at line number [" + p_tagParser.GetLineNumber() + "].");
 				return false;
 			}
 
 			m_groupID = t_nodeAttribute.GetAttributeValueAsString();
 			if (m_groupID == null) {
-				Logger.LogError("TypeConvert.Init() did not get the [groupID] value from attribute that is required for TypeConvert tags.");
+				Logger.LogError("TypeConvert.Init() did not get the value from attribute [" + ATTRIBUTE_GROUP_ID + "] that is required for TypeConvert tags at line number [" + p_tagParser.GetLineNumber() + "].");
 				return false;
 			}
 
 			return true;
 		}
 		catch (Throwable t_error) {
-			Logger.LogError("TypeConvert.Init() failed with error: ", t_error);
+			Logger.LogException("TypeConvert.Init() failed with error at line number [" + p_tagParser.GetLineNumber() + "]: ", t_error);
 			return false;
 		}
 	}
@@ -264,7 +273,7 @@ public class TypeConvert extends TemplateBlock_Base {
 				//p_writer.Write("No type conversion was found for language [" + t_targetLanguageValue + "] sourceType [" + t_sourceValue + "] groupID [" + t_groupIDValue + "].");
 		}
 		catch (Throwable t_error) {
-			Logger.LogError("TypeConvert.Evaluate() failed with error: ", t_error);
+			Logger.LogException("TypeConvert.Evaluate() failed with error: ", t_error);
 			return false;
 		}
 

@@ -119,7 +119,7 @@ public class TemplateTokenizer {
 				return false;
 		}
 		catch (Throwable t_error) {
-			Logger.LogError("TemplateTokenizer() failed with error: ", t_error);
+			Logger.LogException("TemplateTokenizer() failed with error: ", t_error);
 			return false;
 		}
 
@@ -209,7 +209,7 @@ public class TemplateTokenizer {
 			}
 		}
 		catch (Throwable t_error) {
-			Logger.LogError("TemplateTokenizer.GetNextToken() failed with error at line [" + m_currentLineIndex + "]: ", t_error);
+			Logger.LogException("TemplateTokenizer.GetNextToken() failed with error at line [" + m_currentLineIndex + "]: ", t_error);
 			return null;
 		}
 		finally {
@@ -338,7 +338,7 @@ NextSym:for (SpecialSymbol t_nextSymbol: m_symbolList) {
 				return false;
 		}
 		catch (Throwable t_error) {
-			Logger.LogError("TemplateTokenizer.ReadHeader() failed with error: ", t_error);
+			Logger.LogException("TemplateTokenizer.ReadHeader() failed with error: ", t_error);
 			return false;
 		}
 

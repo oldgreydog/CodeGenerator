@@ -57,6 +57,11 @@ public class TabMarker extends TemplateBlock_Base {
 	//*********************************
 	@Override
 	public boolean Init(TagParser p_tagParser) {
+		if (!super.Init(p_tagParser)) {
+			Logger.LogError("TabMarker.Init() failed in the parent Init() at line number [" + p_tagParser.GetLineNumber() + "].");
+			return false;
+		}
+
 		return true;
 	}
 
@@ -86,7 +91,7 @@ public class TabMarker extends TemplateBlock_Base {
 			TabStop.SetMarker(TabStop.GetCurrentLineLength(p_writer.GetCurrentLineContents()));
 		}
 		catch (Throwable t_error) {
-			Logger.LogError("TabMarker.Evaluate() failed with error: ", t_error);
+			Logger.LogException("TabMarker.Evaluate() failed with error: ", t_error);
 			return false;
 		}
 

@@ -111,7 +111,7 @@ public class <%className%> {
 			<%customCode key="Validate<%name%>" openingCommentCharacters="//"%>
 		}
 		catch (Exception t_error) {
-			Logger.LogError("<%^className%>.Validate<%name%>() failed with error: ", t_error);
+			Logger.LogException("<%^className%>.Validate<%name%>() failed with error: ", t_error);
 			p_errorMessagesReturn.append("<%^className%>.<%name%> is invalid: " + t_error);
 			return false;
 		}
@@ -276,7 +276,7 @@ public class <%className%> {
 			return t_results;
 		}
 		catch (Exception t_error) {
-			Logger.LogError("<%className%>.LoadAll<%className%>() failed with error: ", t_error);
+			Logger.LogException("<%className%>.LoadAll<%className%>() failed with error: ", t_error);
 			Logger.LogError("This is the SQL that failed: " + t_sql);
 			return null;
 		}
@@ -328,7 +328,7 @@ public class <%className%> {
 			return t_results;
 		}
 		catch (Exception t_error) {
-			Logger.LogError("<%^className%>.LoadAll<%^className%>For<%name%>() failed with error: ", t_error);
+			Logger.LogException("<%^className%>.LoadAll<%^className%>For<%name%>() failed with error: ", t_error);
 			Logger.LogError("This is the SQL that failed: " + t_sql);
 			return null;
 		}
@@ -382,7 +382,7 @@ public class <%className%> {
 			return t_results;
 		}
 		catch (Exception t_error) {
-			Logger.LogError("<%^className%>.LoadAll<%^className%>For<%name%>() failed with error: ", t_error);
+			Logger.LogException("<%^className%>.LoadAll<%^className%>For<%name%>() failed with error: ", t_error);
 			Logger.LogError("This is the SQL that failed: " + t_sql);
 			return null;
 		}
@@ -450,7 +450,7 @@ public class <%className%> {
 			}
 		}
 		catch (Exception t_error) {
-			Logger.LogError("<%className%>.Load<%className%>WithSQL() failed with an exception : ", t_error);
+			Logger.LogException("<%className%>.Load<%className%>WithSQL() failed with an exception : ", t_error);
 			return null;
 		}
 
@@ -536,7 +536,7 @@ public class <%className%> {
 
 <%text%>		}
 		catch (Exception t_error) {
-			Logger.LogError("<%className%>.Create<%className%>() failed with error: ", t_error);
+			Logger.LogException("<%className%>.Create<%className%>() failed with error: ", t_error);
 			Logger.LogError("The SQL that failed: " + t_sql + "\nFor object: " + p_new<%className%>.toString());
 			return false;
 		}
@@ -665,7 +665,7 @@ public class <%className%> {
 			}
 		}
 		catch (Exception t_error) {
-			Logger.LogError("<%className%>.Update<%className%>() failed with error: ", t_error);
+			Logger.LogException("<%className%>.Update<%className%>() failed with error: ", t_error);
 			Logger.LogError("The SQL that failed: " + t_sql + "\nFor object: " + p_target<%className%>.toString());
 			return false;
 		}
@@ -731,7 +731,7 @@ public class <%className%> {
 			t_preparedStatement.executeUpdate();
 		}
 		catch (Exception t_error) {
-			Logger.LogError("<%className%>.Delete<%className%>() failed with error: ", t_error);
+			Logger.LogException("<%className%>.Delete<%className%>() failed with error: ", t_error);
 			Logger.LogError("The SQL that failed: " + t_sql + "\nFor object: " + p_target<%className%>.toString());
 			return false;
 		}

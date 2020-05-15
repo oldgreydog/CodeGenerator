@@ -67,7 +67,7 @@ public class Cursor {
 			}
 		}
 		catch (Throwable t_error) {
-			Logger.LogError("Cursor.Write() failed with error: ", t_error);
+			Logger.LogException("Cursor.Write() failed with error: ", t_error);
 			return false;
 		}
 

@@ -73,7 +73,7 @@ public class <%className%>DAO_NET_Server extends Request_Base {
 			return super.SetParameter(p_parameterName, p_value);
 		}
 		catch (Exception t_error) {
-			Logger.LogError("<%className%>DAO_NET_Server.SetParameter() failed with error: ", t_error);
+			Logger.LogException("<%className%>DAO_NET_Server.SetParameter() failed with error: ", t_error);
 			return false;
 		}
 	}
@@ -153,7 +153,7 @@ public class <%className%>DAO_NET_Server extends Request_Base {
 			<%customCode key="ExecuteMiscellaneous" openingCommentCharacters="//"%>
 		}
 		catch (Exception t_error) {
-			Logger.LogError("<%className%>DAO_NET_Server.Execute() failed with error: ", t_error);
+			Logger.LogException("<%className%>DAO_NET_Server.Execute() failed with error: ", t_error);
 
 			if (t_nextMessageInfo != null) {
 				NetMessage	t_response = t_nextMessageInfo.GetMessage().CreateResponseMessage();
@@ -203,7 +203,7 @@ public class <%className%>DAO_NET_Server extends Request_Base {
 			p_messageInfo.GetSourceConnection().AddMessage(t_response);
 		}
 		catch (Exception t_error) {
-			Logger.LogError("<%className%>DAO_NET_Server.LoadAll<%className%>() failed with error: ", t_error);
+			Logger.LogException("<%className%>DAO_NET_Server.LoadAll<%className%>() failed with error: ", t_error);
 			t_response.SetMessageProperty(NetMessage.NM_HEADER_RESPONSE_STATUS, NetMessage.RESPONSE_FAIL);	// The default response status is "success".  We have to set it to "fail" here.
 			t_response.SetMessageProperty(NetMessage.NM_HEADER_RESPONSE_MESSAGE, "LoadAll<%className%>() failed with error: " + t_error);
 			p_messageInfo.GetSourceConnection().AddMessage(t_response);
@@ -257,7 +257,7 @@ public class <%className%>DAO_NET_Server extends Request_Base {
 			p_messageInfo.GetSourceConnection().AddMessage(t_response);
 		}
 		catch (Exception t_error) {
-			Logger.LogError("<%^className%>DAO_NET_Server.Load<%^className%>For<%name%>() failed with error: ", t_error);
+			Logger.LogException("<%^className%>DAO_NET_Server.Load<%^className%>For<%name%>() failed with error: ", t_error);
 			t_response.SetMessageProperty(NetMessage.NM_HEADER_RESPONSE_STATUS, NetMessage.RESPONSE_FAIL);	// The default response status is "success".  We have to set it to "fail" here.
 			t_response.SetMessageProperty(NetMessage.NM_HEADER_RESPONSE_MESSAGE, "Load<%^className%>For<%name%>() failed with error: " + t_error);
 			p_messageInfo.GetSourceConnection().AddMessage(t_response);
@@ -313,7 +313,7 @@ public class <%className%>DAO_NET_Server extends Request_Base {
 			p_messageInfo.GetSourceConnection().AddMessage(t_response);
 		}
 		catch (Exception t_error) {
-			Logger.LogError("<%^className%>DAO_NET_Server.LoadAll<%^className%>For<%name%>() failed with error: ", t_error);
+			Logger.LogException("<%^className%>DAO_NET_Server.LoadAll<%^className%>For<%name%>() failed with error: ", t_error);
 			t_response.SetMessageProperty(NetMessage.NM_HEADER_RESPONSE_STATUS, NetMessage.RESPONSE_FAIL);	// The default response status is "success".  We have to set it to "fail" here.
 			t_response.SetMessageProperty(NetMessage.NM_HEADER_RESPONSE_MESSAGE, "LoadAll<%^className%>For<%name%>() failed with error: " + t_error);
 			p_messageInfo.GetSourceConnection().AddMessage(t_response);
@@ -370,7 +370,7 @@ public class <%className%>DAO_NET_Server extends Request_Base {
 			p_messageInfo.GetSourceConnection().AddMessage(t_response);
 		}
 		catch (Exception t_error) {
-			Logger.LogError("<%className%>DAO_NET_Server.Create<%className%>() failed with error: ", t_error);
+			Logger.LogException("<%className%>DAO_NET_Server.Create<%className%>() failed with error: ", t_error);
 			t_response.SetMessageProperty(NetMessage.NM_HEADER_RESPONSE_STATUS, NetMessage.RESPONSE_FAIL);	// The default response status is "success".  We have to set it to "fail" here.
 			t_response.SetMessageProperty(NetMessage.NM_HEADER_RESPONSE_MESSAGE, "Create<%className%>() failed with error: " + t_error);
 			p_messageInfo.GetSourceConnection().AddMessage(t_response);
@@ -419,7 +419,7 @@ public class <%className%>DAO_NET_Server extends Request_Base {
 			p_messageInfo.GetSourceConnection().AddMessage(t_response);
 		}
 		catch (Exception t_error) {
-			Logger.LogError("<%className%>DAO_NET_Server.Update<%className%>() failed with error: ", t_error);
+			Logger.LogException("<%className%>DAO_NET_Server.Update<%className%>() failed with error: ", t_error);
 			t_response.SetMessageProperty(NetMessage.NM_HEADER_RESPONSE_STATUS, NetMessage.RESPONSE_FAIL);	// The default response status is "success".  We have to set it to "fail" here.
 			t_response.SetMessageProperty(NetMessage.NM_HEADER_RESPONSE_MESSAGE, "Update<%className%>() failed with error: " + t_error);
 			p_messageInfo.GetSourceConnection().AddMessage(t_response);
@@ -468,7 +468,7 @@ public class <%className%>DAO_NET_Server extends Request_Base {
 			p_messageInfo.GetSourceConnection().AddMessage(t_response);
 		}
 		catch (Exception t_error) {
-			Logger.LogError("<%className%>DAO_NET_Server.Delete<%className%>() failed with error: ", t_error);
+			Logger.LogException("<%className%>DAO_NET_Server.Delete<%className%>() failed with error: ", t_error);
 			t_response.SetMessageProperty(NetMessage.NM_HEADER_RESPONSE_STATUS, NetMessage.RESPONSE_FAIL);	// The default response status is "success".  We have to set it to "fail" here.
 			t_response.SetMessageProperty(NetMessage.NM_HEADER_RESPONSE_MESSAGE, "Delete<%className%>() failed with error: " + t_error);
 			p_messageInfo.GetSourceConnection().AddMessage(t_response);

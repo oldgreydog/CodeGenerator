@@ -125,6 +125,10 @@ public class IfElseBlock extends TemplateBlock_Base {
 	 * This is a simple helper class.
 	 */
 	static protected class IfCondition extends TemplateBlock_Base {
+
+		static public final String		ATTRIBUTE_EXISTS	= "exists";
+
+
 		public boolean				m_testExists		= false;
 		public TemplateBlock_Base	m_sourceStringBlock	= null;
 		public TemplateBlock_Base	m_compareValue		= null;
@@ -139,8 +143,13 @@ public class IfElseBlock extends TemplateBlock_Base {
 		@Override
 		public boolean Init(TagParser p_tagParser) {
 			try {
+				if (!super.Init(p_tagParser)) {
+					Logger.LogError("IfCondition.Init() failed in the parent Init() at line number [" + p_tagParser.GetLineNumber() + "].");
+					return false;
+				}
+
 				// I've added the special-case attribute "exists" so that we can use the if/else block to test for the existence of a child node type and then execute different tag blogs depending on that test.
-				TagAttributeParser t_nodeAttribute = p_tagParser.GetNamedAttribute("exists");
+				TagAttributeParser t_nodeAttribute = p_tagParser.GetNamedAttribute(ATTRIBUTE_EXISTS);
 				if (t_nodeAttribute != null) {
 					m_testExists = true;
 				}
@@ -183,7 +192,7 @@ public class IfElseBlock extends TemplateBlock_Base {
 				return true;
 			}
 			catch (Throwable t_error) {
-				Logger.LogError("IfCondition.Init() failed with error: ", t_error);
+				Logger.LogException("IfCondition.Init() failed with error: ", t_error);
 				return false;
 			}
 		}
@@ -198,7 +207,7 @@ public class IfElseBlock extends TemplateBlock_Base {
 		public boolean Init(TagAttributeParser p_tagAttributeParser) {
 			try {
 				String t_attributeName = p_tagAttributeParser.GetAttributeNameAsString();
-				if ((t_attributeName != null) && t_attributeName.equalsIgnoreCase("exists")) {
+				if ((t_attributeName != null) && t_attributeName.equalsIgnoreCase(ATTRIBUTE_EXISTS)) {
 					m_testExists = true;
 				}
 				else {
@@ -215,7 +224,7 @@ public class IfElseBlock extends TemplateBlock_Base {
 				return true;
 			}
 			catch (Throwable t_error) {
-				Logger.LogError("IfCondition.Init(TagAttributeParser) failed with error: ", t_error);
+				Logger.LogException("IfCondition.Init(TagAttributeParser) failed with error: ", t_error);
 				return false;
 			}
 		}
@@ -271,7 +280,7 @@ public class IfElseBlock extends TemplateBlock_Base {
 					return false;
 				}
 				catch (Throwable t_error) {
-					Logger.LogError("IfExistsBlock.Evaluate() failed with error at line number [" + m_lineNumber + "]: ", t_error);
+					Logger.LogException("IfExistsBlock.Evaluate() failed with error at line number [" + m_lineNumber + "]: ", t_error);
 					return null;
 				}
 			}
@@ -340,9 +349,14 @@ public class IfElseBlock extends TemplateBlock_Base {
 	@Override
 	public boolean Init(TagParser p_tagParser) {
 		try {
+			if (!super.Init(p_tagParser)) {
+				Logger.LogError("IfElseBlock.Init() failed in the parent Init() at line number [" + p_tagParser.GetLineNumber() + "].");
+				return false;
+			}
+
 			IfCondition t_ifCondition = new IfCondition();
 			if (!t_ifCondition.Init(p_tagParser)) {
-				Logger.LogError("IfElseBlock.Init() failed to initialize the first IfCondition block.");
+				Logger.LogError("IfElseBlock.Init() failed to initialize the first IfCondition block at line number [" + m_lineNumber + "].");
 				return false;
 			}
 
@@ -351,7 +365,7 @@ public class IfElseBlock extends TemplateBlock_Base {
 			return true;
 		}
 		catch (Throwable t_error) {
-			Logger.LogError("IfElseBlock.Init() failed with error: ", t_error);
+			Logger.LogException("IfElseBlock.Init() failed with error: ", t_error);
 			return false;
 		}
 	}
@@ -373,7 +387,7 @@ public class IfElseBlock extends TemplateBlock_Base {
 			// Get the general block of tags for the <if> tag.
 			GeneralBlock t_generalBlock	= new GeneralBlock();
 			if (!t_generalBlock.Parse(p_tokenizer)) {
-				Logger.LogError("IfElseBlock.Parse() general block parser failed.");
+				Logger.LogError("IfElseBlock.Parse() general block parser failed in the block starting at [" + m_lineNumber + "].");
 				return false;
 			}
 
@@ -392,7 +406,7 @@ public class IfElseBlock extends TemplateBlock_Base {
 
 				t_generalBlock	= new GeneralBlock();
 				if (!t_generalBlock.Parse(p_tokenizer)) {
-					Logger.LogError("IfElseBlock.Parse() general block parser failed in elseif block.");
+					Logger.LogError("IfElseBlock.Parse() general block parser failed in elseif block starting at line [" + t_nextCondition.m_lineNumber + "].");
 					return false;
 				}
 
@@ -408,7 +422,7 @@ public class IfElseBlock extends TemplateBlock_Base {
 
 				t_generalBlock	= new GeneralBlock();
 				if (!t_generalBlock.Parse(p_tokenizer)) {
-					Logger.LogError("IfElseBlock.Parse() general block parser failed in else block.");
+					Logger.LogError("IfElseBlock.Parse() general block parser failed in else block at line [" + t_nextCondition.m_lineNumber + "].");
 					return false;
 				}
 
@@ -425,7 +439,7 @@ public class IfElseBlock extends TemplateBlock_Base {
 			return true;
 		}
 		catch (Throwable t_error) {
-			Logger.LogError("IfElseBlock.Parse() failed with error at line [" + p_tokenizer.GetLineCount() + "]: ", t_error);
+			Logger.LogException("IfElseBlock.Parse() failed with error at line [" + p_tokenizer.GetLineCount() + "] in the block starting at [" + m_lineNumber + "]: ", t_error);
 			return false;
 		}
 	}
@@ -460,7 +474,7 @@ public class IfElseBlock extends TemplateBlock_Base {
 			}
 		}
 		catch (Throwable t_error) {
-			Logger.LogError("IfElseBlock.Evaluate() failed with error: ", t_error);
+			Logger.LogException("IfElseBlock.Evaluate() failed with error: ", t_error);
 			return false;
 		}
 

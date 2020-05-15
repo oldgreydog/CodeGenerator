@@ -121,7 +121,10 @@ import codegenerator.generator.utils.*;
  */
 public class OuterContext extends TemplateBlock_Base {
 
-	static public final String	BLOCK_NAME		= "outerContext";
+	static public final String		BLOCK_NAME										= "outerContext";
+
+	static public final String		ATTRIBUTE_CONTEXT_NAME							= "contextName";
+	static public final String		ATTRIBUTE_OPTIONAL_JUMP_TO_PARENT_CONTEXT		= "optionalJumpToParentContext";
 
 
 	// Data members
@@ -140,22 +143,25 @@ public class OuterContext extends TemplateBlock_Base {
 	@Override
 	public boolean Init(TagParser p_tagParser) {
 		try {
-			m_lineNumber = p_tagParser.GetLineNumber();
+			if (!super.Init(p_tagParser)) {
+				Logger.LogError("OuterContext.Init() failed in the parent Init() at line number [" + p_tagParser.GetLineNumber() + "].");
+				return false;
+			}
 
-			TagAttributeParser t_nodeAttribute = p_tagParser.GetNamedAttribute("contextname");
+			TagAttributeParser t_nodeAttribute = p_tagParser.GetNamedAttribute(ATTRIBUTE_CONTEXT_NAME);
 			if (t_nodeAttribute == null) {
-				Logger.LogError("OuterContext.Init() failed to find the required attribute [contextname] at line number [" + m_lineNumber + "].");
+				Logger.LogError("OuterContext.Init() failed to find the required attribute [" + ATTRIBUTE_CONTEXT_NAME + "] at line number [" + m_lineNumber + "].");
 				return false;
 			}
 
 			m_contextName = t_nodeAttribute.GetAttributeValueAsString();
 
 			// Handle the optional attribute optionalJumpToParentContext.
-			t_nodeAttribute = p_tagParser.GetNamedAttribute("optionalJumpToParentContext");
+			t_nodeAttribute = p_tagParser.GetNamedAttribute(ATTRIBUTE_OPTIONAL_JUMP_TO_PARENT_CONTEXT);
 			if (t_nodeAttribute != null) {
 				String t_contextJump = t_nodeAttribute.GetAttributeValueAsString();
 				if (t_contextJump == null) {
-					Logger.LogError("OuterContext.Init() failed to get the string value of attribute [optionalJumpToParentContext] at line number [" + m_lineNumber + "].");
+					Logger.LogError("OuterContext.Init() failed to get the string value of attribute [" + ATTRIBUTE_OPTIONAL_JUMP_TO_PARENT_CONTEXT + "] at line number [" + m_lineNumber + "].");
 					return false;
 				}
 
@@ -173,7 +179,7 @@ public class OuterContext extends TemplateBlock_Base {
 			return true;
 		}
 		catch (Throwable t_error) {
-			Logger.LogError("OuterContext.Init() failed with error at line number [" + m_lineNumber + "]: ", t_error);
+			Logger.LogException("OuterContext.Init() failed with error at line number [" + m_lineNumber + "]: ", t_error);
 			return false;
 		}
 	}
@@ -193,7 +199,7 @@ public class OuterContext extends TemplateBlock_Base {
 			// Get the general block of tags for the <if> tag.
 			GeneralBlock t_generalBlock	= new GeneralBlock();
 			if (!t_generalBlock.Parse(p_tokenizer)) {
-				Logger.LogError("OuterContext.Parse() general block parser failed.");
+				Logger.LogError("OuterContext.Parse() general block parser failed in the block starting at line number [" + m_lineNumber + "].");
 				return false;
 			}
 
@@ -201,12 +207,12 @@ public class OuterContext extends TemplateBlock_Base {
 
 			String t_endingTagName = t_generalBlock.GetUnknownTag().GetTagName();
 			if (!t_endingTagName.equalsIgnoreCase("endcontext")) {
-				Logger.LogError("OuterContext.Parse() general block ended on a tag named [" + t_endingTagName + "] at line [" + p_tokenizer.GetLineCount() + "].  The closing tag [endif] was expected.");
+				Logger.LogError("OuterContext.Parse() general block ended on a tag named [" + t_endingTagName + "] at line [" + p_tokenizer.GetLineCount() + "] in the block starting at [" + m_lineNumber + "].  The closing tag [endif] was expected.");
 				return false;
 			}
 		}
 		catch (Throwable t_error) {
-			Logger.LogError("OuterContext.Parse() failed with error: ", t_error);
+			Logger.LogException("OuterContext.Parse() failed with error at line [" + p_tokenizer.GetLineCount() + "] in the block starting at [" + m_lineNumber + "]: ", t_error);
 			return false;
 		}
 
@@ -241,7 +247,7 @@ public class OuterContext extends TemplateBlock_Base {
 			OuterContextManager.RemoveOuterContext(m_contextName);
 		}
 		catch (Throwable t_error) {
-			Logger.LogError("OuterContext.Evaluate() failed with error: ", t_error);
+			Logger.LogException("OuterContext.Evaluate() failed with error: ", t_error);
 			return false;
 		}
 

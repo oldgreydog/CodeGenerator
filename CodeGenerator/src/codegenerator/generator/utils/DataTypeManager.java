@@ -42,12 +42,6 @@ import coreutil.logging.*;
  */
 public class DataTypeManager {
 
-	// Data type manager config names.
-	static private final String		CONFIG_NODE_DATA_TYPE_MANAGER				= "dataTypeManager";
-
-	static private final String		CONFIG_VALUE_TYPE_FILE						= "typeFile";
-
-
 	// Type map config names
 	static private final String		CONFIG_NODE_DATA_TYPE_MAPS					= "dataTypeMaps";
 	static private final String		CONFIG_NODE_TYPE_MAP						= "typeMap";
@@ -177,7 +171,7 @@ public class DataTypeManager {
 			return true;
 		}
 		catch (Throwable t_error) {
-			Logger.LogError("DataTypeManager.LoadConfigFile() failed with error: ", t_error);
+			Logger.LogException("DataTypeManager.LoadConfigFile() failed with error: ", t_error);
 			return false;
 		}
 	}
@@ -201,7 +195,7 @@ public class DataTypeManager {
 			return t_sourceType.get(p_typeClass);	// It's fine if this returns NULL if there is no p_typeClass for this source type.
 		}
 		catch (Throwable t_error) {
-			Logger.LogError("DataTypeManager.GetTypeConversion() failed with error: ", t_error);
+			Logger.LogException("DataTypeManager.GetTypeConversion() failed with error: ", t_error);
 			return null;
 		}
 	}

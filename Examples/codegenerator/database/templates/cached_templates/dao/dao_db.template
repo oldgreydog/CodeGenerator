@@ -46,7 +46,7 @@ public class <%className%>DAO_DB implements <%className%>DAO {
 			return t_results;
 		}
 		catch (Exception t_error) {
-			Logger.LogError("<%className%>DAO_DB.LoadAll<%className%>() failed with error: ", t_error);
+			Logger.LogException("<%className%>DAO_DB.LoadAll<%className%>() failed with error: ", t_error);
 			Logger.LogError("This is the SQL that failed: " + t_sql);
 			return null;
 		}
@@ -119,7 +119,7 @@ public class <%className%>DAO_DB implements <%className%>DAO {
 			return (!t_results.isEmpty()) ? t_results.getFirst() : null;
 		}
 		catch (Exception t_error) {
-			Logger.LogError("<%^className%>DAO_DB.Load<%^className%>For<%name%>() failed with error: ", t_error);
+			Logger.LogException("<%^className%>DAO_DB.Load<%^className%>For<%name%>() failed with error: ", t_error);
 			Logger.LogError("This is the SQL that failed: " + t_sql);
 			return null;
 		}
@@ -194,7 +194,7 @@ public class <%className%>DAO_DB implements <%className%>DAO {
 			return t_results;
 		}
 		catch (Exception t_error) {
-			Logger.LogError("<%^className%>DAO_DB.LoadAll<%^className%>For<%name%>() failed with error: ", t_error);
+			Logger.LogException("<%^className%>DAO_DB.LoadAll<%^className%>For<%name%>() failed with error: ", t_error);
 			Logger.LogError("This is the SQL that failed: " + t_sql);
 			return null;
 		}
@@ -286,7 +286,7 @@ public class <%className%>DAO_DB implements <%className%>DAO {
 			}
 		}
 		catch (Exception t_error) {
-			Logger.LogError("<%className%>DAO_DB.Load<%className%>WithSQL() failed with an exception : ", t_error);
+			Logger.LogException("<%className%>DAO_DB.Load<%className%>WithSQL() failed with an exception : ", t_error);
 			return null;
 		}
 
@@ -426,7 +426,7 @@ public class <%className%>DAO_DB implements <%className%>DAO {
 
 <%text%>		}
 		catch (Exception t_error) {
-			Logger.LogError("<%className%>DAO_DB.Create<%className%>() failed with error: ", t_error);
+			Logger.LogException("<%className%>DAO_DB.Create<%className%>() failed with error: ", t_error);
 			Logger.LogError("The SQL that failed: " + t_sql + "\nFor object: " + p_new<%className%>.toString());
 			return false;
 		}
@@ -604,7 +604,7 @@ public class <%className%>DAO_DB implements <%className%>DAO {
 			}
 		}
 		catch (Exception t_error) {
-			Logger.LogError("<%className%>DAO_DB.Update<%className%>() failed with error: ", t_error);
+			Logger.LogException("<%className%>DAO_DB.Update<%className%>() failed with error: ", t_error);
 			Logger.LogError("The SQL that failed: " + t_sql + "\nFor object: " + p_target<%className%>.toString());
 			return false;
 		}
@@ -688,7 +688,7 @@ public class <%className%>DAO_DB implements <%className%>DAO {
 			t_preparedStatement.executeUpdate();
 		}
 		catch (Exception t_error) {
-			Logger.LogError("<%className%>DAO_DB.Delete<%className%>() failed with error: ", t_error);
+			Logger.LogException("<%className%>DAO_DB.Delete<%className%>() failed with error: ", t_error);
 			Logger.LogError("The SQL that failed: " + t_sql + "\nFor object: " + p_target<%className%>.toString());
 			return false;
 		}

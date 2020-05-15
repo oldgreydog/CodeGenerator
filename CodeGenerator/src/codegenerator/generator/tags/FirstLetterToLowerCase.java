@@ -44,7 +44,9 @@ import coreutil.logging.*;
  */
 public class FirstLetterToLowerCase extends TemplateBlock_Base {
 
-	static public final String		BLOCK_NAME		= "firstLetterToLowerCase";
+	static public final String		BLOCK_NAME			= "firstLetterToLowerCase";
+
+	static public final String		ATTRIBUTE_VALUE		= "value";
 
 
 	// Data members
@@ -62,22 +64,27 @@ public class FirstLetterToLowerCase extends TemplateBlock_Base {
 	@Override
 	public boolean Init(TagParser p_tagParser) {
 		try {
-			TagAttributeParser t_nodeAttribute = p_tagParser.GetNamedAttribute("value");
+			if (!super.Init(p_tagParser)) {
+				Logger.LogError("FirstLetterToLowerCase.Init() failed in the parent Init() at line number [" + p_tagParser.GetLineNumber() + "].");
+				return false;
+			}
+
+			TagAttributeParser t_nodeAttribute = p_tagParser.GetNamedAttribute(ATTRIBUTE_VALUE);
 			if (t_nodeAttribute == null) {
-				Logger.LogError("FirstLetterToLowerCase.Init() did not find the [value] attribute that is required for FirstLetterToLowerCase tags.");
+				Logger.LogError("FirstLetterToLowerCase.Init() did not find the [" + ATTRIBUTE_VALUE + "] attribute that is required for FirstLetterToLowerCase tags.");
 				return false;
 			}
 
 			m_value = t_nodeAttribute.GetAttributeValue();
 			if (m_value == null) {
-				Logger.LogError("FirstLetterToLowerCase.Init() did not get the [value] value from attribute that is required for FirstLetterToLowerCase tags.");
+				Logger.LogError("FirstLetterToLowerCase.Init() did not get the [" + ATTRIBUTE_VALUE + "] value from attribute that is required for FirstLetterToLowerCase tags.");
 				return false;
 			}
 
 			return true;
 		}
 		catch (Throwable t_error) {
-			Logger.LogError("FirstLetterToLowerCase.Init() failed with error: ", t_error);
+			Logger.LogException("FirstLetterToLowerCase.Init() failed with error: ", t_error);
 			return false;
 		}
 	}
@@ -128,7 +135,7 @@ public class FirstLetterToLowerCase extends TemplateBlock_Base {
 			p_writer.Write(t_newValue.toString());
 		}
 		catch (Throwable t_error) {
-			Logger.LogError("FirstLetterToLowerCase.Evaluate() failed with error: ", t_error);
+			Logger.LogException("FirstLetterToLowerCase.Evaluate() failed with error: ", t_error);
 			return false;
 		}
 

@@ -44,7 +44,12 @@ import codegenerator.generator.utils.*;
  */
 public class FileBlock extends TemplateBlock_Base {
 
-	static public final String	BLOCK_NAME	= "file";
+	static public final String		BLOCK_NAME	= "file";
+
+	static public final String		ATTRIBUTE_TEMPLATE		= "template";
+	static public final String		ATTRIBUTE_FILENAME		= "filename";
+	static public final String		ATTRIBUTE_DEST_DIR		= "destDir";
+
 
 	// Static members
 	static private int		s_fileCount		= 0;	// Simple way to count the number of files generated.
@@ -87,39 +92,44 @@ public class FileBlock extends TemplateBlock_Base {
 	//*********************************
 	@Override
 	public boolean Init(TagParser p_tagParser) {
-		TagAttributeParser t_nodeAttribute = p_tagParser.GetNamedAttribute("template");
+		if (!super.Init(p_tagParser)) {
+			Logger.LogError("FileBlock.Init() failed in the parent Init() at line number [" + p_tagParser.GetLineNumber() + "].");
+			return false;
+		}
+
+		TagAttributeParser t_nodeAttribute = p_tagParser.GetNamedAttribute(ATTRIBUTE_TEMPLATE);
 		if (t_nodeAttribute == null) {
-			Logger.LogError("FileBlock.Init() did not find the [template] attribute that is required for FileBlock tags.");
+			Logger.LogError("FileBlock.Init() did not find the [" + ATTRIBUTE_TEMPLATE + "] attribute that is required for FileBlock tags at line number [" + m_lineNumber + "].");
 			return false;
 		}
 
 		m_templateFileName = t_nodeAttribute.GetAttributeValueAsString();
 		if (m_templateFileName == null) {
-			Logger.LogError("FileBlock.Init() did not get the [template] string from attribute that is required for FileBlock tags.");
+			Logger.LogError("FileBlock.Init() did not get the [" + ATTRIBUTE_TEMPLATE + "] string from attribute that is required for FileBlock tags at line number [" + m_lineNumber + "].");
 			return false;
 		}
 
-		t_nodeAttribute = p_tagParser.GetNamedAttribute("filename");
+		t_nodeAttribute = p_tagParser.GetNamedAttribute(ATTRIBUTE_FILENAME);
 		if (t_nodeAttribute == null) {
-			Logger.LogError("FileBlock.Init() did not find the [filename] attribute that is required for FileBlock tags.");
+			Logger.LogError("FileBlock.Init() did not find the [" + ATTRIBUTE_FILENAME + "] attribute that is required for FileBlock tags at line number [" + m_lineNumber + "].");
 			return false;
 		}
 
 		m_fileNameBlock = t_nodeAttribute.GetAttributeValue();
 		if (m_fileNameBlock == null) {
-			Logger.LogError("FileBlock.Init() did not get the [filename] value from attribute that is required for FileBlock tags.");
+			Logger.LogError("FileBlock.Init() did not get the [" + ATTRIBUTE_FILENAME + "] value from attribute that is required for FileBlock tags at line number [" + m_lineNumber + "].");
 			return false;
 		}
 
-		t_nodeAttribute = p_tagParser.GetNamedAttribute("destDir");
+		t_nodeAttribute = p_tagParser.GetNamedAttribute(ATTRIBUTE_DEST_DIR);
 		if (t_nodeAttribute == null) {
-			Logger.LogError("FileBlock.Init() did not find the [destDir] attribute that is required for FileBlock tags.");
+			Logger.LogError("FileBlock.Init() did not find the [" + ATTRIBUTE_DEST_DIR + "] attribute that is required for FileBlock tags at line number [" + m_lineNumber + "].");
 			return false;
 		}
 
-		m_destDirectoryBlock = t_nodeAttribute.GetAttributeValue();
-		if (m_destDirectoryBlock == null) {
-			Logger.LogError("FileBlock.Init() did not get the [destDir] value from attribute that is required for FileBlock tags.");
+		m_destinationDirectoryBlock = t_nodeAttribute.GetAttributeValue();
+		if (m_destinationDirectoryBlock == null) {
+			Logger.LogError("FileBlock.Init() did not get the [" + ATTRIBUTE_DEST_DIR + "] value from attribute that is required for FileBlock tags at line number [" + m_lineNumber + "].");
 			return false;
 		}
 
@@ -133,7 +143,7 @@ public class FileBlock extends TemplateBlock_Base {
 		try {
 			File t_templateFile = new File(m_templateFileName);
 			if (!t_templateFile.exists()) {
-				Logger.LogFatal("FileBlock.Parse() could not open the template file [" + m_templateFileName + "].");
+				Logger.LogFatal("FileBlock.Parse() could not open the template file [" + m_templateFileName + "] at line number [" + m_lineNumber + "].");
 				System.exit(1);
 			}
 
@@ -141,7 +151,7 @@ public class FileBlock extends TemplateBlock_Base {
 			TemplateParser t_parser = new TemplateParser();
 			TemplateBlock_Base t_template = t_parser.ParseTemplate(t_templateFile);
 			if (t_template == null) {
-				Logger.LogError("FileBlock.Parse() failed in file [" + t_templateFile.getAbsolutePath() + "].");
+				Logger.LogError("FileBlock.Parse() failed in file [" + t_templateFile.getAbsolutePath() + "] at line number [" + m_lineNumber + "].");
 				return false;
 			}
 
@@ -150,7 +160,7 @@ public class FileBlock extends TemplateBlock_Base {
 			return true;
 		}
 		catch (Throwable t_error) {
-			Logger.LogError("FileBlock.Parse() failed with error: ", t_error);
+			Logger.LogException("FileBlock.Parse() failed with error at line number [" + m_lineNumber + "] in file [" + m_templateFileName + "]: ", t_error);
 			return false;
 		}
 	}
@@ -201,7 +211,7 @@ public class FileBlock extends TemplateBlock_Base {
 			t_fileWriter.close();
 		}
 		catch (Throwable t_error) {
-			Logger.LogError("FileBlock.Evaluate() failed with error: ", t_error);
+			Logger.LogException("FileBlock.Evaluate() failed with error: ", t_error);
 			return false;
 		}
 

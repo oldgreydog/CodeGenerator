@@ -96,7 +96,7 @@ public class GeneralBlock extends TemplateBlock_Base {
 					}
 
 					if (!t_newBlock.Parse(p_tokenizer)) {
-						Logger.LogError("GeneralBlock.Parse() failed attempting to parse the tag [" + t_newBlock.GetName() + "].");
+						Logger.LogError("GeneralBlock.Parse() failed attempting to parse the tag [" + t_newBlock.GetName() + "] at line [" + p_tokenizer.GetLineCount() + "].");
 						return false;
 					}
 
@@ -111,7 +111,7 @@ public class GeneralBlock extends TemplateBlock_Base {
 			return true;
 		}
 		catch (Throwable t_error) {
-			Logger.LogError("GeneralBlock.Parse() failed with error at line [" + p_tokenizer.GetLineCount() + "]: ", t_error);
+			Logger.LogException("GeneralBlock.Parse() failed with error at line [" + p_tokenizer.GetLineCount() + "]: ", t_error);
 			return false;
 		}
 	}

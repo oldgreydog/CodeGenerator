@@ -85,7 +85,11 @@ public class TextBlock extends TemplateBlock_Base {
 	//*********************************
 	@Override
 	public boolean Init(TagParser p_tagParser) {
-		// This should never be called, but we'll return true just in case.
+		if (!super.Init(p_tagParser)) {
+			Logger.LogError("TextBlock.Init() failed in the parent Init() at line number [" + p_tagParser.GetLineNumber() + "].");
+			return false;
+		}
+
 		return true;
 	}
 
@@ -142,7 +146,7 @@ public class TextBlock extends TemplateBlock_Base {
 					case Token.TOKEN_TYPE_OPENING_DELIMITER:
 						t_tagParser = new TagParser();
 						if (!t_tagParser.Parse(p_tokenizer)) {
-							Logger.LogError("TextBlock.Parse() failed to parse the tag at line [" + p_tokenizer.GetLineCount() + "].");
+							Logger.LogError("TextBlock.Parse() failed to parse the tag at line [" + p_tokenizer.GetLineCount() + "] in the block starting at [" + m_lineNumber + "].");
 							return false;
 						}
 
@@ -158,7 +162,7 @@ public class TextBlock extends TemplateBlock_Base {
 							// This should be variable tag embedded in the text.
 							ConfigVariable t_configVariable = new ConfigVariable();
 							if (!t_configVariable.Init(t_tagParser, p_tokenizer.GetLineCount())) {
-								Logger.LogError("TextBlock.Parse() failed to initialize the config variable at line [" + p_tokenizer.GetLineCount() + "].");
+								Logger.LogError("TextBlock.Parse() failed to initialize the config variable at line [" + p_tokenizer.GetLineCount() + "] in the block starting at [" + m_lineNumber + "].");
 								return false;
 							}
 
@@ -170,12 +174,12 @@ public class TextBlock extends TemplateBlock_Base {
 							if (t_newBlock.IsSafeForTextBlock())
 							{
 								if (!t_newBlock.Init(t_tagParser)) {
-									Logger.LogError("TextBlock.Parse() failed to initialize the block [" + t_newBlock.GetName() + "] at line [" + p_tokenizer.GetLineCount() + "].");
+									Logger.LogError("TextBlock.Parse() failed to initialize the block [" + t_newBlock.GetName() + "] at line [" + p_tokenizer.GetLineCount() + "] in the block starting at [" + m_lineNumber + "].");
 									return false;
 								}
 
 								if (!t_newBlock.Parse(p_tokenizer)) {
-									Logger.LogError("TextBlock.Parse() failed to parse the tag [" + t_newBlock.GetName() + "].");
+									Logger.LogError("TextBlock.Parse() failed to parse the tag [" + t_newBlock.GetName() + "] in the block starting at [" + m_lineNumber + "].");
 									return false;
 								}
 
@@ -183,7 +187,7 @@ public class TextBlock extends TemplateBlock_Base {
 								m_blockList.add(t_newBlock);
 							}
 							else {
-								Logger.LogError("TextBlock.Parse() found the tag [" + t_newBlock.GetName() + "] at line [" + p_tokenizer.GetLineCount() + "] which is not allowed inside a text block.");
+								Logger.LogError("TextBlock.Parse() found the tag [" + t_newBlock.GetName() + "] at line [" + p_tokenizer.GetLineCount() + "] which is not allowed inside a text block that started at [" + m_lineNumber + "].");
 								return false;
 							}
 						}
@@ -192,11 +196,11 @@ public class TextBlock extends TemplateBlock_Base {
 
 					case Token.TOKEN_TYPE_CLOSING_DELIMITER:
 						if (!m_parsingTagElement) {
-							Logger.LogError("TextBlock.Parse() is parsing a text block and found an unexpected CLOSING_DELIMITER at line [" + p_tokenizer.GetLineCount() + "].");
+							Logger.LogError("TextBlock.Parse() is parsing a text block and found an unexpected CLOSING_DELIMITER at line [" + p_tokenizer.GetLineCount() + "] in the block starting at [" + m_lineNumber + "].");
 							return false;
 						}
 						else if (m_expectClosingQuotes) {
-							Logger.LogError("TextBlock.Parse() is parsing a tag element and found an unexpected CLOSING_DELIMITER when it should found a DOUBLE_QUOTE at line [" + p_tokenizer.GetLineCount() + "].");
+							Logger.LogError("TextBlock.Parse() is parsing a tag element and found an unexpected CLOSING_DELIMITER when it should found a DOUBLE_QUOTE at line [" + p_tokenizer.GetLineCount() + "] in the block starting at [" + m_lineNumber + "].");
 							return false;
 						}
 
@@ -266,17 +270,17 @@ public class TextBlock extends TemplateBlock_Base {
 						break;
 
 					default:
-						Logger.LogError("TextBlock.Parse() found a token of type [" + t_nextToken.GetTokenTypeName() + "] when it was expecting a WORD for the attribute name at line [" + p_tokenizer.GetLineCount() + "].");
+						Logger.LogError("TextBlock.Parse() found a token of type [" + t_nextToken.GetTokenTypeName() + "] when it was expecting a WORD for the attribute name at line [" + p_tokenizer.GetLineCount() + "] in the block starting at [" + m_lineNumber + "].");
 						return false;
 				}
 			}
 
 
-			Logger.LogError("TextBlock.Parse() appears to have hit the end of the file without finding the closing tag of the parent block.");
+			Logger.LogError("TextBlock.Parse() appears to have hit the end of the file without finding the closing tag of the parent block that started at [" + m_lineNumber + "].");
 			return false;
 		}
 		catch (Throwable t_error) {
-			Logger.LogError("TextBlock.Parse() failed with error at line [" + p_tokenizer.GetLineCount() + "]: ", t_error);
+			Logger.LogException("TextBlock.Parse() failed with error at line [" + p_tokenizer.GetLineCount() + "] in the text block starting at [" + m_lineNumber + "]: ", t_error);
 			return false;
 		}
 	}
@@ -359,7 +363,7 @@ public class TextBlock extends TemplateBlock_Base {
 			}
 		}
 		catch (Throwable t_error) {
-			Logger.LogError("TextBlock.Evaluate() failed with error: ", t_error);
+			Logger.LogException("TextBlock.Evaluate() failed with error: ", t_error);
 			return false;
 		}
 

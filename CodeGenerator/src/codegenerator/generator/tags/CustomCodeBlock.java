@@ -80,7 +80,11 @@ import codegenerator.generator.utils.*;
  */
 public class CustomCodeBlock extends TemplateBlock_Base {
 
-	static public final String		BLOCK_NAME			= "customCode";
+	static public final String		BLOCK_NAME									= "customCode";
+
+	static public final String		ATTRIBUTE_KEY								= "key";
+	static public final String		ATTRIBUTE_OPENING_COMMENT_CHARS				= "openingCommentCharacters";
+	static public final String		ATTRIBUTE_OPTIONAL_CLOSING_COMMENT_CHARS	= "optionalClosingCommentCharacters";
 
 
 	// Data members
@@ -106,35 +110,40 @@ public class CustomCodeBlock extends TemplateBlock_Base {
 	//*********************************
 	@Override
 	public boolean Init(TagParser p_tagParser) {
-		TagAttributeParser t_nodeAttribute = p_tagParser.GetNamedAttribute("key");
+		if (!super.Init(p_tagParser)) {
+			Logger.LogError("CustomCodeBlock.Init() failed in the parent Init() at line number [" + p_tagParser.GetLineNumber() + "].");
+			return false;
+		}
+
+		TagAttributeParser t_nodeAttribute = p_tagParser.GetNamedAttribute(ATTRIBUTE_KEY);
 		if (t_nodeAttribute == null) {
-			Logger.LogError("CustomCodeBlock.Init() did not find the [key] attribute that is required for CustomCodeBlock tags.");
+			Logger.LogError("CustomCodeBlock.Init() did not find the [" + ATTRIBUTE_KEY + "] attribute that is required for CustomCodeBlock tags at line number [" + m_lineNumber + "].");
 			return false;
 		}
 
 		m_key = t_nodeAttribute.GetAttributeValue();
 		if (m_key == null) {
-			Logger.LogError("CustomCodeBlock.Init() did not get the [key] string from attribute that is required for CustomCodeBlock tags.");
+			Logger.LogError("CustomCodeBlock.Init() did not get the [" + ATTRIBUTE_KEY + "] string from attribute that is required for CustomCodeBlock tags at line number [" + m_lineNumber + "].");
 			return false;
 		}
 
-		t_nodeAttribute = p_tagParser.GetNamedAttribute("openingCommentCharacters");
+		t_nodeAttribute = p_tagParser.GetNamedAttribute(ATTRIBUTE_OPENING_COMMENT_CHARS);
 		if (t_nodeAttribute == null) {
-			Logger.LogError("CustomCodeBlock.Init() did not find the [openingCommentCharacters] attribute that is required for CustomCodeBlock tags.");
+			Logger.LogError("CustomCodeBlock.Init() did not find the [" + ATTRIBUTE_OPENING_COMMENT_CHARS + "] attribute that is required for CustomCodeBlock tags at line number [" + m_lineNumber + "].");
 			return false;
 		}
 
 		m_openingCommentCharacters = t_nodeAttribute.GetAttributeValueAsString();
 		if (m_openingCommentCharacters == null) {
-			Logger.LogError("CustomCodeBlock.Init() did not get the [openingCommentCharacters] value from attribute that is required for CustomCodeBlock tags.");
+			Logger.LogError("CustomCodeBlock.Init() did not get the [" + ATTRIBUTE_OPENING_COMMENT_CHARS + "] value from attribute that is required for CustomCodeBlock tags at line number [" + m_lineNumber + "].");
 			return false;
 		}
 
-		t_nodeAttribute = p_tagParser.GetNamedAttribute("closingCommentCharacters");
+		t_nodeAttribute = p_tagParser.GetNamedAttribute(ATTRIBUTE_OPTIONAL_CLOSING_COMMENT_CHARS);
 		if (t_nodeAttribute != null) {
 			m_closingCommentCharacters = t_nodeAttribute.GetAttributeValueAsString();
 			if (m_closingCommentCharacters == null) {
-				Logger.LogError("CustomCodeBlock.Init() did not get the [closingCommentCharacters] value from attribute that is required for CustomCodeBlock tags.");
+				Logger.LogError("CustomCodeBlock.Init() did not get the [" + ATTRIBUTE_OPTIONAL_CLOSING_COMMENT_CHARS + "] value from attribute that is required for CustomCodeBlock tags at line number [" + m_lineNumber + "].");
 				return false;
 			}
 		}
@@ -183,7 +192,7 @@ public class CustomCodeBlock extends TemplateBlock_Base {
 				p_writer.Write("	" + m_closingCommentCharacters);	// This doesn't have "\n" on the end because it's used in text blocks and the text block will keep the newline after the tag itself and add it here so we don't have to.
 		}
 		catch (Throwable t_error) {
-			Logger.LogError("CustomCodeBlock.Evaluate() failed with error: ", t_error);
+			Logger.LogException("CustomCodeBlock.Evaluate() failed with error at line number [" + m_lineNumber + "]: ", t_error);
 			return false;
 		}
 

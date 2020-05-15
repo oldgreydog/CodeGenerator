@@ -46,7 +46,7 @@ public class TagParser {
 
 	//*********************************
 	public TagAttributeParser GetNamedAttribute(String p_attributeName) {
-		return m_namedAttributes.get(p_attributeName);
+		return m_namedAttributes.get(p_attributeName.toLowerCase());
 	}
 
 
@@ -102,7 +102,7 @@ public class TagParser {
 				// If the attribute name is NULL, then it is a ConfigVariable that can only be Evaluate()'d so it can't be put in the attribute map.
 				t_attributeName = t_nextAttribute.GetAttributeNameAsString();
 				if (t_attributeName != null)
-					m_namedAttributes.put(t_attributeName, t_nextAttribute);
+					m_namedAttributes.put(t_attributeName.toLowerCase(), t_nextAttribute);
 
 				m_tagAttributes.add(t_nextAttribute);
 
@@ -137,7 +137,7 @@ public class TagParser {
 			return true;
 		}
 		catch (Throwable t_error) {
-			Logger.LogError("TagParser.Parse() failed with error at line [" + p_tokenizer.GetLineCount() + "]: ", t_error);
+			Logger.LogException("TagParser.Parse() failed with error at line [" + p_tokenizer.GetLineCount() + "]: ", t_error);
 			return false;
 		}
 	}
