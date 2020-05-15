@@ -23,7 +23,6 @@ package codegenerator.generator.tags;
 
 
 import codegenerator.generator.utils.*;
-import coreutil.config.*;
 import coreutil.logging.*;
 
 
@@ -82,13 +81,10 @@ public class TabMarker extends TemplateBlock_Base {
 
 	//*********************************
 	@Override
-	public boolean Evaluate(ConfigNode		p_currentNode,
-							ConfigNode		p_rootNode,
-							Cursor			p_writer,
-							LoopCounter		p_iterationCounter)
+	public boolean Evaluate(EvaluationContext p_evaluationContext)
 	{
 		try {
-			TabStop.SetMarker(TabStop.GetCurrentLineLength(p_writer.GetCurrentLineContents()));
+			p_evaluationContext.GetTabSettingsManager().SetMarker(p_evaluationContext.GetTabSettingsManager().GetCurrentLineLength(p_evaluationContext.GetCursor().GetCurrentLineContents()));
 		}
 		catch (Throwable t_error) {
 			Logger.LogException("TabMarker.Evaluate() failed with error: ", t_error);

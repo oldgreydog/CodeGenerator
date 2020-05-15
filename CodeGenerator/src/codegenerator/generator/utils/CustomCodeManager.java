@@ -42,12 +42,13 @@ public class CustomCodeManager {
 	static public final String		START_CUSTOM_CODE		= "StartCustomCode";
 	static public final String		END_CUSTOM_CODE			= "EndCustomCode";
 
+
 	// Static members
-	static private TreeMap<String, String>		m_keyCodeMap	= new TreeMap<String, String>();
+	private TreeMap<String, String>		m_keyCodeMap	= new TreeMap<String, String>();
 
 
-	//===========================================
-	static public boolean ScanFile(File p_targetFile) {
+	//*********************************
+	public boolean ScanFile(File p_targetFile) {
 		BufferedReader t_lineReader = null;
 		try {
 			m_keyCodeMap.clear();	// We have to clear the map when we start a new file.  We do not want to accidently cross-contaminate code into other files.
@@ -119,8 +120,8 @@ public class CustomCodeManager {
 	}
 
 
-	//===========================================
-	static public String GetCodeSegment(String p_key) {
+	//*********************************
+	public String GetCodeSegment(String p_key) {
 		return m_keyCodeMap.get(p_key);
 	}
 }

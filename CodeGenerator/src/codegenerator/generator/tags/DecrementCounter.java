@@ -22,7 +22,6 @@ package codegenerator.generator.tags;
 
 
 
-import coreutil.config.*;
 import coreutil.logging.*;
 import codegenerator.generator.utils.*;
 
@@ -116,15 +115,12 @@ public class DecrementCounter extends TemplateBlock_Base {
 
 	//*********************************
 	@Override
-	public boolean Evaluate(ConfigNode		p_currentNode,
-							ConfigNode		p_rootNode,
-							Cursor 			p_writer,
-							LoopCounter		p_iterationCounter)
+	public boolean Evaluate(EvaluationContext p_evaluationContext)
 	{
 		try {
-			LoopCounter t_iterationCounter = p_iterationCounter;
+			LoopCounter t_iterationCounter = p_evaluationContext.GetLoopCounter();
 			if (m_optionalCounterName != null)
-				t_iterationCounter = p_iterationCounter.GetNamedCounter(m_optionalCounterName);
+				t_iterationCounter = t_iterationCounter.GetNamedCounter(m_optionalCounterName);
 
 			if (t_iterationCounter == null) {
 				Logger.LogError("DecrementCounter.Evaluate() failed to find a loop counter with name [" + m_optionalCounterName + "] at line number [" + m_lineNumber + "].");

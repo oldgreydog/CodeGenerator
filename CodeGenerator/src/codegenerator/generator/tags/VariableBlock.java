@@ -179,10 +179,7 @@ public class VariableBlock extends TemplateBlock_Base {
 
 	//*********************************
 	@Override
-	public boolean Evaluate(ConfigNode		p_currentNode,
-							ConfigNode		p_rootNode,
-							Cursor 			p_writer,
-							LoopCounter		p_iterationCounter)
+	public boolean Evaluate(EvaluationContext p_evaluationContext)
 	{
 		try {
 			if (m_evalMode == EVAL_MODE_VALUE_SET)		// Don't do anything for instances that are "set"s.  Those are never "evaluated".
@@ -195,17 +192,23 @@ public class VariableBlock extends TemplateBlock_Base {
 				}
 
 				// The addition of outer contexts means that if you use a variable inside an inner context, you may need to point it to the outer context to get the correct values in the evaluation of the variable.
-				ConfigNode t_currentNode = p_currentNode;
+				ConfigNode t_currentNode = p_evaluationContext.GetCurrentNode();
 				if (m_contextName != null) {
-					t_currentNode = OuterContextManager.GetOuterContext(m_contextName);
+					t_currentNode = p_evaluationContext.GetOuterContextManager().GetOuterContext(m_contextName);
 					if (t_currentNode == null) {
 						Logger.LogError("VariableBlock.Evaluate() failed to find the outer context [" + m_contextName + "] for the evaluation mode at line [" + m_lineNumber + "].");
 						return false;
 					}
 				}
 
-				if (!t_evalBlock.Evaluate(t_currentNode, p_rootNode, p_writer, p_iterationCounter))
+				p_evaluationContext.PushNewCurrentNode(t_currentNode);
+
+				if (!t_evalBlock.Evaluate(p_evaluationContext)) {
+					p_evaluationContext.PopCurrentNode();
 					return false;
+				}
+
+				p_evaluationContext.PopCurrentNode();
 			}
 			else {
 				Logger.LogError("VariableBlock.Evaluate() found an invalid value [" + m_evalMode + "] for the evaluation mode at line [" + m_lineNumber + "].");

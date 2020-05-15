@@ -22,10 +22,7 @@ package codegenerator.generator.tags;
 
 
 
-import java.io.*;
-
 import codegenerator.generator.utils.*;
-import coreutil.config.*;
 import coreutil.logging.*;
 
 
@@ -108,10 +105,7 @@ public class TypeConvertLoadFile extends TemplateBlock_Base {
 
 	//*********************************
 	@Override
-	public boolean Evaluate(ConfigNode		p_currentNode,
-							ConfigNode		p_rootNode,
-							Cursor 			p_writer,
-							LoopCounter		p_iterationCounter)
+	public boolean Evaluate(EvaluationContext p_evaluationContext)
 	{
 		return true;
 	}

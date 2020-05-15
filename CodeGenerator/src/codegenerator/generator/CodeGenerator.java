@@ -26,8 +26,8 @@ import java.io.*;
 import java.util.*;
 
 import codegenerator.generator.tags.*;
-import codegenerator.generator.tags.TemplateBlock_Base.*;
 import codegenerator.generator.utils.*;
+import codegenerator.generator.utils.multithreading.*;
 import coreutil.config.*;
 import coreutil.logging.*;
 
@@ -89,7 +89,6 @@ public class CodeGenerator {
 			if (t_template == null) {
 				Logger.LogFatal("CodeGenerator.Execute() failed to parse the template file [" + p_templateFilename + "].");
 				Cleanup();
-
 				return false;
 			}
 
@@ -105,19 +104,35 @@ public class CodeGenerator {
 			if ((t_templateConfig = t_configParser.ParseConfigFile(t_templateConfigFile)) == null) {
 				Logger.LogFatal("CodeGenerator.Execute() failed to parse the template variables file [" + p_variablesFilename + "].");
 				Cleanup();
-
 				return false;
 			}
 
 			long t_endConfigValuesParse = Calendar.getInstance().getTimeInMillis();
 
 
+			// Initialize any objects that will be needed over the lifetime of the evaluate.
+			if (!ThreadPoolManager.Init()) {
+				Logger.LogFatal("CodeGenerator.Execute() failed to initialize the ThreadPoolManager.");
+				Cleanup();
+				return false;
+			}
+
+
 			long t_startGenerate = Calendar.getInstance().getTimeInMillis();
 
 			// And finally, "evaluate" the template with the config to generate the all of the file outputs.
-			t_template.Evaluate(t_templateConfig, t_templateConfig, null, new LoopCounter(null));
+			EvaluationContext t_context = new EvaluationContext(t_templateConfig, t_templateConfig, null, new LoopCounter());
+			t_template.Evaluate(t_context);
+
+			// Now that the file writes are multi-threaded, we have to call ThreadPoolManager.Shutdown() to wait until the writes are complete.
+			if (!ThreadPoolManager.Shutdown()) {
+				Logger.LogFatal("CodeGenerator.Execute() failed to initialize the ThreadPoolManager.");
+				Cleanup();
+				return false;
+			}
 
 			long t_endGenerate = Calendar.getInstance().getTimeInMillis();
+
 
 			Logger.LogInfo("Template parse (millisec):      "	+ (t_endTemplateParse		- t_startTemplateParse));
 			Logger.LogInfo("Config values parse (millisec): "	+ (t_endConfigValuesParse	- t_endTemplateParse));

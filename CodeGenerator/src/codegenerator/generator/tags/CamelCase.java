@@ -1,20 +1,20 @@
 /*
-Copyright 2016 Wes Kaylor
+	Copyright 2016 Wes Kaylor
 
-This file is part of CodeGenerator.
+	This file is part of CodeGenerator.
 
-CodeGenerator is free software: you can redistribute it and/or modify
-it under the terms of the GNU Lesser General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
+	CodeGenerator is free software: you can redistribute it and/or modify
+	it under the terms of the GNU Lesser General Public License as published by
+	the Free Software Foundation, either version 3 of the License, or
+	(at your option) any later version.
 
-CodeGenerator is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Lesser General Public License for more details.
+	CodeGenerator is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU Lesser General Public License for more details.
 
-You should have received a copy of the GNU Lesser General Public License
-along with CodeGenerator.  If not, see <http://www.gnu.org/licenses/>.
+	You should have received a copy of the GNU Lesser General Public License
+	along with CodeGenerator.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 
@@ -25,7 +25,6 @@ package codegenerator.generator.tags;
 import java.io.*;
 
 import codegenerator.generator.utils.*;
-import coreutil.config.*;
 import coreutil.logging.*;
 
 
@@ -117,13 +116,9 @@ public class CamelCase extends TemplateBlock_Base {
 
 	//*********************************
 	@Override
-	public boolean Evaluate(ConfigNode		p_currentNode,
-							ConfigNode		p_rootNode,
-							Cursor 			p_writer,
-							LoopCounter		p_iterationCounter)	// There wasn't any good way to tell a CamelCase which iteration it was in that would be safe for arbitrary nesting, so I added this iteration counter to handle the problem.
+	public boolean Evaluate(EvaluationContext p_evaluationContext)
 	{
 		try {
-			// If there are no child blocks, then this is a "leaf" node text object and we have to output its string.
 			if (m_value == null) {
 				Logger.LogError("CamelCase.Evaluate() was not initialized at line number [" + m_lineNumber + "].");
 				return false;
@@ -131,12 +126,17 @@ public class CamelCase extends TemplateBlock_Base {
 
 			StringWriter	t_valueWriter	= new StringWriter();
 			Cursor			t_valueCursor	= new Cursor(t_valueWriter);
-			if (!m_value.Evaluate(p_currentNode, p_rootNode, t_valueCursor, p_iterationCounter)) {
+			p_evaluationContext.PushNewCursor(t_valueCursor);
+
+			if (!m_value.Evaluate(p_evaluationContext)) {
 				Logger.LogError("CamelCase.Evaluate() failed to evaluate the value at line number [" + m_lineNumber + "].");
+				p_evaluationContext.PopCurrentCursor();	// We need to clean up the temp cursor before we fail out of the function.
 				return false;
 			}
 
-			p_writer.Write(CreateCamelCaseName(t_valueWriter.toString()));
+			p_evaluationContext.PopCurrentCursor();	// Get rid of the temp cursor because we can't leave it on the context when we leave.
+
+			p_evaluationContext.GetCursor().Write(CreateCamelCaseName(t_valueWriter.toString()));
 		}
 		catch (Throwable t_error) {
 			Logger.LogException("CamelCase.Evaluate() failed with error: ", t_error);

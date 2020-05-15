@@ -22,10 +22,7 @@ package codegenerator.generator.tags;
 
 
 
-import java.io.*;
-
 import codegenerator.generator.utils.*;
-import coreutil.config.*;
 import coreutil.logging.*;
 
 
@@ -65,88 +62,9 @@ public class TabStop extends TemplateBlock_Base {
 	static private final String		STOP_TYPE_LABEL_STOP		= "stop";
 	static private final String		STOP_TYPE_LABEL_MARKER		= "marker";
 
-	static public  final int		OUTPUT_TYPE_UNDEFINED		= -1;
-	static public  final int		OUTPUT_TYPE_TABS			= 1;
-	static public  final int		OUTPUT_TYPE_SPACES			= 2;
-
 	static private final int		STOP_TYPE_UNDEFINED			= -1;
 	static private final int		STOP_TYPE_STOP				= 1;
 	static private final int		STOP_TYPE_MARKER			= 2;
-
-
-	// Static members
-	// !!!!NOTE!!!! Since the generator is strictly single threaded, these static class members do not require locking around them in this code.
-	static private int		s_tabSize				= -1;
-	static private int		s_outputType			= OUTPUT_TYPE_UNDEFINED;
-	static private int		s_markerColumnNumber	= -1;
-
-
-	//===========================================
-	static public void SetTabSize(int p_tabSize) {
-		s_tabSize = p_tabSize;
-	}
-
-
-	//===========================================
-	static public int GetTabSize() {
-		return s_tabSize;
-	}
-
-
-	//===========================================
-	static public void SetOutputType(int p_outputType) {
-		s_outputType = p_outputType;
-	}
-
-
-	//===========================================
-	static public int GetOutputType() {
-		return s_outputType;
-	}
-
-
-	//===========================================
-	static public void SetMarker(int p_markerColumnNumber) {
-		s_markerColumnNumber = p_markerColumnNumber;
-	}
-
-
-	//===========================================
-	static public int GetMarker() {
-		return s_markerColumnNumber;
-	}
-
-
-	//===========================================
-	/**
-	 * This steps through the current line and counts the columns, substituting the tab size for each tab and handling adjustment for when there is text within a tab stop.
-	 * @return
-	 */
-	static public int GetCurrentLineLength(String p_currentLine) {
-		int		t_index			= 0;
-		int		t_lineLength	= 0;
-		boolean t_lastWasTab	= false;
-		while (t_index < p_currentLine.length()) {
-			if (p_currentLine.charAt(t_index++) == '\t') {
-				if (t_lastWasTab) {
-					t_lineLength += s_tabSize;
-					continue;
-				}
-
-				t_lastWasTab = true;
-				t_lineLength = ((t_lineLength / s_tabSize) + 1) * s_tabSize;	// When a tab is preceded by some number of characters and since tab stops are fixed and you can type "into" the next tab space up to (s_tabSize - 1) characters, this is the easiest way to calculate the next tab stop position after the end of an arbitrary character string.
-				continue;
-			}
-
-			t_lastWasTab = false;
-			++t_lineLength;			// This may not be internationalization safe if the template charset has characters that are more than one column wide.
-		}
-
-
-		return t_lineLength;
-	}
-
-
 
 
 	// Data members
@@ -234,13 +152,13 @@ public class TabStop extends TemplateBlock_Base {
 
 	//*********************************
 	@Override
-	public boolean Evaluate(ConfigNode		p_currentNode,
-							ConfigNode		p_rootNode,
-							Cursor			p_writer,
-							LoopCounter		p_iterationCounter)
+	public boolean Evaluate(EvaluationContext p_evaluationContext)
 	{
 		try {
-			if (s_tabSize == -1) {
+			TabSettingsManager t_tabSettingsManager = p_evaluationContext.GetTabSettingsManager();
+
+			int t_tabsize = t_tabSettingsManager.GetTabSize();
+			if (t_tabsize == -1) {
 				Logger.LogError("TabStop.Evaluate() - the tab size was not set for this template.");
 				return false;
 			}
@@ -250,11 +168,11 @@ public class TabStop extends TemplateBlock_Base {
 				t_stopOffset = m_offset;
 
 				// For the STOP type, if the offset isn't a round tab multiple, we'll round it up to the next tab stop.
-				if ((t_stopOffset % s_tabSize) > 0)
-					t_stopOffset = ((t_stopOffset / s_tabSize) + 1) * s_tabSize;
+				if ((t_stopOffset % t_tabsize) > 0)
+					t_stopOffset = ((t_stopOffset / t_tabsize) + 1) * t_tabsize;
 			}
 			else {
-				t_stopOffset = GetMarker();
+				t_stopOffset = t_tabSettingsManager.GetMarker();
 				if (t_stopOffset < 0) {
 					Logger.LogError("TabStop.Evaluate() - the tab marker was not set for this tab stop.");
 					return false;
@@ -265,27 +183,28 @@ public class TabStop extends TemplateBlock_Base {
 			}
 
 
-			int t_lineLength = GetCurrentLineLength(p_writer.GetCurrentLineContents());
+			Cursor	t_cursor		= p_evaluationContext.GetCursor();
+			int		t_lineLength	= t_tabSettingsManager.GetCurrentLineLength(t_cursor.GetCurrentLineContents());
 			if (t_lineLength >= t_stopOffset)
 				return true;	// We're already past the tab stop requested so we don't need to do anything.
 
 
 			// If the line length isn't at a tab stop, then we'll add one tab to get it up to the next tab stop and then loop from there to get any remaining tabs.
-			if ((t_lineLength % s_tabSize) > 0) {
-				int t_roundUpTabLineLength = ((t_lineLength / s_tabSize) + 1) * s_tabSize;	// The current line length may or may not fall on a tab boundary and adding a tab to square it up might put it passed the final target offset if we are aiming for a non-stop-boundary marker.
+			if ((t_lineLength % t_tabsize) > 0) {
+				int t_roundUpTabLineLength = ((t_lineLength / t_tabsize) + 1) * t_tabsize;	// The current line length may or may not fall on a tab boundary and adding a tab to square it up might put it passed the final target offset if we are aiming for a non-stop-boundary marker.
 				if (t_roundUpTabLineLength <= t_stopOffset) {
 					// If it is safe to add a tab's worth of space without going past the final target offset, then do so.
 					t_lineLength = t_roundUpTabLineLength;
 
-					if (s_outputType == OUTPUT_TYPE_TABS)
-						p_writer.Write("\t");
+					if (t_tabSettingsManager.GetOutputType() == TabSettingsManager.OUTPUT_TYPE_TABS)
+						t_cursor.Write("\t");
 					else
-						AddTabSpaces(p_writer, s_tabSize - (t_lineLength % s_tabSize));
+						AddTabSpaces(t_cursor, t_tabsize - (t_lineLength % t_tabsize));
 				}
 				else {
 					// Otherwise, we are dealing with a non-stop-boundary marker and we only need to add enough spaces to get to the final target offset.
 					for (int i = (t_stopOffset - t_lineLength); i > 0; --i)
-						p_writer.Write(" ");
+						t_cursor.Write(" ");
 
 					return true;	// We're done if we get here.
 				}
@@ -293,20 +212,20 @@ public class TabStop extends TemplateBlock_Base {
 
 			// Now that we have the line length to a tab stop, we can add full tab stops (and, in the case of a non-stop-boundary marker, trailing spaces) until we reach the target offset.
 			int t_remainingLength		= t_stopOffset - t_lineLength;
-			int t_remainingTabsToAdd	= t_remainingLength / s_tabSize;
-			int t_remainingSpacesToAdd	= t_remainingLength % s_tabSize;
+			int t_remainingTabsToAdd	= t_remainingLength / t_tabsize;
+			int t_remainingSpacesToAdd	= t_remainingLength % t_tabsize;
 
 			while (t_remainingTabsToAdd > 0) {
-				if (s_outputType == OUTPUT_TYPE_TABS)
-					p_writer.Write("\t");
+				if (t_tabSettingsManager.GetOutputType() == TabSettingsManager.OUTPUT_TYPE_TABS)
+					t_cursor.Write("\t");
 				else
-					AddTabSpaces(p_writer, s_tabSize);
+					AddTabSpaces(t_cursor, t_tabsize);
 
 				--t_remainingTabsToAdd;
 			}
 
 			while (t_remainingSpacesToAdd > 0) {
-				p_writer.Write(" ");
+				t_cursor.Write(" ");
 				--t_remainingSpacesToAdd;
 			}
 		}
@@ -332,7 +251,7 @@ public class TabStop extends TemplateBlock_Base {
 		StringBuilder t_dump = new StringBuilder();
 
 		t_dump.append(p_tabs + "Block type name  :  " + m_name		+ "\n");
-		t_dump.append(p_tabs + "Stop type		 :  " + ((m_stopType == STOP_TYPE_STOP) ? STOP_TYPE_lABEL_STOP : STOP_TYPE_lABEL_MARKER) 	+ "\n");
+		t_dump.append(p_tabs + "Stop type		 :  " + ((m_stopType == STOP_TYPE_STOP) ? STOP_TYPE_LABEL_STOP : STOP_TYPE_LABEL_MARKER) 	+ "\n");
 		t_dump.append(p_tabs + "Offset			 :  " + m_offset 	+ "\n");
 
 		return t_dump.toString();

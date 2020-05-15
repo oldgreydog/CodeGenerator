@@ -27,25 +27,61 @@ public class LoopCounter {
 	// Static members
 	static private int		s_idSource	= 0;
 
-	static private synchronized String GetNextID() {
-		int t_id = ++s_idSource;
-		return Integer.toString(t_id);
+	static private synchronized int GetNextID() {
+		return ++s_idSource;
 	}
 
-	private LoopCounter		m_parentCounter		= null;			// This lets us find name counters by recursing up the parent pointers.
-	private String			m_counterID			= GetNextID();
-	private int				m_counter			= 1;
+	private LoopCounter		m_parentCounter			= null;			// This lets us find name counters by recursing up the parent pointers.
+	private int				m_counterID				= GetNextID();
+	private String			m_optionalCounterName	= null;
+	private int				m_counter				= 1;
 
+
+	//*********************************
+	public LoopCounter() {}
+
+
+	//*********************************
 	public LoopCounter(LoopCounter p_parentCounter) {
+		m_parentCounter			= p_parentCounter.m_parentCounter;
+		m_counterID				= p_parentCounter.m_counterID;
+		m_optionalCounterName	= p_parentCounter.m_optionalCounterName;
+		m_counter				= p_parentCounter.m_counter;
+	}
+
+
+	//*********************************
+	/**
+	 * In shifting to multithreading on the "file" evaluations (and allowing nested file blocks), we have to snap-shot the parent loop counters so that
+	 * we have the correct static values while we are in the file evaluation.  If we didn't, the parent loop counters would be changing outside the file
+	 * eval and would completely pollute any usage of those parent loop counters inside the file evaluation.
+	 *
+	 * @param p_parentCounter
+	 */
+	public LoopCounter DuplicateCountersForNewFile() {
+		LoopCounter t_newCounter = new LoopCounter(this);
+		if (m_parentCounter != null)
+			t_newCounter.SetParentCounter(m_parentCounter.DuplicateCountersForNewFile());
+
+		return t_newCounter;
+	}
+
+
+	//*********************************
+	public void SetParentCounter(LoopCounter p_parentCounter) {
 		m_parentCounter = p_parentCounter;
 	}
 
+
+	//*********************************
 	public void SetOptionalCounterName(String p_optionalCounterName) {
-		m_counterID = p_optionalCounterName;
+		m_optionalCounterName = p_optionalCounterName;
 	}
 
+
+	//*********************************
 	public LoopCounter GetNamedCounter(String p_optionalCounterName) {
-		if (m_counterID.equalsIgnoreCase(p_optionalCounterName))
+		if ((m_optionalCounterName != null) && m_optionalCounterName.equalsIgnoreCase(p_optionalCounterName))
 			return this;
 
 		if (m_parentCounter == null)
@@ -54,18 +90,26 @@ public class LoopCounter {
 		return m_parentCounter.GetNamedCounter(p_optionalCounterName);
 	}
 
-	public String GetCounterID() {
+
+	//*********************************
+	public int GetCounterID() {
 		return m_counterID;
 	}
 
+
+	//*********************************
 	public void IncrementCounter() {
 		++m_counter;
 	}
 
+
+	//*********************************
 	public void DecrementCounter() {
 		--m_counter;
 	}
 
+
+	//*********************************
 	public int GetCounter() {
 		return m_counter;
 	}

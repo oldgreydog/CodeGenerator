@@ -25,8 +25,6 @@ package codegenerator.generator.tags;
 import coreutil.config.*;
 import coreutil.logging.*;
 
-import java.util.*;
-
 import codegenerator.generator.utils.*;
 
 
@@ -222,15 +220,12 @@ public class OuterContext extends TemplateBlock_Base {
 
 	//*********************************
 	@Override
-	public boolean Evaluate(ConfigNode		p_currentNode,
-							ConfigNode		p_rootNode,
-							Cursor 			p_writer,
-							LoopCounter		p_iterationCounter)
+	public boolean Evaluate(EvaluationContext p_evaluationContext)
 	{
 		try {
-			OuterContextManager.SetOuterContext(m_contextName, p_currentNode);
+			p_evaluationContext.GetOuterContextManager().SetOuterContext(m_contextName, p_evaluationContext.GetCurrentNode());
 
-			ConfigNode t_context = p_currentNode;
+			ConfigNode t_context = p_evaluationContext.GetCurrentNode();
 			for (int i = 0; i < m_jumpToParentContextCount; ++i) {
 				t_context = t_context.GetParentNode();
 				if (t_context == null) {
@@ -239,12 +234,17 @@ public class OuterContext extends TemplateBlock_Base {
 				}
 			}
 
-			if (!m_contentBlock.Evaluate(t_context, p_rootNode, p_writer, p_iterationCounter)) {
+			p_evaluationContext.PushNewCurrentNode(t_context);
+
+			if (!m_contentBlock.Evaluate(p_evaluationContext)) {
 				Logger.LogError("OuterContext.Evaluate() failed to evaluate its content block.");
+				p_evaluationContext.PopCurrentNode();
 				return false;
 			}
 
-			OuterContextManager.RemoveOuterContext(m_contextName);
+			p_evaluationContext.PopCurrentNode();
+
+			p_evaluationContext.GetOuterContextManager().RemoveOuterContext(m_contextName);
 		}
 		catch (Throwable t_error) {
 			Logger.LogException("OuterContext.Evaluate() failed with error: ", t_error);

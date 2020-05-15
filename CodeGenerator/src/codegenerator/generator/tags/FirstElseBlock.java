@@ -22,7 +22,6 @@ package codegenerator.generator.tags;
 
 
 
-import coreutil.config.*;
 import coreutil.logging.*;
 
 import java.util.*;
@@ -69,7 +68,7 @@ public class FirstElseBlock extends TemplateBlock_Base {
 	private	String				m_optionalCounterName	= null;	// Providing a name for the loop counter lets you specify using a named loop counter from a foreach block other than the one directly containing this first block.
 
 //	private ArrayList<Integer>	m_parentIterationCountList	= null;
-	private final TreeMap<String, LoopCounter>		m_counterIDMap	= new TreeMap<>();
+	private final TreeMap<Integer, LoopCounter>		m_counterIDMap	= new TreeMap<>();
 
 
 	//*********************************
@@ -151,20 +150,21 @@ public class FirstElseBlock extends TemplateBlock_Base {
 
 	//*********************************
 	@Override
-	public boolean Evaluate(ConfigNode		p_currentNode,
-							ConfigNode		p_rootNode,
-							Cursor 			p_writer,
-							LoopCounter		p_iterationCounter)
+	public boolean Evaluate(EvaluationContext p_evaluationContext)
 	{
 		try {
-			LoopCounter t_iterationCounter = p_iterationCounter;
+			LoopCounter t_iterationCounter	= p_evaluationContext.GetLoopCounter();
+			boolean		t_popTempCounter	= false;
 			if (m_optionalCounterName != null) {
-				t_iterationCounter = p_iterationCounter.GetNamedCounter(m_optionalCounterName);
+				t_iterationCounter = t_iterationCounter.GetNamedCounter(m_optionalCounterName);
 
 				if (t_iterationCounter == null) {
 					Logger.LogError("FirstElseBlock.Evaluate() failed to find a loop counter with name [" + m_optionalCounterName + "] at line number [" + m_lineNumber + "].");
 					return false;
 				}
+
+				p_evaluationContext.PushLoopCounter(t_iterationCounter);
+				t_popTempCounter = true;
 
 				// Since optionally "named" counters ID's don't change each iteration of an outer loop re-evaluates the foreach, we have to check to see if the named loop counter is a new instance reference and, if it is, count it as a new start of the loop.
 				LoopCounter t_existingLoopCounter = m_counterIDMap.get(t_iterationCounter.GetCounterID());
@@ -173,7 +173,7 @@ public class FirstElseBlock extends TemplateBlock_Base {
 			}
 
 			// I think (!hope!) that using a tree map to keep the internal counter for each counter ID that we see will let us use variable blocks inside various levels of nested <foreach> loops and <if> blocks without having to worry about looking up the stack of counters to figure out if a particular evaluation is the first one or not for that particular counter.
-			LoopCounter t_internalCounter = m_counterIDMap.get(t_iterationCounter.GetCounterID());
+			LoopCounter t_internalCounter	= m_counterIDMap.get(t_iterationCounter.GetCounterID());
 			boolean		t_firstTimeThrough	= false;
 			if (t_internalCounter == null)
 			{
@@ -182,11 +182,14 @@ public class FirstElseBlock extends TemplateBlock_Base {
 			}
 
 			if (t_firstTimeThrough) {
-				m_firstBlock.Evaluate(p_currentNode, p_rootNode, p_writer, t_iterationCounter);
+				m_firstBlock.Evaluate(p_evaluationContext);
 			}
 			else if (m_elseBlock != null) {
-				m_elseBlock.Evaluate(p_currentNode, p_rootNode, p_writer, t_iterationCounter);
+				m_elseBlock.Evaluate(p_evaluationContext);
 			}
+
+			if (t_popTempCounter)
+				p_evaluationContext.PopCurrentLoopCounter();
 		}
 		catch (Throwable t_error) {
 			Logger.LogException("FirstElseBlock.Evaluate() failed with error: ", t_error);

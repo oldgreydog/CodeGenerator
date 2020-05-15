@@ -166,17 +166,14 @@ public class ConfigVariable extends TemplateBlock_Base {
 
 	//*********************************
 	@Override
-	public boolean Evaluate(ConfigNode		p_currentNode,
-							ConfigNode		p_rootNode,
-							Cursor 			p_writer,
-							LoopCounter		p_iterationCounter)
+	public boolean Evaluate(EvaluationContext p_evaluationContext)
 
 	{
 		try {
-			ConfigNode	t_currentNode	= p_currentNode;
+			ConfigNode	t_currentNode	= p_evaluationContext.GetCurrentNode();
 			String		t_variableName	= m_variableName;
 			if (t_variableName.startsWith("root.")) {
-				t_currentNode = p_rootNode;
+				t_currentNode = p_evaluationContext.GetRootNode();
 				t_variableName.replace("root.", "");	// Remove the "root." reference so that the variable name will work correctly below.
 			}
 			else if (m_parentReferenceCount > 0) {
@@ -202,7 +199,7 @@ public class ConfigVariable extends TemplateBlock_Base {
 				return false;
 			}
 
-			p_writer.Write(t_value);
+			p_evaluationContext.GetCursor().Write(t_value);
 		}
 		catch (Throwable t_error) {
 			Logger.LogException("ConfigVariable.Evaluate() failed with error at line [" + m_lineNumber + "]: ", t_error);

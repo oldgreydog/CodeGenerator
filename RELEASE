@@ -3,6 +3,55 @@ This contains important info about each release.
 To run the code generator using the contents of the code_generator.zip file, extract the file into the folder of your choice.
 
 
+1.5
+
+	This release has two major changes.  !!!NOTE!!! c) below will may break your existing templates!  See the detailed notes for c) for any
+	text replacements that you will need to do.
+
+		a) File tags can now be nested inside another file template.
+		b) File tags are now multithreaded in the Evaluate() (or generation) phase of the code.
+		c) The naming of tag attributes and/or using camel-case in names has been made more consistent.
+		d) For another project, I added an "exception" log level and I decided to normalize the exception logging across all my code to use it.
+		e) Cleaned up all TemplateBlock_Base subclasses to properly call the super.Init() in their Init() functions.  This mainly to set the line
+			number where the tag was found.
+		f) Used the e) line number in more error messages to help in finding where the erroneous tag started.
+
+	Detailed change notes:
+
+	a & b) I needed to be able to nest a file tag inside a template.  You may never need this, but I came to a point working on a template
+		for some database code where I wanted to only generate a certain file if the table had a foreign key or other parent-child relationship
+		to another table.  I didn't want to add a bunch of crap to the root template to do this.  Instead I felt like it made more sense to
+		put the file tag inside a specific template that was already detecting the case where I needed it.
+
+		But nesting the file tag would mean some changes had to be made to manage the state being passed down through the parameters to the
+		Evaluate() function.  A few years back, I had started playing with the idea of multithreading the code around the file tag, but soon
+		realized I didn't really want to figure out and execute all of the state management issues that would require.  But now that I was faced
+		with having to do most of that work anyway to get the nested file tags, it was pretty trivial to do the little bit extra required for
+		multithreading.
+
+		Most of the changes revolved around the fact that certain things like the custom code manager, outer context manager and tab settings had
+		been done as singletons, which worked just fine in sequential code.  But with nesting and multithreading, they have to be managed as separate
+		objects for the state of each file object evaluation.  Instead of just adding more and more parameters to Evaluate(), I just created a
+		"context" object and made that the only parameter for Evaluate().  Then I could add/manage/remove any values inside that context object in
+		any way I wanted without having to mess with the parameter list for Evaluate() ever again.
+
+		Once that was done, it was trivial to set up the multithreading.  All I needed was a thread pool and a file-generate task.  I changed the
+		file tag Evaluate() to snapshot the context object (i.e. get a copy) and then throw itself on the thread pool as a file-generate task.
+
+	c) I realized there might be a few places where I hadn't been consistent in naming tag attributes and/or using camel-case
+		in names.  I've tried to take a stab at cleaning that up, but be warned, THIS WILL MAY BREAK YOUR EXISTING TEMPLATES!  Sorry!
+		There are two groups of changes here:
+			- I decided that I needed to uniformly use the prefix "optional" on all optional tag attributes.  I feel like that makes it easier for
+				users (and me) to know which tags have to be used and which ones they can skip if they don't need them.  This change is definitely a template
+				breaker.  I've listed the changed one below so that it should be easier for you to do find/replace to fix your templates.
+			- I also found a few places I wasn't consistently using camel case on some of the attribute names.  I changed them in the code and my templates,
+				but I also made sure the TagParser treats them as case-insensitive which should mean that you can do camel-case or not.  This should not
+				break your templates.
+
+		Here are the values that you need to find/replace (Turned out that, on doing the checkin, only one attribute name got changed.  All of the others
+		had been done that way when they were first added.):
+			- in CustomCodeBlock tags: closingCommentCharacters -> optionalClosingCommentCharacters
+
 
 1.4
 
@@ -23,6 +72,7 @@ To run the code generator using the contents of the code_generator.zip file, ext
 			- first
 		f) Improved release zip file.
 
+	Detailed change notes:
 
 	a) The outer context tags are such special-case tags that you may never find a use for them.  I have a certain type of
 		relationship between database tables that I define in my config value files and I wanted to use that relationship info

@@ -1,20 +1,20 @@
 /*
-Copyright 2016 Wes Kaylor
+	Copyright 2016 Wes Kaylor
 
-This file is part of CodeGenerator.
+	This file is part of CodeGenerator.
 
-CodeGenerator is free software: you can redistribute it and/or modify
-it under the terms of the GNU Lesser General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
+	CodeGenerator is free software: you can redistribute it and/or modify
+	it under the terms of the GNU Lesser General Public License as published by
+	the Free Software Foundation, either version 3 of the License, or
+	(at your option) any later version.
 
-CodeGenerator is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Lesser General Public License for more details.
+	CodeGenerator is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU Lesser General Public License for more details.
 
-You should have received a copy of the GNU Lesser General Public License
-along with CodeGenerator.  If not, see <http://www.gnu.org/licenses/>.
+	You should have received a copy of the GNU Lesser General Public License
+	along with CodeGenerator.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 
@@ -22,7 +22,6 @@ package codegenerator.generator.tags;
 
 
 
-import coreutil.config.*;
 import coreutil.logging.*;
 import codegenerator.generator.utils.*;
 
@@ -92,22 +91,19 @@ public class Counter extends TemplateBlock_Base {
 
 	//*********************************
 	@Override
-	public boolean Evaluate(ConfigNode		p_currentNode,
-							ConfigNode		p_rootNode,
-							Cursor 			p_writer,
-							LoopCounter		p_iterationCounter)
+	public boolean Evaluate(EvaluationContext p_evaluationContext)
 	{
 		try {
-			LoopCounter t_iterationCounter = p_iterationCounter;
+			LoopCounter t_iterationCounter = p_evaluationContext.GetLoopCounter();
 			if (m_optionalCounterName != null)
-				t_iterationCounter = p_iterationCounter.GetNamedCounter(m_optionalCounterName);
+				t_iterationCounter = t_iterationCounter.GetNamedCounter(m_optionalCounterName);
 
 			if (t_iterationCounter == null) {
 				Logger.LogError("Counter.Evaluate() failed to find a loop counter with name [" + m_optionalCounterName + "] at line number [" + m_lineNumber + "].");
 				return false;
 			}
 
-			p_writer.Write(Integer.toString(t_iterationCounter.GetCounter()));
+			p_evaluationContext.GetCursor().Write(Integer.toString(t_iterationCounter.GetCounter()));
 		}
 		catch (Throwable t_error) {
 			Logger.LogException("Counter.Evaluate() failed with error: ", t_error);

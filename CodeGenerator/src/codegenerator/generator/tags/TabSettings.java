@@ -22,10 +22,7 @@ package codegenerator.generator.tags;
 
 
 
-import java.io.*;
-
 import codegenerator.generator.utils.*;
-import coreutil.config.*;
 import coreutil.logging.*;
 
 
@@ -101,9 +98,9 @@ public class TabSettings extends TemplateBlock_Base {
 			}
 
 			if (t_outputType.equalsIgnoreCase("tabs"))
-				m_outputType = TabStop.OUTPUT_TYPE_TABS;
+				m_outputType = TabSettingsManager.OUTPUT_TYPE_TABS;
 			else
-				m_outputType = TabStop.OUTPUT_TYPE_SPACES;
+				m_outputType = TabSettingsManager.OUTPUT_TYPE_SPACES;
 
 			return true;
 		}
@@ -130,10 +127,7 @@ public class TabSettings extends TemplateBlock_Base {
 
 	//*********************************
 	@Override
-	public boolean Evaluate(ConfigNode		p_currentNode,
-							ConfigNode		p_rootNode,
-							Cursor			p_writer,
-							LoopCounter		p_iterationCounter)
+	public boolean Evaluate(EvaluationContext p_evaluationContext)
 	{
 		try {
 			if (m_tabLength == -1) {
@@ -146,8 +140,8 @@ public class TabSettings extends TemplateBlock_Base {
 				return false;
 			}
 
-			TabStop.SetTabSize(m_tabLength);
-			TabStop.SetOutputType(m_outputType);
+			p_evaluationContext.GetTabSettingsManager().SetTabSize(m_tabLength);
+			p_evaluationContext.GetTabSettingsManager().SetOutputType(m_outputType);
 		}
 		catch (Throwable t_error) {
 			Logger.LogException("TabSettings.Evaluate() failed with error: ", t_error);
@@ -155,13 +149,6 @@ public class TabSettings extends TemplateBlock_Base {
 		}
 
 		return true;
-	}
-
-
-	//*********************************
-	private void AddTabSpaces(Cursor p_writer, int p_spaceCount) {
-		for (int i = 0; i < p_spaceCount; i++)
-			p_writer.Write(" ");
 	}
 
 

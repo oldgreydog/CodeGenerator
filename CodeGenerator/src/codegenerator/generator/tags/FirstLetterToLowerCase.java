@@ -25,7 +25,6 @@ package codegenerator.generator.tags;
 import java.io.*;
 
 import codegenerator.generator.utils.*;
-import coreutil.config.*;
 import coreutil.logging.*;
 
 
@@ -107,10 +106,7 @@ public class FirstLetterToLowerCase extends TemplateBlock_Base {
 
 	//*********************************
 	@Override
-	public boolean Evaluate(ConfigNode		p_currentNode,
-							ConfigNode		p_rootNode,
-							Cursor 			p_writer,
-							LoopCounter		p_iterationCounter)	// There wasn't any good way to tell a FirstLetterToLowerCase which iteration it was in that would be safe for arbitrary nesting, so I added this iteration counter to handle the problem.
+	public boolean Evaluate(EvaluationContext p_evaluationContext)
 	{
 		try {
 			// If there are no child blocks, then this is a "leaf" node text object and we have to output its string.
@@ -121,10 +117,16 @@ public class FirstLetterToLowerCase extends TemplateBlock_Base {
 
 			StringWriter	t_valueWriter	= new StringWriter();
 			Cursor			t_valueCursor	= new Cursor(t_valueWriter);
-			if (!m_value.Evaluate(p_currentNode, p_rootNode, t_valueCursor, p_iterationCounter)) {
+
+			p_evaluationContext.PushNewCursor(t_valueCursor);
+
+			if (!m_value.Evaluate(p_evaluationContext)) {
 				Logger.LogError("FirstLetterToLowerCase.Evaluate() failed to evaluate the value.");
+				p_evaluationContext.PopCurrentCursor();	// We need to clean up the temp cursor before we fail out of the function.
 				return false;
 			}
+
+			p_evaluationContext.PopCurrentCursor();
 
 			String			t_sourceValue	= t_valueWriter.toString();
 			StringBuilder	t_newValue		= new StringBuilder();
@@ -132,7 +134,7 @@ public class FirstLetterToLowerCase extends TemplateBlock_Base {
 			t_newValue.append(Character.toLowerCase(t_sourceValue.charAt(0)));
 			t_newValue.append(t_sourceValue.subSequence(1, t_sourceValue.length()));
 
-			p_writer.Write(t_newValue.toString());
+			p_evaluationContext.GetCursor().Write(t_newValue.toString());
 		}
 		catch (Throwable t_error) {
 			Logger.LogException("FirstLetterToLowerCase.Evaluate() failed with error: ", t_error);

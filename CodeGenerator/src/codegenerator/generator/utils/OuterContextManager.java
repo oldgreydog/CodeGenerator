@@ -31,29 +31,40 @@ import coreutil.config.*;
 public class OuterContextManager {
 
 	// Data members
-	static private final TreeMap<String, ConfigNode>	s_contextMap	= new TreeMap<>();
+	private final TreeMap<String, ConfigNode>	m_contextMap	= new TreeMap<>();
 
 
-	//===========================================
-	static public void SetOuterContext(String p_contextName, ConfigNode p_contextNode) {
-		synchronized (s_contextMap) {
-			s_contextMap.put(p_contextName, p_contextNode);
-		}
+	//*********************************
+	public OuterContextManager() {}
+
+
+	//*********************************
+	/**
+	 * In shifting to multithreading on the "file" evaluations (and allowing nested file blocks), we have to snap-shot the context so that
+	 * we have the correct values while we are in the file evaluation.  If we didn't, the context would be changing outside the file
+	 * eval and would completely pollute any usage of those context values inside the file evaluation.
+	 *
+	 * @param p_otherOuterContextManager
+	 */
+	public OuterContextManager(OuterContextManager p_otherOuterContextManager) {
+		m_contextMap.putAll(p_otherOuterContextManager.m_contextMap);
 	}
 
 
-	//===========================================
-	static public ConfigNode GetOuterContext(String p_contextName) {
-		synchronized (s_contextMap) {
-			return s_contextMap.get(p_contextName);
-		}
+	//*********************************
+	public void SetOuterContext(String p_contextName, ConfigNode p_contextNode) {
+		m_contextMap.put(p_contextName, p_contextNode);
 	}
 
 
-	//===========================================
-	static public void RemoveOuterContext(String p_contextName) {
-		synchronized (s_contextMap) {
-			s_contextMap.remove(p_contextName);
-		}
+	//*********************************
+	public ConfigNode GetOuterContext(String p_contextName) {
+		return m_contextMap.get(p_contextName);
+	}
+
+
+	//*********************************
+	public void RemoveOuterContext(String p_contextName) {
+		m_contextMap.remove(p_contextName);
 	}
 }

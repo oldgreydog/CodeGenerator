@@ -238,9 +238,7 @@ public class IfElseBlock extends TemplateBlock_Base {
 
 
 		//*********************************
-		public Boolean Test(ConfigNode		p_currentNode,
-							ConfigNode		p_rootNode,
-							LoopCounter		p_iterationCounter)
+		public Boolean Test(EvaluationContext p_evaluationContext)
 		{
 			// An else will not test for existence of a child node nor will it have a m_configVariable or m_compareValue so it is always TRUE;
 			if (!m_testExists &&
@@ -250,7 +248,7 @@ public class IfElseBlock extends TemplateBlock_Base {
 				return true;
 			}
 
-			String t_righthandValue = TemplateBlock_Base.EvaluateToString(m_compareValue, p_currentNode, p_rootNode, p_iterationCounter);
+			String t_righthandValue = TemplateBlock_Base.EvaluateToString(m_compareValue, p_evaluationContext);
 			if (t_righthandValue == null) {
 				Logger.LogError("IfCondition.Test(TagAttributeParser) failed to evaluate the righthand value of its attribute at line number [" + m_lineNumber + "].");
 				return false;
@@ -259,9 +257,9 @@ public class IfElseBlock extends TemplateBlock_Base {
 			// If we are testing for the existence of a child node type, then we have a completely different test to do.
 			if (m_testExists) {
 				try {
-					ConfigNode t_nextConfigNode	= p_currentNode;
+					ConfigNode t_nextConfigNode	= p_evaluationContext.GetCurrentNode();
 					if (t_righthandValue.startsWith("root.")) {
-						t_nextConfigNode = p_rootNode;
+						t_nextConfigNode = p_evaluationContext.GetRootNode();
 						t_righthandValue = t_righthandValue.replace("root.", "");	// Remove the "root." from the reference so that it will work correctly below.
 					}
 					else if (t_righthandValue.contains("^")) {
@@ -285,7 +283,7 @@ public class IfElseBlock extends TemplateBlock_Base {
 				}
 			}
 			else {	// Otherwise, do the default test.
-				String t_lefthandValue = TemplateBlock_Base.EvaluateToString(m_sourceStringBlock, p_currentNode, p_rootNode, p_iterationCounter);
+				String t_lefthandValue = TemplateBlock_Base.EvaluateToString(m_sourceStringBlock, p_evaluationContext);
 				if (t_lefthandValue == null) {
 					Logger.LogError("IfCondition.Test(TagAttributeParser) failed to evaluate the lefthand value of its attribute at line number [" + m_lineNumber + "].");
 					return false;
@@ -447,10 +445,7 @@ public class IfElseBlock extends TemplateBlock_Base {
 
 	//*********************************
 	@Override
-	public boolean Evaluate(ConfigNode		p_currentNode,
-							ConfigNode		p_rootNode,
-							Cursor 			p_writer,
-							LoopCounter		p_iterationCounter)
+	public boolean Evaluate(EvaluationContext p_evaluationContext)
 
 	{
 		try {
@@ -461,11 +456,11 @@ public class IfElseBlock extends TemplateBlock_Base {
 				t_nextCondition = (IfCondition)t_blockIterator.next();
 
 				// We only evaluate the first condition that returns TRUE.
-				t_result = t_nextCondition.Test(p_currentNode, p_rootNode, p_iterationCounter);
+				t_result = t_nextCondition.Test(p_evaluationContext);
 				if (t_result == null)
 					return false;
 				else if (t_result) {
-					if (!t_nextCondition.Evaluate(p_currentNode, p_rootNode, p_writer, p_iterationCounter)) {
+					if (!t_nextCondition.Evaluate(p_evaluationContext)) {
 						return false;
 					}
 

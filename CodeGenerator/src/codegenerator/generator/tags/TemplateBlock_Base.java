@@ -22,7 +22,6 @@ package codegenerator.generator.tags;
 
 
 
-import coreutil.config.*;
 import coreutil.logging.*;
 
 import java.io.*;
@@ -130,14 +129,11 @@ public abstract class TemplateBlock_Base {
 	 * @param p_iterationCounter	The iteration counter for the inner-most enclosing <code>foreach</code> block.  Currently only used by <code>first</code> tags to know whether it is in the first iteration or not.  This must be an {@link java.util.concurrent.atomic.AtomicInteger} because you can't mutate regular int's or Integers.
 	 * @return
 	 */
-	public boolean Evaluate(ConfigNode		p_currentNode,
-							ConfigNode		p_rootNode,
-							Cursor 			p_writer,
-							LoopCounter		p_iterationCounter)
+	public boolean Evaluate(EvaluationContext p_evaluationContext)
 	{
 		try {
 			for (TemplateBlock_Base t_nextBlock: m_blockList) {
-				if (!t_nextBlock.Evaluate(p_currentNode, p_rootNode, p_writer, p_iterationCounter)) {
+				if (!t_nextBlock.Evaluate(p_evaluationContext)) {
 					return false;
 				}
 			}
@@ -161,9 +157,7 @@ public abstract class TemplateBlock_Base {
 	 * @return
 	 */
 	static public String EvaluateToString(TemplateBlock_Base	p_evalBlock,
-										  ConfigNode			p_currentNode,
-										  ConfigNode			p_rootNode,
-										  LoopCounter			p_iterationCounter)	// There wasn't any good way to tell a CamelCase which iteration it was in that would be safe for arbitrary nesting, so I added this iteration counter to handle the problem.
+										  EvaluationContext		p_evaluationContext)
 	{
 		try {
 			if (p_evalBlock == null) {
@@ -171,10 +165,17 @@ public abstract class TemplateBlock_Base {
 				return null;
 			}
 
-			StringWriter	t_valueWriter	= new StringWriter();
-			Cursor			t_valueCursor	= new Cursor(t_valueWriter);
-			if (!p_evalBlock.Evaluate(p_currentNode, p_rootNode, t_valueCursor, p_iterationCounter))
+			StringWriter		t_valueWriter	= new StringWriter();
+			Cursor				t_valueCursor	= new Cursor(t_valueWriter);
+
+			p_evaluationContext.PushNewCursor(t_valueCursor);
+
+			if (!p_evalBlock.Evaluate(p_evaluationContext)) {
+				p_evaluationContext.PopCurrentCursor();	// We need to throw away the temp cursor now that we're done with it.
 				return null;
+			}
+
+			p_evaluationContext.PopCurrentCursor();	// We need to throw away the temp cursor now that we're done with it.
 
 			return t_valueWriter.toString();
 		}

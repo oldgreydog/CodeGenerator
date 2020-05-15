@@ -265,15 +265,12 @@ public class ForEachBlock extends TemplateBlock_Base {
 
 	//*********************************
 	@Override
-	public boolean Evaluate(ConfigNode		p_currentNode,
-							ConfigNode		p_rootNode,
-							Cursor 			p_writer,
-							LoopCounter		p_iterationCounter)
+	public boolean Evaluate(EvaluationContext p_evaluationContext)
 	{
 		try {
 			// You can use parent references (i.e. "^") in the node name to jump this ForEach block's context up one or more parent nodes.
 			// This will probably always be used inside one or more OuterContext blocks.
-			ConfigNode t_currentNode = p_currentNode;
+			ConfigNode t_currentNode = p_evaluationContext.GetCurrentNode();
 			if (m_parentReferenceCount > 0) {
 				// This will kick the node reference up the tree the specified number of times.
 				for (int i = 0; i < m_parentReferenceCount; i++) {
@@ -291,22 +288,34 @@ public class ForEachBlock extends TemplateBlock_Base {
 				return false;
 			}
 
-			LoopCounter t_iterationCount = new LoopCounter(p_iterationCounter);
+			LoopCounter t_iterationCount = new LoopCounter();
+			t_iterationCount.SetParentCounter(p_evaluationContext.GetLoopCounter());
+
 			if (m_optionalCounterName != null)
 				t_iterationCount.SetOptionalCounterName(m_optionalCounterName);
+
+			p_evaluationContext.PushLoopCounter(t_iterationCount);
 
 			for (ConfigNode t_nextConfigNode: t_currentNode.GetChildNodeList()) {
 				// For each child config node of the name t_nodeName, we will re-evaluate all of our child blocks.
 				if (t_nextConfigNode.GetName().compareToIgnoreCase(m_nodeName) == 0) {
+					p_evaluationContext.PushNewCurrentNode(t_nextConfigNode);
+
 					for (TemplateBlock_Base t_nextBlock: m_blockList) {
-						if (!t_nextBlock.Evaluate(t_nextConfigNode, p_rootNode, p_writer, t_iterationCount)) {
+						if (!t_nextBlock.Evaluate(p_evaluationContext)) {
+							p_evaluationContext.PopCurrentNode();
+							p_evaluationContext.PopCurrentLoopCounter();
 							return false;
 						}
 					}
 
+					p_evaluationContext.PopCurrentNode();
+
 					t_iterationCount.IncrementCounter();
 				}
 			}
+
+			p_evaluationContext.PopCurrentLoopCounter();
 		}
 		catch (Throwable t_error) {
 			Logger.LogException("ForEachBlock.Evaluate() failed with error: ", t_error);

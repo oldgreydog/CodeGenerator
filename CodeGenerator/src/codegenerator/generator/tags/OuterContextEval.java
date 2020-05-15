@@ -22,8 +22,6 @@ package codegenerator.generator.tags;
 
 
 
-import java.io.*;
-
 import codegenerator.generator.utils.*;
 import coreutil.config.*;
 import coreutil.logging.*;
@@ -122,10 +120,7 @@ public class OuterContextEval extends TemplateBlock_Base {
 
 	//*********************************
 	@Override
-	public boolean Evaluate(ConfigNode		p_currentNode,
-							ConfigNode		p_rootNode,
-							Cursor 			p_writer,
-							LoopCounter		p_iterationCounter)	// There wasn't any good way to tell a OuterContextEval which iteration it was in that would be safe for arbitrary nesting, so I added this iteration counter to handle the problem.
+	public boolean Evaluate(EvaluationContext p_evaluationContext)
 	{
 		try {
 			if (m_valuePath == null) {
@@ -133,20 +128,25 @@ public class OuterContextEval extends TemplateBlock_Base {
 				return false;
 			}
 
-			ConfigNode t_contextNode = OuterContextManager.GetOuterContext(m_contextName);
+			ConfigNode t_contextNode = p_evaluationContext.GetOuterContextManager().GetOuterContext(m_contextName);
 			if (t_contextNode == null) {
 				Logger.LogError("OuterContextEval.Evaluate() failed to retreive an outer context with the name [" + m_contextName + "].");
 				return false;
 			}
 
+			p_evaluationContext.PushNewCurrentNode(t_contextNode);
+
 			// We'll us a ConfigVariable to do the dirty work of getting the value out of the config.
 			ConfigVariable t_targetValue = new ConfigVariable();
 			t_targetValue.Init(m_valuePath, m_lineNumber);
 
-			if (!t_targetValue.Evaluate(t_contextNode, p_rootNode, p_writer, p_iterationCounter)) {
+			if (!t_targetValue.Evaluate(p_evaluationContext)) {
 				Logger.LogError("OuterContextEval.Evaluate() failed to evaluate the value.");
+				p_evaluationContext.PopCurrentNode();
 				return false;
 			}
+
+			p_evaluationContext.PopCurrentNode();
 		}
 		catch (Throwable t_error) {
 			Logger.LogException("OuterContextEval.Evaluate() failed with error: ", t_error);

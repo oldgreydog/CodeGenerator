@@ -22,10 +22,7 @@ package codegenerator.generator.tags;
 
 
 
-import java.io.*;
-
 import codegenerator.generator.utils.*;
-import coreutil.config.*;
 import coreutil.logging.*;
 
 
@@ -246,10 +243,7 @@ public class TypeConvert extends TemplateBlock_Base {
 
 	//*********************************
 	@Override
-	public boolean Evaluate(ConfigNode		p_currentNode,
-							ConfigNode		p_rootNode,
-							Cursor 			p_writer,
-							LoopCounter		p_iterationCounter)
+	public boolean Evaluate(EvaluationContext p_evaluationContext)
 	{
 		try {
 			if (m_targetLanguage == null) {
@@ -258,7 +252,7 @@ public class TypeConvert extends TemplateBlock_Base {
 			}
 
 			// Only the source type should require evaluation.  The target language and group IDs should both be string constants.
-			String t_sourceTypeValue = TemplateBlock_Base.EvaluateToString(m_sourceType, p_currentNode, p_rootNode, p_iterationCounter);
+			String t_sourceTypeValue = TemplateBlock_Base.EvaluateToString(m_sourceType, p_evaluationContext);
 			if (t_sourceTypeValue == null) {
 				Logger.LogError("TypeConvert.Evaluate() failed to evaluate the [sourceType] value.");
 				return false;
@@ -267,10 +261,10 @@ public class TypeConvert extends TemplateBlock_Base {
 			String t_convertedType = DataTypeManager.GetTypeConversion(m_targetLanguage, t_sourceTypeValue, m_groupID);
 
 			if ((t_convertedType != null) && !t_convertedType.isEmpty())
-				p_writer.Write(t_convertedType);
+				p_evaluationContext.GetCursor().Write(t_convertedType);
 			else
-				p_writer.Write("");
-				//p_writer.Write("No type conversion was found for language [" + t_targetLanguageValue + "] sourceType [" + t_sourceValue + "] groupID [" + t_groupIDValue + "].");
+				p_evaluationContext.GetCursor().Write("");
+				//p_evaluationContext.GetCursor().Write("No type conversion was found for language [" + t_targetLanguageValue + "] sourceType [" + t_sourceValue + "] groupID [" + t_groupIDValue + "].");
 		}
 		catch (Throwable t_error) {
 			Logger.LogException("TypeConvert.Evaluate() failed with error: ", t_error);

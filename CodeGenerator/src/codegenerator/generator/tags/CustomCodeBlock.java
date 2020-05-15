@@ -22,7 +22,6 @@ package codegenerator.generator.tags;
 
 
 
-import coreutil.config.*;
 import coreutil.logging.*;
 
 import java.io.*;
@@ -163,33 +162,37 @@ public class CustomCodeBlock extends TemplateBlock_Base {
 
 	//*********************************
 	@Override
-	public boolean Evaluate(ConfigNode		p_currentNode,
-							ConfigNode		p_rootNode,
-							Cursor 			p_writer,
-							LoopCounter		p_iterationCounter)
+	public boolean Evaluate(EvaluationContext p_evaluationContext)
 	{
 		try {
 			StringWriter	t_keyWriter = new StringWriter();
 			Cursor			t_keyCursor	= new Cursor(t_keyWriter);
-			m_key.Evaluate(p_currentNode, p_rootNode, t_keyCursor, p_iterationCounter);
 
-			String t_leadingWhiteSpace = p_writer.GetCurrentLineContents();		// Grab the current contents of the line because we want to use the same whitespace offset for the closing comment line below as is before this tag in the template so that the two comments line up at the same indention.
+			p_evaluationContext.PushNewCursor(t_keyCursor);
 
-			p_writer.Write(m_openingCommentCharacters + "	" + CustomCodeManager.START_CUSTOM_CODE + ":" + t_keyWriter.toString());
+			m_key.Evaluate(p_evaluationContext);
+
+			p_evaluationContext.PopCurrentCursor();
+
+
+			Cursor t_writer = p_evaluationContext.GetCursor();
+			String t_leadingWhiteSpace = t_writer.GetCurrentLineContents();		// Grab the current contents of the line because we want to use the same whitespace offset for the closing comment line below as is before this tag in the template so that the two comments line up at the same indention.
+
+			t_writer.Write(m_openingCommentCharacters + "	" + CustomCodeManager.START_CUSTOM_CODE + ":" + t_keyWriter.toString());
 
 			if (m_closingCommentCharacters != null)
-				p_writer.Write("	" + m_closingCommentCharacters);
+				t_writer.Write("	" + m_closingCommentCharacters);
 
-			p_writer.Write("\n");
+			t_writer.Write("\n");
 
-			String t_customCode = CustomCodeManager.GetCodeSegment(t_keyWriter.toString());
+			String t_customCode = p_evaluationContext.GetCustomCodeManager().GetCodeSegment(t_keyWriter.toString());
 			if (t_customCode != null)
-				p_writer.Write(t_customCode);
+				t_writer.Write(t_customCode);
 
-			p_writer.Write(t_leadingWhiteSpace + m_openingCommentCharacters + "	" + CustomCodeManager.END_CUSTOM_CODE + ":" + t_keyWriter.toString());	// This doesn't have "\n" on the end because it's used in text blocks and the text block will keep the newline after the tag itself and add it here so we don't have to.
+			t_writer.Write(t_leadingWhiteSpace + m_openingCommentCharacters + "	" + CustomCodeManager.END_CUSTOM_CODE + ":" + t_keyWriter.toString());	// This doesn't have "\n" on the end because it's used in text blocks and the text block will keep the newline after the tag itself and add it here so we don't have to.
 
 			if (m_closingCommentCharacters != null)
-				p_writer.Write("	" + m_closingCommentCharacters);	// This doesn't have "\n" on the end because it's used in text blocks and the text block will keep the newline after the tag itself and add it here so we don't have to.
+				t_writer.Write("	" + m_closingCommentCharacters);	// This doesn't have "\n" on the end because it's used in text blocks and the text block will keep the newline after the tag itself and add it here so we don't have to.
 		}
 		catch (Throwable t_error) {
 			Logger.LogException("CustomCodeBlock.Evaluate() failed with error at line number [" + m_lineNumber + "]: ", t_error);

@@ -24,7 +24,6 @@ package codegenerator.generator.tags;
 
 import codegenerator.generator.tags.IfElseBlock.*;
 import codegenerator.generator.utils.*;
-import coreutil.config.*;
 import coreutil.logging.*;
 
 
@@ -63,16 +62,13 @@ public abstract class If_Boolean extends TemplateBlock_Base {
 		}
 
 		@Override
-		public Boolean EvaluateChild(ConfigNode		p_currentNode,
-									 ConfigNode		p_rootNode,
-									 Cursor			p_writer,
-									 LoopCounter	p_iterationCounter)
+		public Boolean EvaluateChild(EvaluationContext p_evaluationContext)
 		{
 			try {
 				Boolean t_result;
 				for (TemplateBlock_Base t_nextCondition: m_blockList) {
 					// Since this is an "AND" operation, we can return FALSE on the first condition that fails.
-					t_result = ((IfCondition)t_nextCondition).Test(p_currentNode, p_rootNode, p_iterationCounter);
+					t_result = ((IfCondition)t_nextCondition).Test(p_evaluationContext);
 					if (t_result == null)
 						return null;
 					else if (!t_result)
@@ -111,16 +107,13 @@ public abstract class If_Boolean extends TemplateBlock_Base {
 		}
 
 		@Override
-		public Boolean EvaluateChild(ConfigNode		p_currentNode,
-									 ConfigNode		p_rootNode,
-									 Cursor			p_writer,
-									 LoopCounter	p_iterationCounter)
+		public Boolean EvaluateChild(EvaluationContext p_evaluationContext)
 		{
 			try {
 				Boolean t_result;
 				for (TemplateBlock_Base t_nextCondition: m_blockList) {
 					// Since this is an "OR" operation, we can return TRUE on the first condition that succeeds.
-					t_result = ((IfCondition)t_nextCondition).Test(p_currentNode, p_rootNode, p_iterationCounter);
+					t_result = ((IfCondition)t_nextCondition).Test(p_evaluationContext);
 					if (t_result == null)
 						return null;
 					else if (t_result)
@@ -182,16 +175,13 @@ public abstract class If_Boolean extends TemplateBlock_Base {
 		}
 
 		@Override
-		public Boolean EvaluateChild(ConfigNode		p_currentNode,
-									 ConfigNode		p_rootNode,
-									 Cursor			p_writer,
-									 LoopCounter	p_iterationCounter)
+		public Boolean EvaluateChild(EvaluationContext p_evaluationContext)
 		{
 			try {
 				Boolean t_result;
 				for (TemplateBlock_Base t_nextCondition: m_blockList) {
 					// Since this is an "Not" operation, we only execute the first condition.
-					t_result = ((IfCondition)t_nextCondition).Test(p_currentNode, p_rootNode, p_iterationCounter);
+					t_result = ((IfCondition)t_nextCondition).Test(p_evaluationContext);
 					if (t_result == null)
 						return null;
 					else if (t_result)
@@ -257,19 +247,16 @@ public abstract class If_Boolean extends TemplateBlock_Base {
 
 	//*********************************
 	@Override
-	public boolean Evaluate(ConfigNode		p_currentNode,
-							ConfigNode		p_rootNode,
-							Cursor			p_writer,
-							LoopCounter		p_iterationCounter)
+	public boolean Evaluate(EvaluationContext p_evaluationContext)
 	{
 		try {
-			Boolean t_result = EvaluateChild(p_currentNode, p_rootNode, p_writer, p_iterationCounter);
+			Boolean t_result = EvaluateChild(p_evaluationContext);
 			if (t_result == null)
 				return false;
 			else if (t_result)
-				p_writer.Write(RESULT_TRUE);
+				p_evaluationContext.GetCursor().Write(RESULT_TRUE);
 			else
-				p_writer.Write(RESULT_FALSE);
+				p_evaluationContext.GetCursor().Write(RESULT_FALSE);
 		}
 		catch (Throwable t_error) {
 			Logger.LogException("If_Boolean.Evaluate() failed with error: ", t_error);
@@ -281,10 +268,7 @@ public abstract class If_Boolean extends TemplateBlock_Base {
 
 
 	//*********************************
-	public abstract Boolean EvaluateChild(ConfigNode	p_currentNode,
-										  ConfigNode	p_rootNode,
-										  Cursor		p_writer,
-										  LoopCounter	p_iterationCounter);
+	public abstract Boolean EvaluateChild(EvaluationContext p_evaluationContext);
 
 
 	//*********************************

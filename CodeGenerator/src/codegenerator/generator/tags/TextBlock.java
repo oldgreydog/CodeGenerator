@@ -27,7 +27,6 @@ import java.util.*;
 
 import codegenerator.generator.utils.*;
 import codegenerator.generator.utils.TemplateTokenizer.*;
-import coreutil.config.*;
 import coreutil.logging.*;
 
 
@@ -324,16 +323,20 @@ public class TextBlock extends TemplateBlock_Base {
 	 * @param p_iterationCount
 	 * @return
 	 */
-	public String EvaluateToString(ConfigNode		p_currentNode,
-								   ConfigNode		p_rootNode,
-								   LoopCounter		p_iterationCounter)
+	public String EvaluateToString(EvaluationContext p_evaluationContext)
 	{
 		StringWriter	t_stringWriter	= new StringWriter();
 		Cursor			t_stringCursor	= new Cursor(t_stringWriter);
-		if (!Evaluate(p_currentNode, p_rootNode, t_stringCursor, p_iterationCounter)) {
+
+		p_evaluationContext.PushNewCursor(t_stringCursor);
+
+		if (!Evaluate(p_evaluationContext)) {
 			Logger.LogError("TextBlock.EvaluateToString() failed to evaluate.");
+			p_evaluationContext.PopCurrentCursor();
 			return null;
 		}
+
+		p_evaluationContext.PopCurrentCursor();
 
 		return t_stringWriter.toString();
 	}
@@ -341,23 +344,20 @@ public class TextBlock extends TemplateBlock_Base {
 
 	//*********************************
 	@Override
-	public boolean Evaluate(ConfigNode		p_currentNode,
-							ConfigNode		p_rootNode,
-							Cursor 			p_writer,
-							LoopCounter		p_iterationCounter)	// There wasn't any good way to tell a TextBlock which iteration it was in that would be safe for arbitrary nesting, so I added this iteration counter to handle the problem.
+	public boolean Evaluate(EvaluationContext p_evaluationContext)
 	{
 		try {
 			// If there are no child blocks, then this is a "leaf" node text object and we have to output its string.
 			if (m_blockList.isEmpty()) {
 				if (m_text != null)
-					p_writer.Write(m_text);
+					p_evaluationContext.GetCursor().Write(m_text);
 
 				return true;
 			}
 
 			// Otherwise, this is just a parent instance that contains the list of child text/variable blocks that make up the whole "outer" text block.
 			for (TemplateBlock_Base t_nextBlock: m_blockList) {
-				if (!t_nextBlock.Evaluate(p_currentNode, p_rootNode, p_writer, p_iterationCounter)) {
+				if (!t_nextBlock.Evaluate(p_evaluationContext)) {
 					return false;
 				}
 			}
