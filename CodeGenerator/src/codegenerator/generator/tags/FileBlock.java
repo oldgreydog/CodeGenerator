@@ -22,6 +22,7 @@ package codegenerator.generator.tags;
 
 
 
+import coreutil.config.*;
 import coreutil.logging.*;
 
 import java.io.*;
@@ -37,27 +38,26 @@ import codegenerator.generator.utils.multithreading.*;
 
 	<p>Here's an example of this tag:</p>
 
-	<pre><code>&lt;%file template=templates/cached_templates/marshalling/marshalling_interface.template	filename=&lt;%className%&gt;Marshalling.java	destDir=&lt;%root.global.outputPath%&gt;/marshalling%&gt;</code></pre>
+	<pre><code>&lt;%file template = templates/cached_templates/marshalling/marshalling_interface.template	filename = "&lt;%className%&gt;Marshalling.java"	destDir = "&lt;%root.global.outputPath%&gt;/marshalling" optionalContextName = "parentTable"%&gt;</code></pre>
 
-	<p>As the example shows, you can use tags that evaluate to strings in the values of the attributes.</p>
+	<p>As the example shows, you can use tags that evaluate to strings in the values of the attributes, but if you do, you are
+	required to surround the value with double quotes as shown.</p>
+
+	<p>Note that it is now possible to nest this file tag inside another file template.  To that ends, the optional
+	attribute "optionalContextName" is used if you need to have the	nested file tag execute inside an outer context
+	instead of the local context it is defined in.  The value you give this attribute will be the contextname
+	you gave to the outerContext tag that encloses the nested instance of the file tag.</p>
 
 	<p>Refer to the files in the <code>Examples/codegenerator</code> folders to better understand its usage.</p>
-
-	<p>I recently found a case where I needed to use the file tag nested inside another file template.  I quickly realized that everything
-	that nesting required was also a large subset of what was needed to multithread the file generation code, so that's what I did.  I was
-	essentially able to kill two birds with one stone.  Of course, multithreading wasn't really necessary.  The generator was fast enough as
-	sequential-only code, but it was such a trivial add-on after setting up the changes for nesting the file tag that I couldn't resist.  I
-	wanted to see how much difference it would make.  So far, on my 8-year-old machine, I'm getting 30-90% faster generation, which is seen
-	in the time on the "Generation time (millisec):" line of the output depending on the complexity of the templates and number of files generated.
-	This doesn't effect the template or config parse times.</p>
  */
 public class FileBlock extends TemplateBlock_Base {
 
 	static public final String		BLOCK_NAME	= "file";
 
-	static public final String		ATTRIBUTE_TEMPLATE		= "template";
-	static public final String		ATTRIBUTE_FILENAME		= "filename";
-	static public final String		ATTRIBUTE_DEST_DIR		= "destDir";
+	static public final String		ATTRIBUTE_TEMPLATE					= "template";
+	static public final String		ATTRIBUTE_FILENAME					= "filename";
+	static public final String		ATTRIBUTE_DEST_DIR					= "destDir";
+	static public final String		ATTRIBUTE_OPTIONAL_CONTEXT_NAME		= "optionalContextName";
 
 
 	// Static members
@@ -100,11 +100,12 @@ public class FileBlock extends TemplateBlock_Base {
 
 
 	// Data members
-	protected	String				m_templateFileName;
+	private	String		m_templateFileName;
+	private	String		m_contextName			= null;					// The optional outer context in which to evaluate this variable.
 
 	// These values can themselves be composites of evaluation-time config variables and text, so we have to store them in their TextBlock form and evaluate them at runtime to get their final values.
-	protected	TemplateBlock_Base	m_fileNameBlock				= null;
-	protected	TemplateBlock_Base	m_destinationDirectoryBlock	= null;
+	private	TemplateBlock_Base	m_fileNameBlock				= null;
+	private	TemplateBlock_Base	m_destinationDirectoryBlock	= null;
 
 
 	//*********************************
@@ -163,6 +164,12 @@ public class FileBlock extends TemplateBlock_Base {
 			Logger.LogError("FileBlock.Init() did not get the [" + ATTRIBUTE_DEST_DIR + "] value from attribute that is required for FileBlock tags at line number [" + m_lineNumber + "].");
 			return false;
 		}
+
+
+		// The "contextname" attribute is optional, so it's fine if it doesn't exist.
+		t_nodeAttribute = p_tagParser.GetNamedAttribute(ATTRIBUTE_OPTIONAL_CONTEXT_NAME);
+		if (t_nodeAttribute != null)
+			m_contextName = t_nodeAttribute.GetAttributeValueAsString();
 
 		return true;
 	}
@@ -267,6 +274,18 @@ public class FileBlock extends TemplateBlock_Base {
 			p_evaluationContext.PopCurrentCursor();	// We need to throw away the filename cursor before we add the new file cursor to the context.
 			p_evaluationContext.PushNewCursor(t_fileWriterCursor);
 
+			// The addition of outer contexts means that if you use a file tag inside an inner context, you may need to point it to the outer context to get the correct values in the evaluation of the file.
+			ConfigNode t_currentNode = p_evaluationContext.GetCurrentNode();
+			if (m_contextName != null) {
+				t_currentNode = p_evaluationContext.GetOuterContextManager().GetOuterContext(m_contextName);
+				if (t_currentNode == null) {
+					Logger.LogError("FileBlock.Evaluate() failed to find the outer context [" + m_contextName + "] for the evaluation mode at line [" + m_lineNumber + "].");
+					return false;
+				}
+			}
+
+			p_evaluationContext.PushNewCurrentNode(t_currentNode);	// This is unnecessarily redundant if we aren't changing the context above, but it simpler and cleaner, particularly if we error out in the if() below.
+
 			for (TemplateBlock_Base t_nextBlock: m_blockList) {
 				if (!t_nextBlock.Evaluate(p_evaluationContext)) {
 					t_fileWriter.close();
@@ -275,6 +294,8 @@ public class FileBlock extends TemplateBlock_Base {
 					return false;
 				}
 			}
+
+			p_evaluationContext.PopCurrentNode();
 
 			t_fileWriter.close();
 			p_evaluationContext.PopCurrentCursor();	// We need to throw away the file cursor now that we're done with it.

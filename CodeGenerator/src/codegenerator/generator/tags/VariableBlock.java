@@ -201,7 +201,7 @@ public class VariableBlock extends TemplateBlock_Base {
 					}
 				}
 
-				p_evaluationContext.PushNewCurrentNode(t_currentNode);
+				p_evaluationContext.PushNewCurrentNode(t_currentNode);	// This is unnecessarily redundant if we aren't changing the context above, but it simpler and cleaner, particularly if we error out in the if() below.
 
 				if (!t_evalBlock.Evaluate(p_evaluationContext)) {
 					p_evaluationContext.PopCurrentNode();
