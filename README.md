@@ -9,6 +9,6 @@ I would be particularly interested in discussing internationalization (foreign l
 
 ## Note for existing users!
 
-If you have version 1.3 or earlier, you must read the RELEASE file if you are going to get 1.4!  That version might break your templates in a few different ways and they are explained there.
+If you have version 1.3 or earlier and you want to get new code, you must read the RELEASE file!  Later versions might break your templates in a various ways and they are explained there.
 
 
