@@ -209,30 +209,6 @@ public class FileBlock extends TemplateBlock_Base {
 	public boolean Evaluate(EvaluationContext p_evaluationContext)
 	{
 		try {
-			EvaluationContext	t_newContext	= new EvaluationContext(p_evaluationContext);
-			FileTask			t_newTask		= new FileTask(this, t_newContext);
-			ThreadPoolManager.AddTask(t_newTask);
-
-			return true;
-		}
-		catch (Throwable t_error) {
-			Logger.LogException("FileBlock.Evaluate() failed with error at line number [" + m_lineNumber + "]: ", t_error);
-			return false;
-		}
-	}
-
-
-	//*********************************
-	/**
-	 * This should only ever be called from FileTask.run()!  As such, p_evaluationContext is expected to be a copy generated in Evaluate() above
-	 * that can be freely altered in this thread.
-	 *
-	 * @param p_evaluationContext
-	 * @return
-	 */
-	public boolean TaskEvaluate(EvaluationContext p_evaluationContext)
-	{
-		try {
 			// Build the filename from the component destdir and filename parts.
 			StringWriter		t_fileName			= new StringWriter();
 			Cursor				t_fileNameCursor	= new Cursor(t_fileName);

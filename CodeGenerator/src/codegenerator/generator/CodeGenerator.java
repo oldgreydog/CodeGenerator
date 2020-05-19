@@ -110,26 +110,11 @@ public class CodeGenerator {
 			long t_endConfigValuesParse = Calendar.getInstance().getTimeInMillis();
 
 
-			// Initialize any objects that will be needed over the lifetime of the evaluate.
-			if (!ThreadPoolManager.Init()) {
-				Logger.LogFatal("CodeGenerator.Execute() failed to initialize the ThreadPoolManager.");
-				Cleanup();
-				return false;
-			}
-
-
 			long t_startGenerate = Calendar.getInstance().getTimeInMillis();
 
 			// And finally, "evaluate" the template with the config to generate the all of the file outputs.
 			EvaluationContext t_context = new EvaluationContext(t_templateConfig, t_templateConfig, null, new LoopCounter());
 			t_template.Evaluate(t_context);
-
-			// Now that the file writes are multi-threaded, we have to call ThreadPoolManager.Shutdown() to wait until the writes are complete.
-			if (!ThreadPoolManager.Shutdown()) {
-				Logger.LogFatal("CodeGenerator.Execute() failed to initialize the ThreadPoolManager.");
-				Cleanup();
-				return false;
-			}
 
 			long t_endGenerate = Calendar.getInstance().getTimeInMillis();
 
