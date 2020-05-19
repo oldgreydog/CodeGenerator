@@ -110,6 +110,8 @@ public class TagAttributeParser {
 	//*********************************
 	public boolean Parse(TemplateTokenizer p_tokenizer) {
 		try {
+			m_lineNumber = p_tokenizer.GetLineCount();
+
 			// A general block will parse child tags until it finds a tag that isn't a command.  That tag should be the closing tag for the parent block.
 			Token				t_nextToken;
 			TagParser			t_tagParser;

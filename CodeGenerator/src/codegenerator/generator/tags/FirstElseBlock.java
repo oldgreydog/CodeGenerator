@@ -192,7 +192,7 @@ public class FirstElseBlock extends TemplateBlock_Base {
 				p_evaluationContext.PopCurrentLoopCounter();
 		}
 		catch (Throwable t_error) {
-			Logger.LogException("FirstElseBlock.Evaluate() failed with error: ", t_error);
+			Logger.LogException("FirstElseBlock.Evaluate() failed with error at line number [" + m_lineNumber + "]: ", t_error);
 			return false;
 		}
 

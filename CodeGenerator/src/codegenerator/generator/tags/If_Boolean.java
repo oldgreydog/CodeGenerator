@@ -78,8 +78,8 @@ public abstract class If_Boolean extends TemplateBlock_Base {
 				return true;
 			}
 			catch (Throwable t_error) {
-				Logger.LogException("And.EvaluateChild() failed with error: ", t_error);
-				return false;
+				Logger.LogException("And.EvaluateChild() failed with error at line number [" + m_lineNumber + "]: ", t_error);
+				return null;
 			}
 		}
 	}
@@ -123,8 +123,8 @@ public abstract class If_Boolean extends TemplateBlock_Base {
 				return false;
 			}
 			catch (Throwable t_error) {
-				Logger.LogException("Or.EvaluateChild() failed with error: ", t_error);
-				return false;
+				Logger.LogException("Or.EvaluateChild() failed with error at line number [" + m_lineNumber + "]: ", t_error);
+				return null;
 			}
 		}
 	}
@@ -162,14 +162,14 @@ public abstract class If_Boolean extends TemplateBlock_Base {
 				}
 
 				if (m_blockList.size() > 1) {
-					Logger.LogError("Not.Init() found more than one child condition block at line number [" + p_tagParser.GetLineNumber() + "].");
+					Logger.LogError("Not.Init() found more than one child condition block at line number [" + m_lineNumber + "].");
 					return false;
 				}
 
 				return true;
 			}
 			catch (Throwable t_error) {
-				Logger.LogException("If_Boolean.Init() failed with error: ", t_error);
+				Logger.LogException("Not.Init() failed with error at line number [" + m_lineNumber + "]: ", t_error);
 				return false;
 			}
 		}
@@ -193,8 +193,8 @@ public abstract class If_Boolean extends TemplateBlock_Base {
 				return false;
 			}
 			catch (Throwable t_error) {
-				Logger.LogException("Or.EvaluateChild() failed with error: ", t_error);
-				return false;
+				Logger.LogException("Not.EvaluateChild() failed with error at line number [" + m_lineNumber + "]: ", t_error);
+				return null;
 			}
 		}
 	}
@@ -222,7 +222,7 @@ public abstract class If_Boolean extends TemplateBlock_Base {
 			for (TagAttributeParser t_nextAttributeParser: p_tagParser.GetTagAttributes()) {
 				t_ifCondition = new IfCondition();
 				if (!t_ifCondition.Init(t_nextAttributeParser)) {
-					Logger.LogError("If_Boolean.Init() failed to initialize the first IfCondition block.");
+					Logger.LogError("If_Boolean.Init() failed to initialize the first IfCondition block at line number [" + m_lineNumber + "].");
 					return false;
 				}
 
@@ -232,7 +232,7 @@ public abstract class If_Boolean extends TemplateBlock_Base {
 			return true;
 		}
 		catch (Throwable t_error) {
-			Logger.LogException("If_Boolean.Init() failed with error: ", t_error);
+			Logger.LogException("If_Boolean.Init() failed with error at line number [" + m_lineNumber + "]: ", t_error);
 			return false;
 		}
 	}
@@ -247,20 +247,20 @@ public abstract class If_Boolean extends TemplateBlock_Base {
 
 	//*********************************
 	@Override
-	public boolean Evaluate(EvaluationContext p_evaluationContext)
+	public boolean Evaluate(EvaluationContext p_evaluationContext) throws Throwable
 	{
 		try {
 			Boolean t_result = EvaluateChild(p_evaluationContext);
 			if (t_result == null)
-				return false;
+				throw new Exception("If_Boolean.Evaluate() failed to evaluate at line number [" + m_lineNumber + "]");
 			else if (t_result)
 				p_evaluationContext.GetCursor().Write(RESULT_TRUE);
 			else
 				p_evaluationContext.GetCursor().Write(RESULT_FALSE);
 		}
 		catch (Throwable t_error) {
-			Logger.LogException("If_Boolean.Evaluate() failed with error: ", t_error);
-			return false;
+			Logger.LogException("If_Boolean.Evaluate() failed with error at line number [" + m_lineNumber + "]: ", t_error);
+			throw t_error;
 		}
 
 		return true;

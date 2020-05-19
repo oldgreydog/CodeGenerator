@@ -157,18 +157,18 @@ public class IfElseBlock extends TemplateBlock_Base {
 					// This is a really bu-tugly way to get this value, but it was the only way to do with a generic tag parser.
 					Vector<TagAttributeParser> t_attributeList = p_tagParser.GetTagAttributes();
 					if (t_attributeList.isEmpty()) {
-						Logger.LogError("IfCondition.Init() the tag attribute parser did not contain any config variable attributes.  One is required for a IfElseBlock.");
+						Logger.LogError("IfCondition.Init() the tag attribute parser did not contain any config variable attributes at line number [" + m_lineNumber + "].  One is required for a IfElseBlock.");
 						return false;
 					}
 
 					if (t_attributeList.size() > 1) {
-						Logger.LogError("IfCondition.Init() the tag attribute parser contained [" + t_attributeList.size() + "] config variable attributes.  Only one is required for a IfElseBlock.");
+						Logger.LogError("IfCondition.Init() the tag attribute parser contained [" + t_attributeList.size() + "] config variable attributes at line number [" + m_lineNumber + "].  Only one is required for a IfElseBlock.");
 						return false;
 					}
 
 					t_nodeAttribute = t_attributeList.get(0);
 					if (t_nodeAttribute == null) {
-						Logger.LogError("IfCondition.Init() did not find the [template] attribute that is required for IfElseBlock tags.");
+						Logger.LogError("IfCondition.Init() did not find the [template] attribute that is required for IfElseBlock tags at line number [" + m_lineNumber + "].");
 						return false;
 					}
 
@@ -179,7 +179,7 @@ public class IfElseBlock extends TemplateBlock_Base {
 						 !t_sourceStringBlock.GetName().equals(If_Boolean.Not.BLOCK_NAME) &&
 						 !t_sourceStringBlock.IsSafeForTextBlock()))
 					{
-						Logger.LogError("IfCondition.Init() did not get a config variable from attribute that is required for IfElseBlock tags.");
+						Logger.LogError("IfCondition.Init() did not get a config variable from attribute that is required for IfElseBlock tags at line number [" + m_lineNumber + "].");
 						return false;
 					}
 
@@ -192,7 +192,7 @@ public class IfElseBlock extends TemplateBlock_Base {
 				return true;
 			}
 			catch (Throwable t_error) {
-				Logger.LogException("IfCondition.Init() failed with error: ", t_error);
+				Logger.LogException("IfCondition.Init() failed with error at line number [" + m_lineNumber + "]: ", t_error);
 				return false;
 			}
 		}
@@ -251,7 +251,7 @@ public class IfElseBlock extends TemplateBlock_Base {
 			String t_righthandValue = TemplateBlock_Base.EvaluateToString(m_compareValue, p_evaluationContext);
 			if (t_righthandValue == null) {
 				Logger.LogError("IfCondition.Test(TagAttributeParser) failed to evaluate the righthand value of its attribute at line number [" + m_lineNumber + "].");
-				return false;
+				return null;
 			}
 
 			// If we are testing for the existence of a child node type, then we have a completely different test to do.
@@ -286,7 +286,7 @@ public class IfElseBlock extends TemplateBlock_Base {
 				String t_lefthandValue = TemplateBlock_Base.EvaluateToString(m_sourceStringBlock, p_evaluationContext);
 				if (t_lefthandValue == null) {
 					Logger.LogError("IfCondition.Test(TagAttributeParser) failed to evaluate the lefthand value of its attribute at line number [" + m_lineNumber + "].");
-					return false;
+					return null;
 				}
 
 				return t_lefthandValue.equalsIgnoreCase(t_righthandValue);
@@ -363,7 +363,7 @@ public class IfElseBlock extends TemplateBlock_Base {
 			return true;
 		}
 		catch (Throwable t_error) {
-			Logger.LogException("IfElseBlock.Init() failed with error: ", t_error);
+			Logger.LogException("IfElseBlock.Init() failed with error at line number [" + m_lineNumber + "]: ", t_error);
 			return false;
 		}
 	}

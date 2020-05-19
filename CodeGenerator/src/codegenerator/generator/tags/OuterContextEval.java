@@ -124,13 +124,13 @@ public class OuterContextEval extends TemplateBlock_Base {
 	{
 		try {
 			if (m_valuePath == null) {
-				Logger.LogError("OuterContextEval.Evaluate() was not initialized.");
+				Logger.LogError("OuterContextEval.Evaluate() at line number [" + m_lineNumber + "] was not initialized.");
 				return false;
 			}
 
 			ConfigNode t_contextNode = p_evaluationContext.GetOuterContextManager().GetOuterContext(m_contextName);
 			if (t_contextNode == null) {
-				Logger.LogError("OuterContextEval.Evaluate() failed to retreive an outer context with the name [" + m_contextName + "].");
+				Logger.LogError("OuterContextEval.Evaluate() failed to retreive an outer context with the name [" + m_contextName + "] at line number [" + m_lineNumber + "].");
 				return false;
 			}
 
@@ -141,7 +141,7 @@ public class OuterContextEval extends TemplateBlock_Base {
 			t_targetValue.Init(m_valuePath, m_lineNumber);
 
 			if (!t_targetValue.Evaluate(p_evaluationContext)) {
-				Logger.LogError("OuterContextEval.Evaluate() failed to evaluate the value.");
+				Logger.LogError("OuterContextEval.Evaluate() failed to evaluate the value at line number [" + m_lineNumber + "].");
 				p_evaluationContext.PopCurrentNode();
 				return false;
 			}
@@ -149,7 +149,7 @@ public class OuterContextEval extends TemplateBlock_Base {
 			p_evaluationContext.PopCurrentNode();
 		}
 		catch (Throwable t_error) {
-			Logger.LogException("OuterContextEval.Evaluate() failed with error: ", t_error);
+			Logger.LogException("OuterContextEval.Evaluate() failed with error at line number [" + m_lineNumber + "]: ", t_error);
 			return false;
 		}
 

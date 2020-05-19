@@ -128,8 +128,9 @@ public abstract class TemplateBlock_Base {
 	 * @param p_writer			The output stream to which all generated text is written.
 	 * @param p_iterationCounter	The iteration counter for the inner-most enclosing <code>foreach</code> block.  Currently only used by <code>first</code> tags to know whether it is in the first iteration or not.  This must be an {@link java.util.concurrent.atomic.AtomicInteger} because you can't mutate regular int's or Integers.
 	 * @return
+	 * @throws Throwable
 	 */
-	public boolean Evaluate(EvaluationContext p_evaluationContext)
+	public boolean Evaluate(EvaluationContext p_evaluationContext) throws Throwable
 	{
 		try {
 			for (TemplateBlock_Base t_nextBlock: m_blockList) {
