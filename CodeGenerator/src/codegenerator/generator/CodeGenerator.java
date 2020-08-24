@@ -27,7 +27,6 @@ import java.util.*;
 
 import codegenerator.generator.tags.*;
 import codegenerator.generator.utils.*;
-import codegenerator.generator.utils.multithreading.*;
 import coreutil.config.*;
 import coreutil.logging.*;
 
