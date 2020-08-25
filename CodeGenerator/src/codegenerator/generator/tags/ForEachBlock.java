@@ -164,7 +164,8 @@ import codegenerator.generator.utils.*;
  */
 public class ForEachBlock extends TemplateBlock_Base {
 
-	static public final String		BLOCK_NAME							= "foreach";
+	static public final String		BLOCK_NAME							= "forEach";
+	static public final String		BLOCK_END_NAME						= "endFor";
 
 	static public final String		ATTRIBUTE_NODE						= "node";
 	static public final String		ATTRIBUTE_OPTIONAL_COUNTER_NAME		= "optionalCounterName";
@@ -200,13 +201,13 @@ public class ForEachBlock extends TemplateBlock_Base {
 
 			TagAttributeParser t_nodeAttribute = p_tagParser.GetNamedAttribute(ATTRIBUTE_NODE);
 			if (t_nodeAttribute == null) {
-				Logger.LogError("ForEachBlock.Init() did not find the [" + ATTRIBUTE_NODE + "] attribute that is required for foreach tags.");
+				Logger.LogError("ForEachBlock.Init() did not find the [" + ATTRIBUTE_NODE + "] attribute that is required for [" + BLOCK_NAME + "] tags.");
 				return false;
 			}
 
 			m_nodeName = t_nodeAttribute.GetAttributeValueAsString();
 			if (m_nodeName == null) {
-				Logger.LogError("ForEachBlock.Init() did not get the value from attribute [" + ATTRIBUTE_NODE + "] that is required for foreach tags.");
+				Logger.LogError("ForEachBlock.Init() did not get the value from attribute [" + ATTRIBUTE_NODE + "] that is required for [" + BLOCK_NAME + "] tags.");
 				return false;
 			}
 
@@ -222,7 +223,7 @@ public class ForEachBlock extends TemplateBlock_Base {
 			if (t_nodeAttribute != null) {
 				m_optionalCounterName = t_nodeAttribute.GetAttributeValueAsString();
 				if (m_optionalCounterName == null) {
-					Logger.LogError("ForEachBlock.Init() did not get the value from attribute [" + ATTRIBUTE_OPTIONAL_COUNTER_NAME + "] that is required for foreach tags.");
+					Logger.LogError("ForEachBlock.Init() did not get the value from attribute [" + ATTRIBUTE_OPTIONAL_COUNTER_NAME + "] that is required for [" + BLOCK_NAME + "] tags.");
 					return false;
 				}
 			}
@@ -247,8 +248,8 @@ public class ForEachBlock extends TemplateBlock_Base {
 			}
 
 			String t_endingTagName = t_generalBlock.GetUnknownTag().GetTagName();
-			if (!t_endingTagName.equalsIgnoreCase("endfor")) {
-				Logger.LogError("ForEachBlock.Parse() general block ended on a tag named [" + t_endingTagName + "] at line [" + p_tokenizer.GetLineCount() + "] in the block starting at [" + m_lineNumber + "].  The closing tag [endfor] was expected.");
+			if (!t_endingTagName.equalsIgnoreCase(BLOCK_END_NAME)) {
+				Logger.LogError("ForEachBlock.Parse() general block ended on a tag named [" + t_endingTagName + "] at line [" + p_tokenizer.GetLineCount() + "] in the block starting at [" + m_lineNumber + "].  The closing tag [" + BLOCK_END_NAME + "] was expected.");
 				return false;
 			}
 

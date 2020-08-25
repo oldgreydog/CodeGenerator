@@ -60,6 +60,8 @@ import codegenerator.generator.utils.*;
 public class FirstElseBlock extends TemplateBlock_Base {
 
 	static public final String		BLOCK_NAME							= "first";
+	static public final String		BLOCK_ELSE_NAME						= "else";
+	static public final String		BLOCK_END_NAME						= "endFirst";
 
 	static public final String		ATTRIBUTE_OPTIONAL_COUNTER_NAME		= "optionalCounterName";
 
@@ -122,10 +124,10 @@ public class FirstElseBlock extends TemplateBlock_Base {
 
 			// If the first block is followed by any elseIf blocks, then consume them.
 			String t_endingTagName = t_generalBlock.GetUnknownTag().GetTagName();
-			if (t_endingTagName.equalsIgnoreCase("else")) {
+			if (t_endingTagName.equalsIgnoreCase(BLOCK_ELSE_NAME)) {
 				t_generalBlock	= new GeneralBlock();
 				if (!t_generalBlock.Parse(p_tokenizer)) {
-					Logger.LogError("FirstElseBlock.Parse() general block parser failed in elseif block in the block starting at [" + t_generalBlock.m_lineNumber + "].");
+					Logger.LogError("FirstElseBlock.Parse() general block parser failed in the [" + BLOCK_ELSE_NAME + "] block in the block starting at [" + t_generalBlock.m_lineNumber + "].");
 					return false;
 				}
 
@@ -134,8 +136,8 @@ public class FirstElseBlock extends TemplateBlock_Base {
 				t_endingTagName = t_generalBlock.GetUnknownTag().GetTagName();
 			}
 
-			if (!t_endingTagName.equalsIgnoreCase("endfirst")) {
-				Logger.LogError("FirstElseBlock.Parse() general block ended on a tag named [" + t_endingTagName + "] at line [" + p_tokenizer.GetLineCount() + "] in the block starting at [" + t_generalBlock.m_lineNumber + "].  The closing tag [endif] was expected.");
+			if (!t_endingTagName.equalsIgnoreCase(BLOCK_END_NAME)) {
+				Logger.LogError("FirstElseBlock.Parse() general block ended on a tag named [" + t_endingTagName + "] at line [" + p_tokenizer.GetLineCount() + "] in the block starting at [" + t_generalBlock.m_lineNumber + "].  The closing tag [" + BLOCK_END_NAME + "] was expected.");
 				return false;
 			}
 		}

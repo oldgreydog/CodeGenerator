@@ -120,6 +120,7 @@ import codegenerator.generator.utils.*;
 public class OuterContext extends TemplateBlock_Base {
 
 	static public final String		BLOCK_NAME										= "outerContext";
+	static public final String		BLOCK_END_NAME									= "endContext";
 
 	static public final String		ATTRIBUTE_CONTEXT_NAME							= "contextName";
 	static public final String		ATTRIBUTE_OPTIONAL_JUMP_TO_PARENT_CONTEXT		= "optionalJumpToParentContext";
@@ -204,8 +205,8 @@ public class OuterContext extends TemplateBlock_Base {
 			m_contentBlock = t_generalBlock;
 
 			String t_endingTagName = t_generalBlock.GetUnknownTag().GetTagName();
-			if (!t_endingTagName.equalsIgnoreCase("endcontext")) {
-				Logger.LogError("OuterContext.Parse() general block ended on a tag named [" + t_endingTagName + "] at line [" + p_tokenizer.GetLineCount() + "] in the block starting at [" + m_lineNumber + "].  The closing tag [endif] was expected.");
+			if (!t_endingTagName.equalsIgnoreCase(BLOCK_END_NAME)) {
+				Logger.LogError("OuterContext.Parse() general block ended on a tag named [" + t_endingTagName + "] at line [" + p_tokenizer.GetLineCount() + "] in the block starting at [" + m_lineNumber + "].  The closing tag [" + BLOCK_END_NAME + "] was expected.");
 				return false;
 			}
 		}

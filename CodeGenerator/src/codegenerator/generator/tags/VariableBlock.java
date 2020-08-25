@@ -55,6 +55,7 @@ variables could be made to work even inside inner contexts.
 public class VariableBlock extends TemplateBlock_Base {
 
 	static public final String		BLOCK_NAME							= "variable";
+	static public final String		BLOCK_END_NAME						= "endVariable";
 
 	static public final String		ATTRIBUTE_NAME						= "name";
 	static public final String		ATTRIBUTE_EVAL_MODE					= "evalMode";
@@ -161,8 +162,8 @@ public class VariableBlock extends TemplateBlock_Base {
 			}
 
 			String t_endingTagName = t_generalBlock.GetUnknownTag().GetTagName();
-			if (!t_endingTagName.equalsIgnoreCase("endvariable")) {
-				Logger.LogError("VariableBlock.Parse() general block ended on a tag named [" + t_endingTagName + "] at line [" + p_tokenizer.GetLineCount() + "] in the block starting at [" + m_lineNumber + "].  The closing tag [endfor] was expected.");
+			if (!t_endingTagName.equalsIgnoreCase(BLOCK_END_NAME)) {
+				Logger.LogError("VariableBlock.Parse() general block ended on a tag named [" + t_endingTagName + "] at line [" + p_tokenizer.GetLineCount() + "] in the block starting at [" + m_lineNumber + "].  The closing tag [" + BLOCK_END_NAME + "] was expected.");
 				return false;
 			}
 
