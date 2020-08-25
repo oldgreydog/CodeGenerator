@@ -1,11 +1,25 @@
 
+# This script builds the zip file that is the working release build put out on the GitHub page.
 
 # Remove any existing jars so that we get a clean build.
 rm lib/code_generator.jar
+rm lib/coreutil.jar
+
+
+# Build Coreutils
+pushd ../Coreutils
+
+source java_build clean
+source java_build
+
+popd
+
+
+# Copy the coreutil jar into this project so it will build.
+cp -pL  ../Coreutils/lib/*.* ./lib
 
 
 # Build the code generator java code.
-
 source java_build clean
 source java_build
 
@@ -19,15 +33,15 @@ mkdir zip/code_generator/logs
 
 
 cp -prL Examples/*				zip/code_generator/examples
+cp -pL  ../Coreutils/lib/*.*	zip/code_generator/lib
 cp -pL  lib/*.*					zip/code_generator/lib
-cp -pL  VendorLib/*				zip/code_generator/lib
 cp -pL  CodeGeneratorConfig.xml zip/code_generator
 cp -pL  generate				zip/code_generator
 cp -pL  generate.cmd			zip/code_generator
 cp -pL  RELEASE					zip/code_generator
 
 
-# The zip folder should be completely populated at this point so we are now ready to create the tar file from it.
+# The zip folder should be completely populated at this point so we are now ready to create the zip file from it.
 rm code_generator.zip
 
 pushd zip
@@ -42,6 +56,13 @@ rm -fr zip
 
 rm lib/*.jar
 
+
+# Clean up Coreutils
+pushd ../Coreutils
+source java_build clean
+popd
+
+# Finally, clean this build dir.
 source java_build clean
 
 

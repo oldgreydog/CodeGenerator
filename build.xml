@@ -3,7 +3,6 @@
 
 	<property environment="env"/>
 	<property name="jar_dir" value="lib"/>
-	<property name="vendor_jar_dir" value="VendorLib"/>
 
 	<echo message="Ant java version: ${ant.java.version}" />
 
@@ -24,7 +23,7 @@
 
 		<javac includeantruntime="false" srcdir="CodeGenerator/src" destdir="CodeGenerator/bin" debug="true">
 			<classpath>
-				<pathelement path="${vendor_jar_dir}/coreutil.jar"/>
+				<pathelement path="${jar_dir}/coreutil.jar"/>
 			</classpath>
 			<exclude name="**/ddl/*.java"/>
 		</javac>
