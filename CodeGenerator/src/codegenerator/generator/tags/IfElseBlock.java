@@ -32,27 +32,27 @@ import codegenerator.generator.utils.*;
 
 
 /**
-	Provides the <code>if</code> and <code>elseif</code> tag parsing and evaluation.
+	Provides the <code>if</code> and <code>elseIf</code> tag parsing and evaluation.
 
 	<p>Here is a sample of the if-else tags that are parsed by this code:</p>
 
 	<pre><code>&lt;%if  &lt;%type%&gt; = Integer %&gt;
 	...
-&lt;%elseif  &lt;%type%&gt; = Long %&gt;
+&lt;%elseIf  &lt;%type%&gt; = Long %&gt;
 	...
 &lt;%else%&gt;
 	...
-&lt;%endif%&gt;</code></pre>
+&lt;%endIf%&gt;</code></pre>
 
 	<p>Where &lt;%type%&gt; is a {@link ConfigVariable} tag object that converts a config value of
 	the name "type" into the value it has in the config file under the current parent node.</p>
 
-	<p>The test condition for the <code>if</code> and <code>elseif</code> tags is more generically
+	<p>The test condition for the <code>if</code> and <code>elseIf</code> tags is more generically
 	defined like this:</p>
 
 	<p><code>&lt;%if  [any tag that evaluates to a string] = [string constant] %&gt;</code></p>
 
-	<p>So the other common instance of the <code>if</code> and <code>elseif</code> tags you'll see
+	<p>So the other common instance of the <code>if</code> and <code>elseIf</code> tags you'll see
 	in the example templates uses <code>typeConvert</code> because it also evaluates to a string:</p>
 
 	<p><code>&lt;%if  &lt;%typeConvert targetLanguage = "java" sourceType = &lt;%type%&gt; class = "object" %&gt; = Integer %&gt;</code></p>
@@ -67,24 +67,24 @@ import codegenerator.generator.utils.*;
 
 	<pre><code>&lt;%if  exists = parameter %&gt;
 	...
-&lt;%elseif  exists = returnType %&gt;
+&lt;%elseIf  exists = returnType %&gt;
 	...
 &lt;%else%&gt;
 	...
-&lt;%endif%&gt;</code></pre>
+&lt;%endIf%&gt;</code></pre>
 
 	<p>And you can mix conditions if it makes sense:</p>
 
 	<pre><code>&lt;%if  exists = parameter %&gt;
 	...
-&lt;%elseif  &lt;%type%&gt; = Long %&gt;
+&lt;%elseIf  &lt;%type%&gt; = Long %&gt;
 	...
 &lt;%else%&gt;
 	...
-&lt;%endif%&gt;</code></pre>
+&lt;%endIf%&gt;</code></pre>
 
 	<p>I finally added boolean logic because I needed it.  You now have simplistic <code>and</code> and <code>or</code> functionality
-	to use in your <code>if</code> and <code>elseif</code> tags.  As with all of the other tags, <code>and</code> and <code>or</code>
+	to use in your <code>if</code> and <code>elseIf</code> tags.  As with all of the other tags, <code>and</code> and <code>or</code>
 	use the same XML tag layout for simplicity of parsing.</p>
 
 	<p><code>&lt;%[and/or]  [some tag that evaluates to a string] = [some string const] [...] %&gt;</code></p>
@@ -103,17 +103,17 @@ import codegenerator.generator.utils.*;
 	on the first test condition attribute that is <code>false</code> and <code>or</code> returns <code>true</code> on the first test condition
 	attribute that is <code>true</code>.</p>
 
-	<p>Here is an example of an <code>if</code>/<code>elseif</code> tag using and <code>or</code> and <code>and</code> tags:</p>
+	<p>Here is an example of an <code>if</code>/<code>elseIf</code> tag using and <code>or</code> and <code>and</code> tags:</p>
 
 	<pre><code>&lt;%if  &lt;%or  &lt;%typeConvert targetLanguage = "java" sourceType = &lt;%type%&gt; groupID = "object" %&gt; = String
 		&lt;%typeConvert targetLanguage = "java" sourceType = &lt;%type%&gt; groupID = "object" %&gt; = Calendar
 		&lt;%typeConvert targetLanguage = "java" sourceType = &lt;%type%&gt; groupID = "object" %&gt; = byte[] %&gt; = "true" %&gt;
 	...
-&lt;%elseif  &lt;%and	&lt;%name%&gt; = "Company"  &lt;%isNullable%&gt; = "true" %&gt; = "true" %&gt;
+&lt;%elseIf  &lt;%and	&lt;%name%&gt; = "Company"  &lt;%isNullable%&gt; = "true" %&gt; = "true" %&gt;
 	...
 &lt;%else%&gt;
 	...
-&lt;%endif%&gt;</code></pre>
+&lt;%endIf%&gt;</code></pre>
 
 	<p><code>and</code> and <code>or</code> should also nest inside each other so that you can make
 	fairly complicated conditionals if you need them.</p>

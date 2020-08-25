@@ -126,7 +126,7 @@ public abstract class TemplateBlock_Base {
 	 * @param p_currentNode
 	 * @param p_rootNode		Can be used to reach globals or other nodes that aren't part of the current node subtree.
 	 * @param p_writer			The output stream to which all generated text is written.
-	 * @param p_iterationCounter	The iteration counter for the inner-most enclosing <code>foreach</code> block.  Currently only used by <code>first</code> tags to know whether it is in the first iteration or not.  This must be an {@link java.util.concurrent.atomic.AtomicInteger} because you can't mutate regular int's or Integers.
+	 * @param p_iterationCounter	The iteration counter for the inner-most enclosing <code>forEach</code> block.  Currently only used by <code>first</code> tags to know whether it is in the first iteration or not.  This must be an {@link java.util.concurrent.atomic.AtomicInteger} because you can't mutate regular int's or Integers.
 	 * @return
 	 * @throws Throwable
 	 */

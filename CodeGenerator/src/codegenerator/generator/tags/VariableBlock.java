@@ -36,11 +36,11 @@ import codegenerator.generator.utils.*;
 up and simplified.</p>
 
 <p>When used with a variable name and the evalmode set to "set", it will parse the contents to the
-<code>&lt;%endvariable%&gt;</code> tag and save them for the variable name.</p>
+<code>&lt;%endVariable%&gt;</code> tag and save them for the variable name.</p>
 
 <pre><code>&lt;%variable name = "primeNames" evalmode = "set" %&gt;
 ...
-&lt;%endvariable%&gt;</code></pre>
+&lt;%endVariable%&gt;</code></pre>
 
 <p>When used with a variable name and the evalmode set to "evaluate", it will evaluate the template
 block set for that variable name at that location.  Obviously, all of the config value references must

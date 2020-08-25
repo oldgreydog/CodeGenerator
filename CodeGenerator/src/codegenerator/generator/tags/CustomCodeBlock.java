@@ -56,20 +56,20 @@ import codegenerator.generator.utils.*;
  * <p><b><code>commentCharacters</code></b> - this is the set of single-line comment characters that is used by whatever language is being generated.  In this example, it's "//" for java.</p>
  *
  * <p>The key is critical.  It has to be unique in the file.  If the code where this tag is used is
- * outside a <code>foreach</code> block, then you can optionally give it a key that is fixed, such
- * as <code>StaticMembers</code>.  However, if this tag is used inside a <code>foreach</code> block,
+ * outside a <code>forEach</code> block, then you can optionally give it a key that is fixed, such
+ * as <code>StaticMembers</code>.  However, if this tag is used inside a <code>forEach</code> block,
  * then you must define a key that uses a raw or type-converted config value to make it unique within
  * the context. The <code>LoadAll&lt;%className%&gt;CacheCode</code> used in the example above is a
  * perfect example.  The config variable <code>&lt;%className%&gt;</code> will cause a unique tag to
- * be generated at that location in every pass through the <code>foreach</code> block.</p>
+ * be generated at that location in every pass through the <code>forEach</code> block.</p>
  *
  * <p><b>If you don't make the key unique, you will loose custom code the next time you regenerate
  * on top of existing files!!</b></p>
  *
- * <p>To that end, if you are inside nested <code>foreach</code> blocks, then you will probably need
+ * <p>To that end, if you are inside nested <code>forEach</code> blocks, then you will probably need
  * to add a config value for each context, using the parent reference caret (^) where necessary.  So,
- * for example, if you were inside a <code>foreach</code> block iterating over the "member" nodes under
- * an outer <code>foreach</code> block that's iterating over "class" nodes, then you might create a tag like:</p>
+ * for example, if you were inside a <code>forEach</code> block iterating over the "member" nodes under
+ * an outer <code>forEach</code> block that's iterating over "class" nodes, then you might create a tag like:</p>
  *
  * <p><code>&lt;%customCode key=Validate&lt;%memberName%&gt;Of&lt;%^className%&gt; commentCharacters=//%&gt;</code></p>
  *

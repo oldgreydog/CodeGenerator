@@ -52,30 +52,30 @@ import codegenerator.generator.utils.*;
 
 	<p>Here's an abbreviated example of the usage of these tags (the 1., 2., 3. and 4. are for reference in the explanation below):</p>
 
-	<code>&lt;!-- At this point in the template, we are inside a <code>&lt;%foreach node = "table" %&gt;</code> tag, so the current
+	<code>&lt;!-- At this point in the template, we are inside a <code>&lt;%forEach node = "table" %&gt;</code> tag, so the current
 		node context is pointing to a particular "table" node --&gt;</code>
 
 <br><br><pre><code>		&lt;%outerContext contextname = parentTable %&gt;
-	1.		&lt;%foreach node = ^table  optionalCounterName = innerTable %&gt;
-	2.			&lt;%foreach node = column %&gt;
-					&lt;%foreach node = foreignKey %&gt;
+	1.		&lt;%forEach node = ^table  optionalCounterName = innerTable %&gt;
+	2.			&lt;%forEach node = column %&gt;
+					&lt;%forEach node = foreignKey %&gt;
 	3.					&lt;%if &lt;%and &lt;%parentTableName%&gt; = &lt;%outerContextEval contextname = parentTable targetvalue = sqlName %&gt;
 									&lt;%not &lt;%parentTableName%&gt; = &lt;%^^sqlName%&gt; %&gt; == true %&gt; == true %&gt;
 							&lt;%text%&gt;...&lt;%endtext%&gt;
-						&lt;%endif%&gt;
-					&lt;%endfor%&gt;
-				&lt;%endfor%&gt;
+						&lt;%endIf%&gt;
+					&lt;%endFor%&gt;
+				&lt;%endFor%&gt;
 
-				&lt;%foreach node = tableRelationship %&gt;
+				&lt;%forEach node = tableRelationship %&gt;
 					&lt;%if &lt;%and &lt;%parentTableName%&gt; = &lt;%outerContextEval contextname = parentTable targetvalue = sqlName %&gt;
 								&lt;%not &lt;%parentTableName%&gt; = &lt;%^sqlName%&gt; %&gt; == true %&gt; == true %&gt;
 						&lt;%first  optionalCounterName = innerTable %&gt;
 							&lt;%text%&gt;...&lt;%endtext%&gt;
 						&lt;%endfirst%&gt;
 							&lt;%text%&gt;...&lt;%endtext%&gt;
-					&lt;%endif%&gt;
-				&lt;%endfor%&gt;
-			&lt;%endfor%&gt;
+					&lt;%endIf%&gt;
+				&lt;%endFor%&gt;
+			&lt;%endFor%&gt;
 	4.	&lt;%endcontext%&gt;</code></pre>
 
 	<p>Once the  <code>outerContext</code>  tag is hit, you can then jump the node pointer to a different context with a <code>forEach</code> as shown at 1.
@@ -97,13 +97,13 @@ import codegenerator.generator.utils.*;
 
 	<p>Here's an example of this usage:</p>
 
-<pre><code>	&lt;%foreach node=manager%&gt;
+<pre><code>	&lt;%forEach node=manager%&gt;
 		&lt;%file template=manager.template						filename="&lt;%className%&gt;Manager.java"				destDir="&lt;%root.global.outputPath%&gt;/&lt;%firstLetterToLowerCase value = &lt;%className%&gt; %&gt;" %&gt;
 
-		&lt;%foreach node=api%&gt;
+		&lt;%forEach node=api%&gt;
 			&lt;%file template=manager_net_client.template		filename="&lt;%apiName%&gt;_NET.java"						destDir="&lt;%root.global.outputPath%&gt;/&lt;%firstLetterToLowerCase value = &lt;%^className%&gt; %&gt;" %&gt;
 			&lt;%file template=manager_net_server.template		filename="&lt;%apiName%&gt;_NET_Server.java"				destDir="&lt;%root.global.outputPath%&gt;/&lt;%firstLetterToLowerCase value = &lt;%^className%&gt; %&gt;" %&gt;
-		&lt;%endfor%&gt;
+		&lt;%endFor%&gt;
 
 		&lt;%if &lt;%accessType%&gt; = "transparent" %&gt;
 			&lt;%file template=manager_interface.template		filename = "&lt;%className%&gt;Manager_Interface.java"		destDir = "&lt;%root.global.outputPath%&gt;/&lt;%firstLetterToLowerCase value = &lt;%className%&gt; %&gt;" %&gt;
@@ -114,8 +114,8 @@ import codegenerator.generator.utils.*;
 					&lt;%file template=manager_factory_config.template		filename = "&lt;%root.global.serviceGroupName%&gt;ManagerFactoryConfig.xml"	destDir = "&lt;%root.global.outputPath%&gt;/factory" %&gt;
 				&lt;%endcontext%&gt;
 			&lt;%endFirst%&gt;
-		&lt;%endif%&gt;
-	&lt;%endfor%&gt;</code></pre>
+		&lt;%endIf%&gt;
+	&lt;%endFor%&gt;</code></pre>
  */
 public class OuterContext extends TemplateBlock_Base {
 

@@ -32,7 +32,7 @@ import codegenerator.generator.utils.*;
 
 	<pre><code>&lt;%counter  optionalCounterName = "loop1" %&gt;</code></pre>
 
-	<p>The optionalCounterName attribute lets you specify using a named loop counter from a foreach block other than the
+	<p>The optionalCounterName attribute lets you specify using a named loop counter from a forEach block other than the
 	one directly containing this counter block.</p>
 */
 public class Counter extends TemplateBlock_Base {
@@ -42,7 +42,7 @@ public class Counter extends TemplateBlock_Base {
 	static public final String		ATTRIBUTE_OPTIONAL_COUNTER_NAME		= "optionalCounterName";
 
 	// Data members
-	private	String	m_optionalCounterName	= null;	// Providing a name for the loop counter lets you specify using a named loop counter from a foreach block other than the one directly containing this first block.
+	private	String	m_optionalCounterName	= null;	// Providing a name for the loop counter lets you specify using a named loop counter from a forEach block other than the one directly containing this first block.
 
 
 	//*********************************

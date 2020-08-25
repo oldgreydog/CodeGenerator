@@ -32,12 +32,12 @@ import codegenerator.generator.utils.*;
 /**
 	<p>Provides the looping mechanism that iterates over child nodes of the specified name.</p>
 
-	<pre><code>&lt;%foreach node = column  optionalCounterName = "loop1" %&gt;
+	<pre><code>&lt;%forEach node = column  optionalCounterName = "loop1" %&gt;
 ...
-&lt;%endfor%&gt;</code></pre>
+&lt;%endFor%&gt;</code></pre>
 
 	<p>This tag is the main control in the templates.  The config values are defined in a tree structure
-	in the XML file and the <code>foreach</code> tag lets you build templates that can iterate down
+	in the XML file and the <code>forEach</code> tag lets you build templates that can iterate down
 	through that tree structure.</p>
 
 	<p>When you start the code generator, the "current" node pointer is, conceptually, pointed at the
@@ -46,18 +46,18 @@ import codegenerator.generator.utils.*;
 	the template file that the code generator was started with.</p>
 
 	<p>Each node in the config value tree can have both values and child nodes.  That means that at any
-	point in a template, you can access the values under the "current" node or you can use the <code>foreach</code>
-	tag to start a loop over that node's child nodes.  Inside the <code>foreach</code> block, the current
+	point in a template, you can access the values under the "current" node or you can use the <code>forEach</code>
+	tag to start a loop over that node's child nodes.  Inside the <code>forEach</code> block, the current
 	pointer is changed every iteration to point to the next available child of the specified name.
 	If there are child nodes with different names, only the ones with the name specified in the tag will
-	be iterated over in that particular <code>foreach</code> block.  Therefore, if you have multiple
-	child node groups, you can use multiple <code>foreach</code> blocks to iterate over them.</p>
+	be iterated over in that particular <code>forEach</code> block.  Therefore, if you have multiple
+	child node groups, you can use multiple <code>forEach</code> blocks to iterate over them.</p>
 
-	<p>The optionalCounterName attribute is just that: optional.  It lets you give the <code>foreach</code> block's counter
-	a user-controlled name so that it can be accessed by name inside nested <code>foreach</code> blocks to achieve more
-	controlled behavior.  For example, if you have two nested <code>foreach</code> loops and you want a <code>first</code> block in the
+	<p>The optionalCounterName attribute is just that: optional.  It lets you give the <code>forEach</code> block's counter
+	a user-controlled name so that it can be accessed by name inside nested <code>forEach</code> blocks to achieve more
+	controlled behavior.  For example, if you have two nested <code>forEach</code> loops and you want a <code>first</code> block in the
 	inner loop to only run the first time that the inner block runs regardless of how many times the outer loop
-	has stepped through, then you can put the same optionalCounterName on the outer <code>foreach</code> and the inner <code>first</code> tag.</p>
+	has stepped through, then you can put the same optionalCounterName on the outer <code>forEach</code> and the inner <code>first</code> tag.</p>
 
 	<p>Let's start with an example of a config value XML tree (truncated in places for brevity):</p>
 
@@ -116,7 +116,7 @@ import codegenerator.generator.utils.*;
 	<pre><code>
 %%HEADER%% openingDelimiter=&lt;% closingDelimiter=%&gt;
 
-&lt;%foreach node=table%&gt;
+&lt;%forEach node=table%&gt;
 	&lt;%file template=database_class.template                      filename="&lt;%tableName%&gt;.java"                       destDir="&lt;%root.global.outputPath%&gt;"%&gt;
 
 	&lt;%file template=marshalling/marshalling_interface.template   filename="&lt;%tableName%&gt;Marshalling.java"            destDir="&lt;%root.global.outputPath%&gt;/marshalling"%&gt;
@@ -129,7 +129,7 @@ import codegenerator.generator.utils.*;
 
 	&lt;%file template=dao/dao_net_client.template                  filename="&lt;%tableName%&gt;DAO_NET.java"                destDir="&lt;%root.global.outputPath%&gt;/dao/net"%&gt;
 	&lt;%file template=dao/dao_net_server.template                  filename="&lt;%tableName%&gt;DAO_NET_Server.java"         destDir="&lt;%root.global.outputPath%&gt;/dao/net/server"%&gt;
-&lt;%endfor%&gt;
+&lt;%endFor%&gt;
 
 &lt;%file template=marshalling/marshalling_factory.template         filename="&lt;%root.global.databaseName%&gt;MarshallingFactory.java"  destDir="&lt;%root.global.outputPath%&gt;/marshalling"%&gt;
 &lt;%file template=dao/dao_factory_interface.template               filename="&lt;%root.global.databaseName%&gt;DAOFactory.java"          destDir="&lt;%root.global.outputPath%&gt;/dao/factory"%&gt;
@@ -138,25 +138,25 @@ import codegenerator.generator.utils.*;
 </code></pre>
 
 	<p>When the generator starts up with these two files, the "current" node pointer points to "root".
-	That means that when the template evaluation starts, and at any point outside a <code>foreach</code>
-	block, the current pointer for this template is "root".  However, inside this template's <code>foreach</code>
+	That means that when the template evaluation starts, and at any point outside a <code>forEach</code>
+	block, the current pointer for this template is "root".  However, inside this template's <code>forEach</code>
 	the current node pointer will iterate over each root child node that has the name "table".  The
-	target child node name is specified as the "node" attribute value in the <code>foreach</code> tag.
+	target child node name is specified as the "node" attribute value in the <code>forEach</code> tag.
 	In this example, that looks like:</p>
 
-	<p><code>&lt;%foreach node=table%&gt;</code></p>
+	<p><code>&lt;%forEach node=table%&gt;</code></p>
 
-	<p>After <code>foreach</code> has iterated over all of the "table" child nodes that it can find,
-	it exits its block at the <code>endfor</code> tag and from there the current node is again "root".
-	That's why the <code>file</code> tags after the <code>foreach</code> block use fully-qualified
+	<p>After <code>forEach</code> has iterated over all of the "table" child nodes that it can find,
+	it exits its block at the <code>endFor</code> tag and from there the current node is again "root".
+	That's why the <code>file</code> tags after the <code>forEach</code> block use fully-qualified
 	value names like <code>root.global.outputPath</code> to access the "global" values.</p>
 
-	<p>However, all of the <code>file</code> tags inside the <code>foreach</code> block start their
+	<p>However, all of the <code>file</code> tags inside the <code>forEach</code> block start their
 	evaluation with a current pointer pointing to a "table" node, not "root".  So when you are looking
 	at any of those child template files, you have to always keep that in mind.</p>
 
-	<p>Inside those child templates, more <code>foreach</code> blocks can be used to iterate over the
-	<code>column</code> and <code>foreignKey</code> child nodes.  Thus <code>foreach</code> blocks are
+	<p>Inside those child templates, more <code>forEach</code> blocks can be used to iterate over the
+	<code>column</code> and <code>foreignKey</code> child nodes.  Thus <code>forEach</code> blocks are
 	nested either directly inside a template or indirectly in a template's <code>file</code> tags to
 	traverse the config value tree and generate the desired output.</p>
 

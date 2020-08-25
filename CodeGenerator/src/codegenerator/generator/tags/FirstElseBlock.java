@@ -38,23 +38,23 @@ import codegenerator.generator.utils.*;
 	so you need to control when, in that example, you insert commas.  The <code>first</code>-<code>else</code>
 	tags let you do that.  For example:</p>
 
-	<pre><code>&lt;%foreach node = member  optionalCounterName = "loop1" %&gt;
+	<pre><code>&lt;%forEach node = member  optionalCounterName = "loop1" %&gt;
 	&lt;%first%&gt;
 		&lt;%text%&gt;&lt;%endtext%&gt;
 	&lt;%else%&gt;
 		&lt;%text%&gt;,
 &lt;%endtext%&gt;
-	&lt;%endfirst%&gt;
+	&lt;%endFirst%&gt;
 
 	&lt;%text%&gt;       &lt;%typeConvert targetLanguage = "java" sourceType = &lt;%type%&gt; class = "object" %&gt; p_&lt;%firstLetterToLowerCase member = &lt;%name%&gt;%&gt;&lt;%endtext%&gt;
-&lt;%endfor%&gt;
+&lt;%endFor%&gt;
 </code></pre>
 
 	<p>The first pass through this loop that is iterating over "member" nodes, the loop will add an
 	empty text block in front of the parameter definition.  But for every iteration after that, the
 	<code>else</code> block will add a comma and a new-line in front of the parameter definition.</p>
 
-	<p>The optionalCounterName attribute lets you specify using a named loop counter from a foreach block other than the
+	<p>The optionalCounterName attribute lets you specify using a named loop counter from a forEach block other than the
 	one directly containing this first block.</p>
  */
 public class FirstElseBlock extends TemplateBlock_Base {
@@ -65,7 +65,7 @@ public class FirstElseBlock extends TemplateBlock_Base {
 
 	private GeneralBlock		m_firstBlock			= null;
 	private GeneralBlock		m_elseBlock				= null;
-	private	String				m_optionalCounterName	= null;	// Providing a name for the loop counter lets you specify using a named loop counter from a foreach block other than the one directly containing this first block.
+	private	String				m_optionalCounterName	= null;	// Providing a name for the loop counter lets you specify using a named loop counter from a forEach block other than the one directly containing this first block.
 
 //	private ArrayList<Integer>	m_parentIterationCountList	= null;
 	private final TreeMap<Integer, LoopCounter>		m_counterIDMap	= new TreeMap<>();
@@ -120,7 +120,7 @@ public class FirstElseBlock extends TemplateBlock_Base {
 			m_firstBlock = t_generalBlock;
 
 
-			// If the first block is followed by any elseif blocks, then consume them.
+			// If the first block is followed by any elseIf blocks, then consume them.
 			String t_endingTagName = t_generalBlock.GetUnknownTag().GetTagName();
 			if (t_endingTagName.equalsIgnoreCase("else")) {
 				t_generalBlock	= new GeneralBlock();
@@ -172,7 +172,7 @@ public class FirstElseBlock extends TemplateBlock_Base {
 					m_counterIDMap.remove(t_iterationCounter.GetCounterID());
 			}
 
-			// I think (!hope!) that using a tree map to keep the internal counter for each counter ID that we see will let us use variable blocks inside various levels of nested <foreach> loops and <if> blocks without having to worry about looking up the stack of counters to figure out if a particular evaluation is the first one or not for that particular counter.
+			// I think (!hope!) that using a tree map to keep the internal counter for each counter ID that we see will let us use variable blocks inside various levels of nested <forEach> loops and <if> blocks without having to worry about looking up the stack of counters to figure out if a particular evaluation is the first one or not for that particular counter.
 			LoopCounter t_internalCounter	= m_counterIDMap.get(t_iterationCounter.GetCounterID());
 			boolean		t_firstTimeThrough	= false;
 			if (t_internalCounter == null)
