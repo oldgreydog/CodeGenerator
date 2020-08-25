@@ -42,7 +42,7 @@ public class LoopCounter {
 
 
 	//*********************************
-	public LoopCounter(LoopCounter p_parentCounter) {
+	private LoopCounter(LoopCounter p_parentCounter) {
 		m_parentCounter			= p_parentCounter.m_parentCounter;
 		m_counterID				= p_parentCounter.m_counterID;
 		m_optionalCounterName	= p_parentCounter.m_optionalCounterName;

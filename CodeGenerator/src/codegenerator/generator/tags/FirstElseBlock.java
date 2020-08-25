@@ -153,24 +153,34 @@ public class FirstElseBlock extends TemplateBlock_Base {
 	public boolean Evaluate(EvaluationContext p_evaluationContext)
 	{
 		try {
-			LoopCounter t_iterationCounter	= p_evaluationContext.GetLoopCounter();
-			boolean		t_popTempCounter	= false;
+			LoopCounter t_iterationCounter		= p_evaluationContext.GetLoopCounter();
+			boolean		t_usingCounterVariable	= false;
 			if (m_optionalCounterName != null) {
 				t_iterationCounter = t_iterationCounter.GetNamedCounter(m_optionalCounterName);
 
 				if (t_iterationCounter == null) {
-					Logger.LogError("FirstElseBlock.Evaluate() failed to find a loop counter with name [" + m_optionalCounterName + "] at line number [" + m_lineNumber + "].");
-					return false;
+					// If we don't find a loop counter by that name, then we need to check to see if there is a counter variable by that name.
+					t_iterationCounter = p_evaluationContext.GetCounterVariable(m_optionalCounterName);
+
+					if (t_iterationCounter == null) {
+						Logger.LogError("FirstElseBlock.Evaluate() failed to find a counter with name [" + m_optionalCounterName + "] at line number [" + m_lineNumber + "].");
+						return false;
+					}
+
+					t_usingCounterVariable	= true;
 				}
 
-				p_evaluationContext.PushLoopCounter(t_iterationCounter);
-				t_popTempCounter = true;
-
-				// Since optionally "named" counters ID's don't change each iteration of an outer loop re-evaluates the foreach, we have to check to see if the named loop counter is a new instance reference and, if it is, count it as a new start of the loop.
+				// Since optionally "named" counters ID's don't change each iteration of an outer loop re-evaluates the forEach, we have to check to see if the named loop counter is a new instance reference and, if it is, count it as a new start of the loop.
 				LoopCounter t_existingLoopCounter = m_counterIDMap.get(t_iterationCounter.GetCounterID());
-				if (t_existingLoopCounter != t_iterationCounter)	// Since optionally "named" counters ID's don't change each iteration of an outer loop re-evaluates the foreach, we have to check to see if the named loop counter is a new instance reference and, if it is, count it as a new start of the loop.
+				if ((t_existingLoopCounter != null) && (t_existingLoopCounter != t_iterationCounter))
 					m_counterIDMap.remove(t_iterationCounter.GetCounterID());
 			}
+
+			if (t_iterationCounter == null) {
+				Logger.LogError("FirstElseBlock.Evaluate() failed to find a default loop counter and no optional counter name was specified at line number [" + m_lineNumber + "].");
+				return false;
+			}
+
 
 			// I think (!hope!) that using a tree map to keep the internal counter for each counter ID that we see will let us use variable blocks inside various levels of nested <forEach> loops and <if> blocks without having to worry about looking up the stack of counters to figure out if a particular evaluation is the first one or not for that particular counter.
 			LoopCounter t_internalCounter	= m_counterIDMap.get(t_iterationCounter.GetCounterID());
@@ -178,7 +188,9 @@ public class FirstElseBlock extends TemplateBlock_Base {
 			if (t_internalCounter == null)
 			{
 				m_counterIDMap.put(t_iterationCounter.GetCounterID(), t_iterationCounter);
-				t_firstTimeThrough	= true;
+
+				if (!t_usingCounterVariable || (t_iterationCounter.GetCounter() == 1))	// Counter variables are different from loop counters in that the "first time through" for a counter variable should always be == 1, whereas a loop counter where the first tag is inside one or more nested if tags can have a "first time through" value > 1.
+					t_firstTimeThrough	= true;
 			}
 
 			if (t_firstTimeThrough) {
@@ -187,9 +199,6 @@ public class FirstElseBlock extends TemplateBlock_Base {
 			else if (m_elseBlock != null) {
 				m_elseBlock.Evaluate(p_evaluationContext);
 			}
-
-			if (t_popTempCounter)
-				p_evaluationContext.PopCurrentLoopCounter();
 		}
 		catch (Throwable t_error) {
 			Logger.LogException("FirstElseBlock.Evaluate() failed with error at line number [" + m_lineNumber + "]: ", t_error);

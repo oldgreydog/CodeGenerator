@@ -1,5 +1,5 @@
 /*
-	Copyright 2016 Wes Kaylor
+	Copyright 2020 Wes Kaylor
 
 	This file is part of CodeGenerator.
 
@@ -15,7 +15,7 @@
 
 	You should have received a copy of the GNU Lesser General Public License
 	along with CodeGenerator.  If not, see <http://www.gnu.org/licenses/>.
-*/
+ */
 
 
 package codegenerator.generator.tags;
@@ -28,16 +28,16 @@ import codegenerator.generator.utils.*;
 
 
 /**
-	This lets you output the counter value.
+	The original use case for this tag was eliminated when the <code>first</code> tag was changed so that it knows
+	the first time its passed through event if the counter it's watching isn't == 1.  That can happen, for example,
+	when the <code>first</code> tag is inside an <code>if</code> tag block.</p>
 
-	<pre><code>&lt;%counter  optionalCounterName = "loop1" %&gt;</code></pre>
+	<p>However, you may find a use for it now that there is the <code>counterVariable</code> tag block, so I have left
+	it in.  You can use this with <code>counterVariable</code> counters and named <code>forEach</code> counters.</p>
+ */
+public class CounterDecrement extends TemplateBlock_Base {
 
-	<p>The optionalCounterName attribute lets you specify using a named loop counter from a forEach block other than the
-	one directly containing this counter block.</p>
-*/
-public class Counter extends TemplateBlock_Base {
-
-	static public final String		BLOCK_NAME							= "counter";
+	static public final String		BLOCK_NAME							= "--counter";
 
 	static public final String		ATTRIBUTE_OPTIONAL_COUNTER_NAME		= "optionalCounterName";
 
@@ -46,9 +46,8 @@ public class Counter extends TemplateBlock_Base {
 
 
 	//*********************************
-	public Counter() {
-		super("counter");
-		m_isSafeForTextBlock = true;
+	public CounterDecrement() {
+		super(BLOCK_NAME);
 	}
 
 
@@ -56,7 +55,7 @@ public class Counter extends TemplateBlock_Base {
 	@Override
 	public boolean Init(TagParser p_tagParser) {
 		if (!super.Init(p_tagParser)) {
-			Logger.LogError("Counter.Init() failed in the parent Init() at line number [" + p_tagParser.GetLineNumber() + "].");
+			Logger.LogError("CounterDecrement.Init() failed in the parent Init() at line number [" + p_tagParser.GetLineNumber() + "].");
 			return false;
 		}
 
@@ -65,7 +64,7 @@ public class Counter extends TemplateBlock_Base {
 		if (t_nodeAttribute != null) {
 			m_optionalCounterName = t_nodeAttribute.GetAttributeValueAsString();
 			if (m_optionalCounterName == null) {
-				Logger.LogError("Counter.Init() did not get the value from the [" + ATTRIBUTE_OPTIONAL_COUNTER_NAME + "] attribute.");
+				Logger.LogError("CounterDecrement.Init() did not get the value from the [" + ATTRIBUTE_OPTIONAL_COUNTER_NAME + "] attribute.");
 				return false;
 			}
 		}
@@ -76,8 +75,8 @@ public class Counter extends TemplateBlock_Base {
 
 	//*********************************
 	@Override
-	public Counter GetInstance() {
-		return new Counter();
+	public CounterDecrement GetInstance() {
+		return new CounterDecrement();
 	}
 
 
@@ -101,23 +100,22 @@ public class Counter extends TemplateBlock_Base {
 				if (t_iterationCounter == null) {
 					// If we don't find a loop counter by that name, then we need to check to see if there is a counter variable by that name.
 					t_iterationCounter = p_evaluationContext.GetCounterVariable(m_optionalCounterName);
-
 					if (t_iterationCounter == null) {
-						Logger.LogError("Counter.Evaluate() failed to find a loop counter with name [" + m_optionalCounterName + "] at line number [" + m_lineNumber + "].");
+						Logger.LogError("CounterDecrement.Evaluate() failed to find a loop counter with name [" + m_optionalCounterName + "] at line number [" + m_lineNumber + "].");
 						return false;
 					}
 				}
 			}
 
 			if (t_iterationCounter == null) {
-				Logger.LogError("Counter.Evaluate() failed to find a default loop counter and no optional counter name was specified at line number [" + m_lineNumber + "].");
+				Logger.LogError("CounterDecrement.Evaluate() failed to find a default loop counter and no optional counter name was specified at line number [" + m_lineNumber + "].");
 				return false;
 			}
 
-			p_evaluationContext.GetCursor().Write(Integer.toString(t_iterationCounter.GetCounter()));
+			t_iterationCounter.DecrementCounter();
 		}
 		catch (Throwable t_error) {
-			Logger.LogException("Counter.Evaluate() failed with error: ", t_error);
+			Logger.LogException("CounterDecrement.Evaluate() failed with error: ", t_error);
 			return false;
 		}
 
@@ -130,7 +128,7 @@ public class Counter extends TemplateBlock_Base {
 	public String Dump(String p_tabs) {
 		StringBuilder t_dump = new StringBuilder();
 
-		t_dump.append(p_tabs + "Block type name :  counter\n");
+		t_dump.append(p_tabs + "Block type name :  --counter\n");
 
 		return t_dump.toString();
 	}

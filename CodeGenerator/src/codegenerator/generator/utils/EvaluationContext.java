@@ -23,6 +23,7 @@ package codegenerator.generator.utils;
 
 
 import java.util.*;
+import java.util.Map.*;
 
 import coreutil.config.*;
 
@@ -32,13 +33,14 @@ import coreutil.config.*;
  * This holds everything that needs to be passed down through the execution tree of objects in the Evaluate() function call.
  */
 public class EvaluationContext {
-	private final LinkedList<ConfigNode>	m_currentNodeStack			= new LinkedList<>();
-	private ConfigNode						m_rootNode;
-	private final LinkedList<Cursor> 		m_writerStack			= new LinkedList<>();
-	private final LinkedList<LoopCounter>	m_iterationCounterStack	= new LinkedList<>();	// There are rare cases (i.e. FirstElseBlock) where we need to grab a named counter from the current counter and set it as the temporary counter for the evaluation of the block.
-	private OuterContextManager				m_contextManager		= null;
-	private CustomCodeManager				m_customCodeManager		= null;
-	private TabSettingsManager				m_tabSettingsManager	= null;
+	private final LinkedList<ConfigNode>		m_currentNodeStack			= new LinkedList<>();
+	private ConfigNode							m_rootNode;
+	private final LinkedList<Cursor> 			m_writerStack			= new LinkedList<>();
+	private final LinkedList<LoopCounter>		m_iterationCounterStack	= new LinkedList<>();	// There are rare cases (i.e. FirstElseBlock) where we need to grab a named counter from the current counter and set it as the temporary counter for the evaluation of the block.
+	private final TreeMap<String, LoopCounter>	m_counterVariableMap	= new TreeMap<>();		// Since counter variables aren't tied to forEach loops, we need to handle them separately.  If we pushed them onto the forEach loop counter stack, we could potentially seriously poison that stack because any first tags that weren't naming the counter they were working with could possibly use the wrong counter.
+	private OuterContextManager					m_contextManager		= null;
+	private CustomCodeManager					m_customCodeManager		= null;
+	private TabSettingsManager					m_tabSettingsManager	= null;
 
 
 	//*********************************
@@ -69,6 +71,10 @@ public class EvaluationContext {
 		// In situations where this copy constructor is used, there is no way the new context we are entering can know about the other loop counters that may exist "outside", so we only need the "current" counter from here on.
 		if (!p_otherEvaluationContext.m_iterationCounterStack.isEmpty())
 			m_iterationCounterStack.push(p_otherEvaluationContext.m_iterationCounterStack.getFirst().DuplicateCountersForNewFile());
+
+		// Copy all of the named counter variables.
+		for (Entry<String, LoopCounter> t_nextCounterVariable: p_otherEvaluationContext.m_counterVariableMap.entrySet())
+			m_counterVariableMap.put(t_nextCounterVariable.getKey(), t_nextCounterVariable.getValue().DuplicateCountersForNewFile());
 
 		m_contextManager		= new OuterContextManager(p_otherEvaluationContext.m_contextManager);
 		m_customCodeManager		= new CustomCodeManager();
@@ -119,8 +125,8 @@ public class EvaluationContext {
 
 
 	//*********************************
-	public void PushLoopCounter(LoopCounter p_cursor) {
-		m_iterationCounterStack.push(p_cursor);
+	public void PushLoopCounter(LoopCounter p_counter) {
+		m_iterationCounterStack.push(p_counter);
 	}
 
 
@@ -133,6 +139,24 @@ public class EvaluationContext {
 	//*********************************
 	public void PopCurrentLoopCounter() {
 		m_iterationCounterStack.pop();
+	}
+
+
+	//*********************************
+	public void AddCounterVariable(String p_counterName, LoopCounter p_counter) {
+		m_counterVariableMap.put(p_counterName, p_counter);
+	}
+
+
+	//*********************************
+	public LoopCounter GetCounterVariable(String p_counterName) {
+		return m_counterVariableMap.get(p_counterName);
+	}
+
+
+	//*********************************
+	public void RemoveCounterVariable(String p_counterName) {
+		m_counterVariableMap.remove(p_counterName);
 	}
 
 
