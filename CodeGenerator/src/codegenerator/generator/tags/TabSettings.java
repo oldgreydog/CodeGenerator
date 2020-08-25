@@ -1,5 +1,5 @@
 /*
-Copyright 2016 Wes Kaylor
+Copyright 2020 Wes Kaylor
 
 This file is part of CodeGenerator.
 
