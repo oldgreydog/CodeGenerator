@@ -14,7 +14,7 @@ Or you can run the script
 
 if you want to create the release zip file that contains the "install" folder that you can then use to run the code generator.
 
-!!NOTE!! I've decided that it probably isn't practical to provide a pre-built release zip file since it has to be built to a particular version n of java and no matter what version I choose, there will be some group of people that, for various reasons, can't use a version of java >= n.  Therefore, the best solution for everyone will be for you to build you own release zip file as described above so you are guaranteed it will work for your installation.
+!!NOTE!! I noted here that I didn't think I would add a release build zip file to the GitHub releases anymore, but I've changed my mind again.  I have added a zip that contains jar files compiled to java version 1.8 compatibility.  It looks like the current long-term support version of java is version 1.11, but I couldn't get a down-compile to anything after 1.8, so 1.8 it is.
 
 !!NOTE 2!!  I haven't had a windows machine in years and it just occurred to me that these scripts only cover Linux, which is a problem.  I'll try to borrow a windows laptop from somebody and use it to create/test the windows versions of these scripts.  I'll add them as soon as I can.  Sorry!
 
