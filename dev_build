@@ -6,8 +6,8 @@ rm lib/code_generator.jar
 rm lib/coreutil.jar
 
 
-# Build Coreutils
-pushd ../Coreutils
+# Build CoreUtils
+pushd ../CoreUtils
 
 source java_build clean
 source java_build
@@ -16,7 +16,8 @@ popd
 
 
 # Copy the coreutil jar into this project so it will build.
-cp -pL  ../Coreutils/lib/*.* ./lib
+mkdir lib
+cp -pL  ../CoreUtils/lib/*.* ./lib
 
 
 # Build the code generator java code.
