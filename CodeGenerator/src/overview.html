@@ -256,13 +256,9 @@
 	different command lines, I've had to create two different versions of the scripts.  For linux,
 	run:</p>
 
-	<pre><code>./java_build
-cd Examples/codegenerator/database
-./generate_cached
-./generate_combined
-cd ../database_alt
-./generate_cached
-./generate_combined
+	<pre><code>./dev_build
+cd Examples/codegenerator
+./generate_all
 </code></pre>
 
 	<p><b>NOTE!</b> All of these scripts have a JAVA_HOME environment variable definition line in them
@@ -272,13 +268,9 @@ cd ../database_alt
 	<p>The windows versions of the scripts just add ".cmd" on the names (well, they also have semicolons
 	in the -cp list instead of colons used on linux):</p>
 
-	<pre><code>java_build.cmd
-cd Examples/codegenerator/database
-generate_cached.cmd
-generate_combined.cmd
-cd ../database_alt
-generate_cached.cmd
-generate_combined.cmd
+	<pre><code>dev_build.cmd
+cd Examples/codegenerator
+generate_all.cmd
 </code></pre>
 
 	<p></p>

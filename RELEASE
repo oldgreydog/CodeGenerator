@@ -46,6 +46,7 @@ To run the code generator using the contents of the code_generator.zip file, ext
 		d) Cleaned up all TemplateBlock_Base subclasses to properly call the super.Init() in their Init() functions.  This mainly to set the line
 			number where the tag was found.
 		e) Used the d) line number in more error messages to help in finding where the erroneous tag started.
+		f) I added a CounterVariable tag and a ++counter (CounterIncrement) tag.
 
 	Detailed change notes:
 
@@ -76,6 +77,13 @@ To run the code generator using the contents of the code_generator.zip file, ext
 			- in CustomCodeBlock tags: closingCommentCharacters -> optionalClosingCommentCharacters
 
 		I also changed BlockFactory so that it doesn't care what case you use for your tag names.
+
+	f) In using the new OuterContext tags, I came across a need to have something only generated once inside all of the nested contexts and foreach
+		loops, so I added a CounterVariable tag (not particularly happy with the name, but I couldn't think of a better one at the time to differentiate it
+		from counter).  To manipulate the counter's value, I also added a ++counter (CounterIncrement) tag.  The --counter tag and counter tags already existed
+		so I just had to make everything work with the CounterVariables.  I also had a separate need to use the counter of an outer forEach inside
+		a child foreach, so I also added an optional name attribute to the forEach and first tags.  By adding an optional name attribute to --counter and counter, it
+		is now possible to work with multiple counters in a nested context to get exactly the result you need.
 
 
 1.4

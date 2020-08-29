@@ -29,7 +29,7 @@ import codegenerator.generator.utils.*;
 
 /**
 	The original use case for this tag was eliminated when the <code>first</code> tag was changed so that it knows
-	the first time its passed through event if the counter it's watching isn't == 1.  That can happen, for example,
+	the first time its passed through even if the counter it's watching isn't == 1.  That can happen, for example,
 	when the <code>first</code> tag is inside an <code>if</code> tag block.</p>
 
 	<p>However, you may find a use for it now that there is the <code>counterVariable</code> tag block, so I have left

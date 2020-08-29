@@ -28,10 +28,10 @@ import codegenerator.generator.utils.*;
 
 
 /**
-	This tag gives you more control over how counter values change.  It is required if you are using free-standing counter variable
-	block because that block doesn't auto-increment the way that a forEach counter does.
+	This tag gives you more control over how counter values change.  It is required if you are using free-standing <code>counterVariable</code>
+	block because that block doesn't auto-increment the way that a <code>forEach</code> counter does.
 
-	<p>Look the documentation for {@link CounterVariable} for an example of usage.  You can use this with <code>counterVariable</code>
+	<p>Look at the documentation for {@link CounterVariable} for an example of usage.  You can use this with <code>counterVariable</code>
 	counters and named <code>forEach</code> counters.</p>
 */
 public class CounterIncrement extends TemplateBlock_Base {

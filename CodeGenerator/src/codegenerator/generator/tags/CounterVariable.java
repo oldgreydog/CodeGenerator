@@ -29,33 +29,81 @@ import codegenerator.generator.utils.*;
 
 
 /**
-<p>Once I started using outer contexts, a need arose for some way to control first/else blocks across more than one forEach
-where there was no outer enclosing forEach block, hence the new counterVariable block and ++counter (CounterIncrement) tags.</p>
+	If you need to have a counter that guarantees that you only generate a piece of code only once inside
+	a complicated set of nested contexts and/or <code>forEach</code> loops, then you can set up a CounterVariable
+	tag that wraps those contexts/loops and use the new <code>++counter</code> ({@link CounterIncrement}) tag inside the
+	if/else block where the desired code is generated with the same name you put on the counterVariable tag.
+	This will ensure that regardless of how the <code>forEach</code> loops traverse the config tree, that code will only get
+	generated once.
 
-<br><br><pre><code>		&lt;%counterVariable counterName = specialCounter1 %&gt;
-		...
-		&lt;%forEach%&gt;
-			...
-			&lt;%if exists = foreignKey%&gt;
-				...
-				&lt;%++counter optionalCounterName = specialCounter1 %&gt;
-				...
-			&lt;%endIf%&gt;</code></pre>
-			...
-		&lt;%endFor%&gt;</code></pre>
-		...
-		...
-		&lt;%forEach%&gt;
-			...
-			&lt;%first optionalCounterName = specialCounter1 %&gt;
-				...
-			&lt;%endFirst%&gt;</code></pre>
-			...
-			&lt;%++counter optionalCounterName = specialCounter1 %&gt;
-			...
-		&lt;%endFor%&gt;</code></pre>
-		...
-	&lt;%endCounter%&gt;</code></pre>
+	<p>Here's an long but (I think) illuminating real usage example from one of my templates:</p>
+	<br>
+	<pre><code>&lt;%counterVariable counterName = tableCounter %&gt;
+
+	&lt;&lt;&lt; This section finds all foreign key references to this table and add the child parent nodes for each of them. &gt;&gt;&gt;
+	&lt;%outerContext contextname = "parentTable" %&gt;
+
+		&lt;%foreach node = "^table" %&gt;
+
+			&lt;&lt;&lt; First we add this child node if this outer table has a foreign key that points back to the outer table.
+			&lt;%foreach node = column %&gt;
+
+				&lt;%foreach node = foreignKey %&gt;
+
+					&lt;%if &lt;%parentTableName%&gt; = &lt;%outerContextEval contextname = "parentTable" targetvalue = sqlName %&gt; %&gt;
+
+						&lt;%first optionalCounterName = tableCounter%&gt;
+
+							&lt;&lt;&lt; We can use the "first" to add the opening authentication code only if there is at least one child found. &gt;&gt;&gt;
+							&lt;%text%&gt;
+	var t_authenticationAPI = new AuthenticationAPI();
+	var t_permissionResults = t_authenticationAPI.GetPermissionValues("&lt;%endtext%&gt;
+
+						&lt;%else%&gt;
+
+							&lt;%text%&gt;,&lt;%endtext%&gt;
+
+						&lt;%endfirst%&gt;
+
+						&lt;%++counter optionalCounterName = tableCounter %&gt;
+
+						&lt;%text%&gt;database.&lt;%^^sqlName%&gt;.view&lt;%endtext%&gt;
+
+					&lt;%endif%&gt;
+
+				&lt;%endfor%&gt;
+
+			&lt;%endfor%&gt;
+
+		&lt;%endfor%&gt;
+
+	&lt;%endcontext%&gt;
+
+
+	&lt;&lt;&lt; We'll use the tableCounter to only add this block of code if at least one child table was found. &gt;&gt;&gt;
+	&lt;%first optionalCounterName = tableCounter%&gt;
+
+	&lt;%else%&gt;
+
+		&lt;%text%&gt;");
+	if (t_permissionResults === null) {
+		alert("Failed to get the permissions required to create the &lt;%className%&gt; display.");
+		return null;
+	}
+	else {
+		var t_permissions = t_permissionResults.permissions;
+
+&lt;%endtext%&gt;
+
+	&lt;%endfirst%&gt;
+
+
+&lt;%endCounter%&gt;
+</code></pre>
+	<br>
+	<p>If you look at the example closely, you'll see that where I used <code>++counter</code>, I only get one pass through that
+	<code>first</code> block.  But I also use the same counter at the bottom of the example in the <code>first</code> block to only
+	generate a matching block of code in the <code>else</code> if the first <code>first</code> block was executed at least once.</p>
 */
 public class CounterVariable extends TemplateBlock_Base {
 
