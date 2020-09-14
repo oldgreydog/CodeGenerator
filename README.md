@@ -2,7 +2,11 @@
 
 I've re-exposed the CoreUtils code but in a way that, unfortunately, changes how you need to build the code generator.  That code was originally just inside this repository but I eventually got to a point where I didn't think anyone would care about it, so I removed it and started just including the jar file.  Then when I was starting the v1.5 commits, I realized that if I compiled that jar locally where I usually run the latest OpenJDK (v14 at the moment), then people that can't run the latest jdk can't use it.  I shot myself in the foot with that one.
 
-I've been thinking about it and I decided that I needed to put that code back out here but that it should be in a separate repository since the config management and logger code it contains aren't restricted to the code generator.  To that end, you also need to clone the oldgreydog/CoreUtils repository into the same parent directory where you cloned CodeGenerator. If you don't want to pull both projects into your IDE of choice (Eclipse project files are included in the repositories), then use the build script
+I've been thinking about it and I decided that I needed to put that code back out here but that it should be in a separate repository since the config management and logger code it contains aren't restricted to the code generator.  To that end, you also need to clone this repository
+
+oldgreydog/CoreUtils
+
+into the same parent directory where you cloned CodeGenerator. If you don't want to pull both projects into your IDE of choice (Eclipse project files are included in the repositories), then use the build script
 
 ./dev_build
 
