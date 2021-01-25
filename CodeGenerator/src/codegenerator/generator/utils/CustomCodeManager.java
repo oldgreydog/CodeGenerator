@@ -48,6 +48,11 @@ public class CustomCodeManager {
 
 
 	//*********************************
+	public void ClearCache() {
+		m_keyCodeMap.clear();	// We have to clear the map when we start a new file.  We do not want to accidently cross-contaminate code into other files.
+	}
+
+	//*********************************
 	public boolean ScanFile(File p_targetFile) {
 		BufferedReader t_lineReader = null;
 		try {

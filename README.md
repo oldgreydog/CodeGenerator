@@ -14,7 +14,7 @@ the first time to build the CoreUtils jar and have it added it to the CodeGenera
 
 Or you can run the script
 
-./release_build 
+./release_build
 
 if you want to create the release zip file that contains the "install" folder that you can then use to run the code generator.
 

@@ -3,6 +3,26 @@ This contains important info about each release.
 To run the code generator using the contents of the code_generator.zip file, extract the file into the folder of your choice.
 
 
+1.5.1
+
+	Change summary:
+		a) Fix custom code handling so that it forces the custom code cache to be cleared when generating a file for the first time.
+		b) Comment/documentation fix for CustomCodeBlock.
+
+	Detailed change notes:
+		a) I don't know how I haven't run into this bug in all of the years I've run this code.  I guess one reason is that I usually don't use generic
+			custom code block key names (i.e. "Includes").  I usually include some config value in the name (i.e. "<%className$>Includes") so that every
+			custom code block in the file has a key name that is unique to that file.  But I recently created a new template set where I didn't do that,
+			so each generated file has (mostly) the same custom code key names.  That was fine with the first set of files I generated with those templates
+			because since they were generated at the same time, there were no existing files that were read before them to polute the custom code manager's
+			cache.  But when I finally added a new definition to the config to generate new files, the generator was now going through existing files before
+			it got to creating the new ones.  That meant that the contents of the last existing file scanned were still in the custome code manager.  The
+			custom code manager has always cleared its cache as the first thing it does before scanning an EXISTING file, but when the next file being generated
+			doesn't exist, then as it was being generated and each custom code block was being evaluated, the code would find a match for the key in the custom
+			code manager from the last file scanned.
+
+			As you can see from the change, the fix was simple: I just needed to force a clearing of the manager's cache if the next file doesn't exist already.
+
 1.5
 
 	Build Change!!

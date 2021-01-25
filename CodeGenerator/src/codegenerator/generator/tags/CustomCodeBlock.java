@@ -47,13 +47,17 @@ import codegenerator.generator.utils.*;
  * that whitespace on the next line before the end-comment.  That ensures that the two comments start
  * with the same, and correct, indentation in the output code.</p>
  *
- * <p>This is a sample of the tag that represents this block:</p>
+ * <p>Here are two samples of the tag that represents this block:</p>
  *
- * <pre><code>&lt;%customCode key=LoadAll&lt;%className%&gt;CacheCode commentCharacters=//%&gt;</code></pre>
+ * <pre><code>&lt;%customCode key=LoadAll&lt;%className%&gt;CacheCode openingCommentCharacters=// %&gt;</code></pre>
+ *
+ * <pre><code>&lt;%customCode key=LoadAll&lt;%className%&gt;CacheCode openingCommentCharacters="<!--" optionalClosingCommentCharacters="-->" %&gt;</code></pre>
  *
  * <p><b><code>key</code></b> - this is the unique name that will be generated for the start/end tags.</p>
  *
- * <p><b><code>commentCharacters</code></b> - this is the set of single-line comment characters that is used by whatever language is being generated.  In this example, it's "//" for java.</p>
+ * <p><b><code>openingCommentCharacters</code></b> - this is either the single-line comment characters or the opening comment characters that are used by whatever language is being generated.  In this example, it's "//" for java, c++, etc..</p>
+ *
+  * <p><b><code>optionalClosingCommentCharacters</code></b> - this optional attribute is used for the closing comment characters for languages or file types that require them.  In this example, it's "-->" that close the "<!--" opening comment for xml.</p>
  *
  * <p>The key is critical.  It has to be unique in the file.  If the code where this tag is used is
  * outside a <code>forEach</code> block, then you can optionally give it a key that is fixed, such
@@ -71,7 +75,7 @@ import codegenerator.generator.utils.*;
  * for example, if you were inside a <code>forEach</code> block iterating over the "member" nodes under
  * an outer <code>forEach</code> block that's iterating over "class" nodes, then you might create a tag like:</p>
  *
- * <p><code>&lt;%customCode key=Validate&lt;%memberName%&gt;Of&lt;%^className%&gt; commentCharacters=//%&gt;</code></p>
+ * <p><code>&lt;%customCode key=Validate&lt;%memberName%&gt;Of&lt;%^className%&gt; openingCommentCharacters=// %&gt;</code></p>
  *
  * <p>The caret (^) in front of "className" tells {@link ConfigVariable} to go up one node before trying
  * to find the value named "className".  Since that parent node will be the one that the outer loop is

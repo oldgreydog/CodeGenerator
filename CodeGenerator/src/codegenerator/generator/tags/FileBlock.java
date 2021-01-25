@@ -235,10 +235,15 @@ public class FileBlock extends TemplateBlock_Base {
 			m_fileNameBlock.Evaluate(p_evaluationContext);
 
 			File t_targetFile = new File(t_fileName.toString());
-			if (t_targetFile.exists() && !p_evaluationContext.GetCustomCodeManager().ScanFile(t_targetFile)) {	// Check to see if the file has any custom code in it.  If it does, this will save it so that the CustomCode tags can re-insert it during the file generation.
-				Logger.LogError("FileBlock.Evaluate() failed to scan the file [" + t_targetFile.getAbsolutePath() + "] for custom code blocks.");
-				p_evaluationContext.PopCurrentCursor();	// We need to clean up the temp cursor before we fail out of the function.
-				return false;
+			if (t_targetFile.exists()) {
+				if (!p_evaluationContext.GetCustomCodeManager().ScanFile(t_targetFile)) {	// Check to see if the file has any custom code in it.  If it does, this will save it so that the CustomCode tags can re-insert it during the file generation.
+					Logger.LogError("FileBlock.Evaluate() failed to scan the file [" + t_targetFile.getAbsolutePath() + "] for custom code blocks.");
+					p_evaluationContext.PopCurrentCursor();	// We need to clean up the temp cursor before we fail out of the function.
+					return false;
+				}
+			}
+			else {
+				p_evaluationContext.GetCustomCodeManager().ClearCache();	// If a new file is being generated after an existing file was regenerated and the custom code blocks aren't unique, then the new file will inherit the previous file's custom code blocks.  !!!That's really BAD!!!  This will clear the custom code cache in those cases.
 			}
 
 			Logger.LogDebug("FileBlock.Evaluate() is writing to file [" + t_fileName + "]");

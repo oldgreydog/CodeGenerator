@@ -4,6 +4,8 @@
 	</Node>
 
 	<Node name="logging">
+		<Value name="timezone" description="local,zulu" >local</Value>
+
 		<Node name="logTargets">
 			<Value name="target">coreutil.logging.ConsoleLogger</Value>
 			<Value name="target">coreutil.logging.FileLogger</Value>
