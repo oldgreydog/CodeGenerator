@@ -90,8 +90,8 @@ public class TemplateTokenizer {
 		}
 	}
 
-	protected	File 						m_sourceTempateFile;
-	protected	BufferedReader				m_fileReader;
+    protected	File 						m_sourceTempateFile;
+    protected	BufferedReader				m_fileReader;
 	protected	LinkedList<SpecialSymbol>	m_symbolList		= new LinkedList<TemplateTokenizer.SpecialSymbol>();
 
 	protected	String						m_currentLine		= null;

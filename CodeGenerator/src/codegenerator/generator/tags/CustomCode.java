@@ -174,7 +174,10 @@ public class CustomCode extends Tag_Base {
 
 			p_evaluationContext.PushNewCursor(t_keyCursor);
 
-			m_key.Evaluate(p_evaluationContext);
+			if (!m_key.Evaluate(p_evaluationContext)) {
+				Logger.LogError("CustomCode.Evaluate() failed to evaluate the key.");
+				return false;
+			}
 
 			p_evaluationContext.PopCurrentCursor();
 

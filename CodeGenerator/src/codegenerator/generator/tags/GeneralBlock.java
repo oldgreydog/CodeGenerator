@@ -100,7 +100,7 @@ public class GeneralBlock extends Tag_Base {
 						return false;
 					}
 
-					m_blockList.add(t_newBlock);
+					AddChildNode(t_newBlock);
 				}
 //				else {
 //					Logger.LogError("GeneralBlock.Parse() found a token of type [" + t_nextToken.GetTokenTypeName() + "] when it was expecting a WORD for the attribute name at line [" + p_tokenizer.GetLineCount() + "].");
@@ -112,6 +112,24 @@ public class GeneralBlock extends Tag_Base {
 		}
 		catch (Throwable t_error) {
 			Logger.LogException("GeneralBlock.Parse() failed with error at line [" + p_tokenizer.GetLineCount() + "]: ", t_error);
+			return false;
+		}
+	}
+
+
+	//*********************************
+	@Override
+	public boolean Evaluate(EvaluationContext p_evaluationContext)
+	{
+		try {
+			// It's possible to have empty blocks for if/else, for example, so we have to gracefully handle that.
+			if ((m_tagList == null) || m_tagList.isEmpty())
+				return true;
+
+			return super.Evaluate(p_evaluationContext);
+		}
+		catch (Throwable t_error) {
+			Logger.LogException("GeneralBlock.Evaluate() failed with error in the block starting at [" + m_lineNumber + "]: ", t_error);
 			return false;
 		}
 	}

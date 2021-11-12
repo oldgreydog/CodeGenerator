@@ -194,7 +194,7 @@ public class FileTag extends Tag_Base {
 				return false;
 			}
 
-			m_blockList.add(t_template);
+			AddChildNode(t_template);
 
 			return true;
 		}
@@ -210,13 +210,21 @@ public class FileTag extends Tag_Base {
 	public boolean Evaluate(EvaluationContext p_evaluationContext)
 	{
 		try {
+			if (m_tagList == null) {
+				Logger.LogError("FileTag.Evaluate() doesn't have any executable content at line [" + m_lineNumber + "].");
+				return false;
+			}
+
 			// Build the filename from the component destdir and filename parts.
 			StringWriter		t_fileName			= new StringWriter();
 			Cursor				t_fileNameCursor	= new Cursor(t_fileName);
 
 			p_evaluationContext.PushNewCursor(t_fileNameCursor);
 
-			m_destinationDirectoryBlock.Evaluate(p_evaluationContext);
+			if (!m_destinationDirectory.Evaluate(p_evaluationContext)) {
+				Logger.LogError("FileTag.Evaluate() failed to evaluate the destination.");
+				return false;
+			}
 
 			File t_destDirectory = new File(t_fileName.toString());
 
@@ -234,7 +242,10 @@ public class FileTag extends Tag_Base {
 			}
 
 			t_fileNameCursor.Write(File.separator);
-			m_fileNameBlock.Evaluate(p_evaluationContext);
+			if (!m_fileName.Evaluate(p_evaluationContext)) {
+				Logger.LogError("FileTag.Evaluate() failed to evaluate the filename.");
+				return false;
+			}
 
 			File t_targetFile = new File(t_fileName.toString());
 			if (t_targetFile.exists()) {

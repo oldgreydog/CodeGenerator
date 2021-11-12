@@ -253,7 +253,7 @@ public class ForEach extends Tag_Base {
 				return false;
 			}
 
-			m_blockList.add(t_generalBlock);
+			AddChildNode(t_generalBlock);
 
 			return true;
 		}
@@ -269,6 +269,10 @@ public class ForEach extends Tag_Base {
 	public boolean Evaluate(EvaluationContext p_evaluationContext)
 	{
 		try {
+			if (m_tagList == null) {
+				Logger.LogError("ForEach.Evaluate() doesn't have any executable content at line [" + m_lineNumber + "].");
+				return false;
+			}
 
 			// You can use parent references (i.e. "^") in the node name to jump this ForEach tag's context up one or more parent nodes.
 			// This will probably always be used inside one or more OuterContext tags.

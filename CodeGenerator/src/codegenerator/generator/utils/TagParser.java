@@ -33,8 +33,8 @@ public class TagParser {
 
 	// Data members
 	private String									m_tagName;
-	private TreeMap<String, TagAttributeParser>		m_namedAttributes	= new TreeMap<>();
-	private Vector<TagAttributeParser>				m_tagAttributes		= new Vector<>();
+	private TreeMap<String, TagAttributeParser>		m_namedAttributes	= new TreeMap<>();	// This gives us fast access to simple named attributes that a tag uses for initializing known attributes that is uses.
+	private Vector<TagAttributeParser>				m_tagAttributes		= new Vector<>();	// This holds all of the attributes, including those that have complex, "mixed" attribute names (i.e. those that include one or more tags in their values).
 	private int										m_lineNumber		= -1;
 
 
@@ -99,7 +99,7 @@ public class TagParser {
 			TagAttributeParser	t_nextAttribute		= new TagAttributeParser();
 			String				t_attributeName;
 			while (t_nextAttribute.Parse(p_tokenizer)) {
-				// If the attribute name is NULL, then it is a ConfigVariable that can only be Evaluate()'d so it can't be put in the attribute map.
+				// If GetAttributeNameAsString() returns NULL, then it contains a "complex" value that includes one or more tags and can therefore only be Evaluate()'d so it can't be put in the attribute map.
 				t_attributeName = t_nextAttribute.GetAttributeNameAsString();
 				if (t_attributeName != null)
 					m_namedAttributes.put(t_attributeName.toLowerCase(), t_nextAttribute);

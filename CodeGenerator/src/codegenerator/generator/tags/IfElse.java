@@ -129,10 +129,10 @@ public class IfElse extends Tag_Base {
 		static public final String		ATTRIBUTE_EXISTS	= "exists";
 
 
-		public boolean				m_testExists		= false;
-		public TemplateBlock_Base	m_sourceStringBlock	= null;
-		public TemplateBlock_Base	m_compareValue		= null;
-		public int					m_lineNumber		= -1;
+		public boolean		m_testExists			= false;
+		public Tag_Base		m_attributeName			= null;
+		public Tag_Base		m_attributeValue		= null;
+		public int			m_lineNumber			= -1;
 
 
 		//*********************************
@@ -148,46 +148,35 @@ public class IfElse extends Tag_Base {
 					return false;
 				}
 
-				// I've added the special-case attribute "exists" so that we can use the if/else block to test for the existence of a child node type and then execute different tag blogs depending on that test.
-				TagAttributeParser t_nodeAttribute = p_tagParser.GetNamedAttribute(ATTRIBUTE_EXISTS);
-				if (t_nodeAttribute != null) {
+				// I've added the special-case attribute "exists" so that we can use the if/else tag to test for the existence of a child node type and then execute different tag blogs depending on that test.
+				TagAttributeParser t_conditionAttribute = p_tagParser.GetNamedAttribute(ATTRIBUTE_EXISTS);
+				if (t_conditionAttribute != null) {
 					m_testExists = true;
 				}
 				else {
 					// This is a really bu-tugly way to get this value, but it was the only way to do with a generic tag parser.
-					Vector<TagAttributeParser> t_attributeList = p_tagParser.GetTagAttributes();
-					if (t_attributeList.isEmpty()) {
-						Logger.LogError("IfCondition.Init() the tag attribute parser did not contain any config variable attributes at line number [" + m_lineNumber + "].  One is required for a IfElseBlock.");
+					Vector<TagAttributeParser> t_attributes = p_tagParser.GetTagAttributes();
+					if (t_attributes.isEmpty()) {
+						Logger.LogError("IfCondition.Init() the tag attribute parser did not contain any config variable attributes at line number [" + m_lineNumber + "].  One is required for a IfElse.");
 						return false;
 					}
 
-					if (t_attributeList.size() > 1) {
-						Logger.LogError("IfCondition.Init() the tag attribute parser contained [" + t_attributeList.size() + "] config variable attributes at line number [" + m_lineNumber + "].  Only one is required for a IfElseBlock.");
+					if (t_attributes.size() > 1) {
+						Logger.LogError("IfCondition.Init() the tag attribute parser contained [" + t_attributes.size() + "] config variable attributes at line number [" + m_lineNumber + "].  Only one is required for a IfElse.");
 						return false;
 					}
 
-					t_nodeAttribute = t_attributeList.get(0);
-					if (t_nodeAttribute == null) {
-						Logger.LogError("IfCondition.Init() did not find the [template] attribute that is required for IfElseBlock tags at line number [" + m_lineNumber + "].");
+					t_conditionAttribute = t_attributes.get(0);
+					if (t_conditionAttribute == null) {	// This should never happen but Vector appears to allow NULL values, so just in case...
+						Logger.LogError("IfCondition.Init() did not find the [template] attribute that is required for IfElse tags at line number [" + m_lineNumber + "].");
 						return false;
 					}
 
-					TemplateBlock_Base t_sourceStringBlock = t_nodeAttribute.GetAttributeName();
-					if ((t_sourceStringBlock == null) ||
-						(!t_sourceStringBlock.GetName().equals(If_Boolean.And.BLOCK_NAME) &&
-						 !t_sourceStringBlock.GetName().equals(If_Boolean.Or.BLOCK_NAME) &&
-						 !t_sourceStringBlock.GetName().equals(If_Boolean.Not.BLOCK_NAME) &&
-						 !t_sourceStringBlock.IsSafeForTextBlock()))
-					{
-						Logger.LogError("IfCondition.Init() did not get a config variable from attribute that is required for IfElseBlock tags at line number [" + m_lineNumber + "].");
-						return false;
-					}
-
-					m_sourceStringBlock	= t_sourceStringBlock;
+					m_attributeName	= t_conditionAttribute.GetAttributeName();
 				}
 
-				m_compareValue	= t_nodeAttribute.GetAttributeValue();
-				m_lineNumber	= p_tagParser.GetLineNumber();
+				m_attributeValue	= t_conditionAttribute.GetAttributeValue();
+				m_lineNumber		= p_tagParser.GetLineNumber();
 
 				return true;
 			}
@@ -211,14 +200,14 @@ public class IfElse extends Tag_Base {
 					m_testExists = true;
 				}
 				else {
-					m_sourceStringBlock = p_tagAttributeParser.GetAttributeName();
-					if (m_sourceStringBlock == null) {
-						Logger.LogError("IfCondition.Init(TagAttributeParser) did not get a left-hand argument from attribute that is required for IfElseBlock tags at line number [" + p_tagAttributeParser.GetLineNumber() + "].");
+					m_attributeName = p_tagAttributeParser.GetAttributeName();
+					if (m_attributeName == null) {
+						Logger.LogError("IfCondition.Init(TagAttributeParser) did not get a left-hand argument from attribute that is required for IfElse tags at line number [" + p_tagAttributeParser.GetLineNumber() + "].");
 						return false;
 					}
 				}
 
-				m_compareValue	= p_tagAttributeParser.GetAttributeValue();
+				m_attributeValue	= p_tagAttributeParser.GetAttributeValue();
 				m_lineNumber	= p_tagAttributeParser.GetLineNumber();
 
 				return true;
@@ -242,13 +231,13 @@ public class IfElse extends Tag_Base {
 		{
 			// An else will not test for existence of a child node nor will it have a m_configVariable or m_compareValue so it is always TRUE;
 			if (!m_testExists &&
-				((m_sourceStringBlock == null) ||
-				 (m_compareValue   == null)))
+				((m_attributeName == null) ||
+				 (m_attributeValue   == null)))
 			{
 				return true;
 			}
 
-			String t_righthandValue = TemplateBlock_Base.EvaluateToString(m_compareValue, p_evaluationContext);
+			String t_righthandValue = Tag_Base.EvaluateToString(m_attributeValue, p_evaluationContext);
 			if (t_righthandValue == null) {
 				Logger.LogError("IfCondition.Test(TagAttributeParser) failed to evaluate the righthand value of its attribute at line number [" + m_lineNumber + "].");
 				return null;
@@ -283,7 +272,7 @@ public class IfElse extends Tag_Base {
 				}
 			}
 			else {	// Otherwise, do the default test.
-				String t_lefthandValue = Tag_Base.EvaluateToString(m_sourceStringBlock, p_evaluationContext);
+				String t_lefthandValue = Tag_Base.EvaluateToString(m_attributeName, p_evaluationContext);
 				if (t_lefthandValue == null) {
 					Logger.LogError("IfCondition.Test(TagAttributeParser) failed to evaluate the lefthand value of its attribute at line number [" + m_lineNumber + "].");
 					return null;
@@ -302,14 +291,25 @@ public class IfElse extends Tag_Base {
 
 
 		//*********************************
-//		@Override
-//		public boolean Evaluate(ConfigNode		p_currentNode,
-//								ConfigNode		p_rootNode,
-//								Cursor 			p_fileWriter,
-//								LoopCounter		p_iterationCount)
-//		{
-//			// Not over-ridden here.
-//		}
+		@Override
+		public boolean Evaluate(EvaluationContext p_evaluationContext)
+		{
+			try {
+				// Now that I've changed Tag_Base.Evaluate() to fail on an empty m_tagList, Any child tags that want to allow empty content blocks have to override Evaluate() and handle that empty case to avoid the error.
+				if ((m_tagList != null) && !m_tagList.isEmpty()) {
+					if (!super.Evaluate(p_evaluationContext)) {
+						Logger.LogError("IfCondition.Evaluate() failed to evaluate an IF condition's contents at line [" + m_lineNumber + "].");
+						return false;
+					}
+				}
+			}
+			catch (Throwable t_error) {
+				Logger.LogException("IfCondition.Evaluate() failed with error at line number [" + m_lineNumber + "]: ", t_error);
+				return false;
+			}
+
+			return true;
+		}
 
 
 		//*********************************
@@ -363,7 +363,7 @@ public class IfElse extends Tag_Base {
 				return false;
 			}
 
-			m_blockList.add(t_ifCondition);
+			AddChildNode(t_ifCondition);
 
 			return true;
 		}
@@ -385,6 +385,11 @@ public class IfElse extends Tag_Base {
 	@Override
 	public boolean Parse(TemplateTokenizer p_tokenizer) {
 		try {
+			if (m_tagList == null) {
+				Logger.LogError("IfElse.Parse() didn't find the condition attribute for the IF tag at line [" + m_lineNumber + "].");
+				return false;
+			}
+
 			IfCondition	t_nextCondition = (IfCondition)m_tagList.getFirst();	// The first IfCondition should have been created in Init() from the tag parser data.
 
 			// Get the general block of tags for the <if> tag.
@@ -394,7 +399,7 @@ public class IfElse extends Tag_Base {
 				return false;
 			}
 
-			t_nextCondition.m_blockList.add(t_generalBlock);
+			t_nextCondition.AddChildNode(t_generalBlock);
 
 			// If the first tag is followed by any elseIf tags, then consume them.
 			String t_endingTagName = t_generalBlock.GetUnknownTag().GetTagName();
@@ -405,7 +410,7 @@ public class IfElse extends Tag_Base {
 					return false;
 				}
 
-				m_blockList.add(t_nextCondition);
+				AddChildNode(t_nextCondition);
 
 				t_generalBlock	= new GeneralBlock();
 				if (!t_generalBlock.Parse(p_tokenizer)) {
@@ -413,7 +418,7 @@ public class IfElse extends Tag_Base {
 					return false;
 				}
 
-				t_nextCondition.m_blockList.add(t_generalBlock);
+				t_nextCondition.AddChildNode(t_generalBlock);
 
 				t_endingTagName = t_generalBlock.GetUnknownTag().GetTagName();
 			}
@@ -421,7 +426,7 @@ public class IfElse extends Tag_Base {
 			// If there is an else tag, then consume it.
 			if (t_endingTagName.equalsIgnoreCase(BLOCK_ELSE_NAME)) {
 				t_nextCondition = new IfCondition();	// Else tags don't have attributes so we can not call Init() here.  All we need is to create the object and add it to m_tagList.
-				m_blockList.add(t_nextCondition);
+				AddChildNode(t_nextCondition);
 
 				t_generalBlock	= new GeneralBlock();
 				if (!t_generalBlock.Parse(p_tokenizer)) {
@@ -429,7 +434,7 @@ public class IfElse extends Tag_Base {
 					return false;
 				}
 
-				t_nextCondition.m_blockList.add(t_generalBlock);
+				t_nextCondition.AddChildNode(t_generalBlock);
 
 				t_endingTagName = t_generalBlock.GetUnknownTag().GetTagName();
 			}
@@ -454,6 +459,11 @@ public class IfElse extends Tag_Base {
 
 	{
 		try {
+			if (m_tagList == null) {
+				Logger.LogError("IfElse.Evaluate() doesn't have an IF condition attribute at line [" + m_lineNumber + "].");
+				return false;
+			}
+
 			ListIterator<Tag_Base> t_tagIterator = m_tagList.listIterator();
 			IfCondition t_nextCondition;
 			Boolean t_result;
@@ -465,8 +475,12 @@ public class IfElse extends Tag_Base {
 				if (t_result == null)
 					return false;
 				else if (t_result) {
-					if (!t_nextCondition.Evaluate(p_evaluationContext)) {
-						return false;
+					LinkedList<Tag_Base> t_contents = t_nextCondition.GetChildNodeList();
+					if ((t_contents != null) && !t_contents.isEmpty()) {
+						if (!t_nextCondition.Evaluate(p_evaluationContext)) {
+							Logger.LogError("IfElse.Evaluate() failed to evaluate an IF condition's contents at line [" + m_lineNumber + "].");
+							return false;
+						}
 					}
 
 					return true;

@@ -61,6 +61,11 @@ public abstract class If_Boolean extends Tag_Base {
 		public Boolean EvaluateChild(EvaluationContext p_evaluationContext)
 		{
 			try {
+				if (m_tagList == null) {
+					Logger.LogError("And.EvaluateChild() doesn't have any executable content at line [" + m_lineNumber + "].");
+					return false;
+				}
+
 				Boolean t_result;
 				for (Tag_Base t_nextCondition: m_tagList) {
 					// Since this is an "AND" operation, we can return FALSE on the first condition that fails.
@@ -93,10 +98,6 @@ public abstract class If_Boolean extends Tag_Base {
 			m_isSafeForTextTag = true;
 		}
 
-		public Or(String p_blockName) {
-			super(p_blockName);
-		}
-
 		@Override
 		public Tag_Base GetInstance() {
 			return new Or();
@@ -106,6 +107,11 @@ public abstract class If_Boolean extends Tag_Base {
 		public Boolean EvaluateChild(EvaluationContext p_evaluationContext)
 		{
 			try {
+				if (m_tagList == null) {
+					Logger.LogError("Or.EvaluateChild() doesn't have any executable content at line [" + m_lineNumber + "].");
+					return false;
+				}
+
 				Boolean t_result;
 				for (Tag_Base t_nextCondition: m_tagList) {
 					// Since this is an "OR" operation, we can return TRUE on the first condition that succeeds.
@@ -136,10 +142,6 @@ public abstract class If_Boolean extends Tag_Base {
 		public Not() {
 			super(TAG_NAME);
 			m_isSafeForTextTag = true;
-		}
-
-		public Not(String p_blockName) {
-			super(p_blockName);
 		}
 
 		@Override
@@ -177,6 +179,11 @@ public abstract class If_Boolean extends Tag_Base {
 		public Boolean EvaluateChild(EvaluationContext p_evaluationContext)
 		{
 			try {
+				if (m_tagList == null) {
+					Logger.LogError("Not.EvaluateChild() doesn't have any executable content at line [" + m_lineNumber + "].");
+					return false;
+				}
+
 				Boolean t_result;
 				for (Tag_Base t_nextCondition: m_tagList) {
 					// Since this is an "Not" operation, we only execute the first condition.
@@ -225,7 +232,7 @@ public abstract class If_Boolean extends Tag_Base {
 					return false;
 				}
 
-				m_blockList.add(t_ifCondition);
+				AddChildNode(t_ifCondition);
 			}
 
 			return true;
