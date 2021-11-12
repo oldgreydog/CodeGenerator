@@ -124,8 +124,13 @@ public class ConfigVariable extends Tag_Base {
 
 	//*********************************
 	public boolean Init(TagParser p_tagParser, int p_lineNumber) {
+		if (!p_tagParser.GetTagAttributes().isEmpty()) {
+			Logger.LogError("ConfigVariable.Init() was handed a tag definition for [" + p_tagParser.GetTagName() + "] at line number [" + p_tagParser.GetLineNumber() + "] that has [" + p_tagParser.GetTagAttributes().size() + "] attribute(s) and is, therefore, not a config variable name.");
+			return false;
+		}
+
 		if (!super.Init(p_tagParser)) {
-			Logger.LogError("ConfigVariable.Init() failed in the parent Init(). at line number [" + p_tagParser.GetLineNumber() + "]");
+			Logger.LogError("ConfigVariable.Init() failed in the parent Init() at line number [" + p_tagParser.GetLineNumber() + "]");
 			return false;
 		}
 

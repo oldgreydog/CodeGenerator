@@ -54,6 +54,7 @@ public class TagFactory {
 			m_tags.put(If_Boolean.Or.TAG_NAME.toLowerCase(),		new If_Boolean.Or());
 			m_tags.put(If_Boolean.Not.TAG_NAME.toLowerCase(),		new If_Boolean.Not());
 
+		m_tags.put(Include.TAG_NAME.toLowerCase(),					new Include());
 		m_tags.put(OuterContext.TAG_NAME.toLowerCase(),				new OuterContext());
 		m_tags.put(OuterContextEval.TAG_NAME.toLowerCase(),			new OuterContextEval());
 		m_tags.put(TabMarker.TAG_NAME.toLowerCase(),				new TabMarker());
