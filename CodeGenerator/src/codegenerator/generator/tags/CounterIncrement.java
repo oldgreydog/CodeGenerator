@@ -29,24 +29,24 @@ import codegenerator.generator.utils.*;
 
 /**
 	This tag gives you more control over how counter values change.  It is required if you are using free-standing <code>counterVariable</code>
-	block because that block doesn't auto-increment the way that a <code>forEach</code> counter does.
+	tag because that tag doesn't auto-increment the way that a <code>forEach</code> counter does.
 
 	<p>Look at the documentation for {@link CounterVariable} for an example of usage.  You can use this with <code>counterVariable</code>
 	counters and named <code>forEach</code> counters.</p>
 */
-public class CounterIncrement extends TemplateBlock_Base {
+public class CounterIncrement extends Tag_Base {
 
-	static public final String		BLOCK_NAME							= "++counter";
+	static public final String		TAG_NAME							= "++counter";
 
 	static public final String		ATTRIBUTE_OPTIONAL_COUNTER_NAME		= "optionalCounterName";
 
 	// Data members
-	private	String	m_optionalCounterName	= null;	// Providing a name for the loop counter lets you specify using a named loop counter from a forEach block other than the one directly containing this first block.
+	private	String	m_optionalCounterName	= null;	// Providing a name for the loop counter lets you specify using a named loop counter from a forEach tag other than the one directly containing this first tag.
 
 
 	//*********************************
 	public CounterIncrement() {
-		super(BLOCK_NAME);
+		super(TAG_NAME);
 	}
 
 
@@ -127,7 +127,7 @@ public class CounterIncrement extends TemplateBlock_Base {
 	public String Dump(String p_tabs) {
 		StringBuilder t_dump = new StringBuilder();
 
-		t_dump.append(p_tabs + "Block type name :  ++counter\n");
+		t_dump.append(p_tabs + "Tag name        :  " + m_name 	+ "\n");
 
 		return t_dump.toString();
 	}

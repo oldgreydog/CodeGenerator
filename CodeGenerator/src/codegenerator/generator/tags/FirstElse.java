@@ -51,31 +51,31 @@ import codegenerator.generator.utils.*;
 </code></pre>
 
 	<p>The first pass through this loop that is iterating over "member" nodes, the loop will add an
-	empty text block in front of the parameter definition.  But for every iteration after that, the
-	<code>else</code> block will add a comma and a new-line in front of the parameter definition.</p>
+	empty text tag in front of the parameter definition.  But for every iteration after that, the
+	<code>else</code> tag will add a comma and a new-line in front of the parameter definition.</p>
 
-	<p>The optionalCounterName attribute lets you specify using a named loop counter from a forEach block other than the
-	one directly containing this first block.</p>
+	<p>The optionalCounterName attribute lets you specify using a named loop counter from a forEach tag other than the
+	one directly containing this first tag.</p>
  */
-public class FirstElseBlock extends TemplateBlock_Base {
+public class FirstElse extends Tag_Base {
 
-	static public final String		BLOCK_NAME							= "first";
-	static public final String		BLOCK_ELSE_NAME						= "else";
-	static public final String		BLOCK_END_NAME						= "endFirst";
+	static public final String		TAG_NAME							= "first";
+	static public final String		TAG_ELSE_NAME						= "else";
+	static public final String		TAG_END_NAME						= "endFirst";
 
 	static public final String		ATTRIBUTE_OPTIONAL_COUNTER_NAME		= "optionalCounterName";
 
 	private GeneralBlock		m_firstBlock			= null;
 	private GeneralBlock		m_elseBlock				= null;
-	private	String				m_optionalCounterName	= null;	// Providing a name for the loop counter lets you specify using a named loop counter from a forEach block other than the one directly containing this first block.
+	private	String				m_optionalCounterName	= null;	// Providing a name for the loop counter lets you specify using a named loop counter from a forEach tag other than the one directly containing this first tag.
 
 //	private ArrayList<Integer>	m_parentIterationCountList	= null;
 	private final TreeMap<Integer, LoopCounter>		m_counterIDMap	= new TreeMap<>();
 
 
 	//*********************************
-	public FirstElseBlock() {
-		super(BLOCK_NAME);
+	public FirstElse() {
+		super(TAG_NAME);
 	}
 
 
@@ -83,7 +83,7 @@ public class FirstElseBlock extends TemplateBlock_Base {
 	@Override
 	public boolean Init(TagParser p_tagParser) {
 		if (!super.Init(p_tagParser)) {
-			Logger.LogError("FirstElseBlock.Init() failed in the parent Init() at line number [" + p_tagParser.GetLineNumber() + "].");
+			Logger.LogError("FirstElse.Init() failed in the parent Init() at line number [" + p_tagParser.GetLineNumber() + "].");
 			return false;
 		}
 
@@ -92,7 +92,7 @@ public class FirstElseBlock extends TemplateBlock_Base {
 		if (t_nodeAttribute != null) {
 			m_optionalCounterName = t_nodeAttribute.GetAttributeValueAsString();
 			if (m_optionalCounterName == null) {
-				Logger.LogError("FirstElseBlock.Init() did not get the value from the [" + ATTRIBUTE_OPTIONAL_COUNTER_NAME + "] attribute.");
+				Logger.LogError("FirstElse.Init() did not get the value from the [" + ATTRIBUTE_OPTIONAL_COUNTER_NAME + "] attribute.");
 				return false;
 			}
 		}
@@ -103,8 +103,8 @@ public class FirstElseBlock extends TemplateBlock_Base {
 
 	//*********************************
 	@Override
-	public FirstElseBlock GetInstance() {
-		return new FirstElseBlock();
+	public FirstElse GetInstance() {
+		return new FirstElse();
 	}
 
 
@@ -115,19 +115,19 @@ public class FirstElseBlock extends TemplateBlock_Base {
 			// Get the general block of tags for the <if> tag.
 			GeneralBlock t_generalBlock	= new GeneralBlock();
 			if (!t_generalBlock.Parse(p_tokenizer)) {
-				Logger.LogError("FirstElseBlock.Parse() general block parser failed in the block starting at [" + m_lineNumber + "].");
+				Logger.LogError("FirstElse.Parse() general block parser failed in the block starting at [" + m_lineNumber + "].");
 				return false;
 			}
 
 			m_firstBlock = t_generalBlock;
 
 
-			// If the first block is followed by any elseIf blocks, then consume them.
+			// If the first tag is followed by an else tag, then consume it.
 			String t_endingTagName = t_generalBlock.GetUnknownTag().GetTagName();
-			if (t_endingTagName.equalsIgnoreCase(BLOCK_ELSE_NAME)) {
+			if (t_endingTagName.equalsIgnoreCase(TAG_ELSE_NAME)) {
 				t_generalBlock	= new GeneralBlock();
 				if (!t_generalBlock.Parse(p_tokenizer)) {
-					Logger.LogError("FirstElseBlock.Parse() general block parser failed in the [" + BLOCK_ELSE_NAME + "] block in the block starting at [" + t_generalBlock.m_lineNumber + "].");
+					Logger.LogError("FirstElse.Parse() general block parser failed in the [" + TAG_ELSE_NAME + "] tag in the tag starting at [" + t_generalBlock.m_lineNumber + "].");
 					return false;
 				}
 
@@ -136,13 +136,13 @@ public class FirstElseBlock extends TemplateBlock_Base {
 				t_endingTagName = t_generalBlock.GetUnknownTag().GetTagName();
 			}
 
-			if (!t_endingTagName.equalsIgnoreCase(BLOCK_END_NAME)) {
-				Logger.LogError("FirstElseBlock.Parse() general block ended on a tag named [" + t_endingTagName + "] at line [" + p_tokenizer.GetLineCount() + "] in the block starting at [" + t_generalBlock.m_lineNumber + "].  The closing tag [" + BLOCK_END_NAME + "] was expected.");
+			if (!t_endingTagName.equalsIgnoreCase(TAG_END_NAME)) {
+				Logger.LogError("FirstElse.Parse() general block ended on a tag named [" + t_endingTagName + "] at line [" + p_tokenizer.GetLineCount() + "] in the tag starting at [" + t_generalBlock.m_lineNumber + "].  The closing tag [" + TAG_END_NAME + "] was expected.");
 				return false;
 			}
 		}
 		catch (Throwable t_error) {
-			Logger.LogException("FirstElseBlock.Parse() failed with error in the block starting at [" + m_lineNumber + "]: ", t_error);
+			Logger.LogException("FirstElse.Parse() failed with error in the tag starting at [" + m_lineNumber + "]: ", t_error);
 			return false;
 		}
 
@@ -165,7 +165,7 @@ public class FirstElseBlock extends TemplateBlock_Base {
 					t_iterationCounter = p_evaluationContext.GetCounterVariable(m_optionalCounterName);
 
 					if (t_iterationCounter == null) {
-						Logger.LogError("FirstElseBlock.Evaluate() failed to find a counter with name [" + m_optionalCounterName + "] at line number [" + m_lineNumber + "].");
+						Logger.LogError("FirstElse.Evaluate() failed to find a counter with name [" + m_optionalCounterName + "] at line number [" + m_lineNumber + "].");
 						return false;
 					}
 
@@ -179,12 +179,12 @@ public class FirstElseBlock extends TemplateBlock_Base {
 			}
 
 			if (t_iterationCounter == null) {
-				Logger.LogError("FirstElseBlock.Evaluate() failed to find a default loop counter and no optional counter name was specified at line number [" + m_lineNumber + "].");
+				Logger.LogError("FirstElse.Evaluate() failed to find a default loop counter and no optional counter name was specified at line number [" + m_lineNumber + "].");
 				return false;
 			}
 
 
-			// I think (!hope!) that using a tree map to keep the internal counter for each counter ID that we see will let us use variable blocks inside various levels of nested <forEach> loops and <if> blocks without having to worry about looking up the stack of counters to figure out if a particular evaluation is the first one or not for that particular counter.
+			// I think (!hope!) that using a tree map to keep the internal counter for each counter ID that we see will let us use variable tags inside various levels of nested <forEach> loops and <if> tags without having to worry about looking up the stack of counters to figure out if a particular evaluation is the first one or not for that particular counter.
 			LoopCounter t_internalCounter	= m_counterIDMap.get(t_iterationCounter.GetCounterID());
 			boolean		t_firstTimeThrough	= false;
 			if (t_internalCounter == null)
@@ -203,7 +203,7 @@ public class FirstElseBlock extends TemplateBlock_Base {
 			}
 		}
 		catch (Throwable t_error) {
-			Logger.LogException("FirstElseBlock.Evaluate() failed with error at line number [" + m_lineNumber + "]: ", t_error);
+			Logger.LogException("FirstElse.Evaluate() failed with error at line number [" + m_lineNumber + "]: ", t_error);
 			return false;
 		}
 

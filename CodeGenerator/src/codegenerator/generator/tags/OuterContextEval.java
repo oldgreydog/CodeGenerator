@@ -40,9 +40,9 @@ import coreutil.logging.*;
 <p></p>
 
 */
-public class OuterContextEval extends TemplateBlock_Base {
+public class OuterContextEval extends Tag_Base {
 
-	static public final String		BLOCK_NAME					= "outerContextEval";
+	static public final String		TAG_NAME					= "outerContextEval";
 
 	static public final String		ATTRIBUTE_CONTEXT_NAME		= "contextName";
 	static public final String		ATTRIBUTE_TARGET_VALUE		= "targetValue";
@@ -55,8 +55,8 @@ public class OuterContextEval extends TemplateBlock_Base {
 
 	//*********************************
 	public OuterContextEval() {
-		super(BLOCK_NAME);
-		m_isSafeForTextBlock = true;
+		super(TAG_NAME);
+		m_isSafeForTextTag = true;
 	}
 
 
@@ -105,7 +105,7 @@ public class OuterContextEval extends TemplateBlock_Base {
 
 	//*********************************
 	@Override
-	public TemplateBlock_Base GetInstance() {
+	public Tag_Base GetInstance() {
 		return new OuterContextEval();
 	}
 
@@ -162,7 +162,7 @@ public class OuterContextEval extends TemplateBlock_Base {
 	public String Dump(String p_tabs) {
 		StringBuilder t_dump = new StringBuilder();
 
-		t_dump.append(p_tabs + "Block type name   :  " + m_name 		+ "\n");
+		t_dump.append(p_tabs + "Tag name          :  " + m_name 		+ "\n");
 		t_dump.append(p_tabs + "	context name  :  " + m_contextName 	+ "\n");
 
 		if (m_valuePath != null) {

@@ -40,10 +40,10 @@ import coreutil.logging.*;
 
 	Text that is not in a <code>text</code> tag should be ignored by the parser.  This is an easy
 	mistake to make because you will see your text is in the template but it may not be immediately
-	obvious that it isn't inside a <code>text</code> block and that's why it isn't getting written
+	obvious that it isn't inside a <code>text</code> tag and that's why it isn't getting written
 	out to your files.
 
-	<p>The <code>text</code> block is not allowed to have any other tags inside it except for:</p>
+	<p>The <code>text</code> tag is not allowed to have any other tags inside it except for:</p>
 
 	<pre>- a config value (such as <code>&lt;%className%&gt;</code>)
 - <code>customCode</code>
@@ -60,23 +60,23 @@ import coreutil.logging.*;
 	made certain forms of code impossible to generate (such as a comma delimited sequence like ?,?,?,?
 	that was driven by the number of columns in a table).</p>
 
-	<p>Once I realized I could create an explicit <code>text</code> block and only output text that
-	was inside those blocks, it made parsing and complex output much easier and more flexible.</p>
+	<p>Once I realized I could create an explicit <code>text</code> tag and only output text that
+	was inside those tags, it made parsing and complex output much easier and more flexible.</p>
  */
-public class TextBlock extends TemplateBlock_Base {
+public class Text extends Tag_Base {
 
-	static public final String	BLOCK_NAME		= "text";
+	static public final String	TAG_NAME		= "text";
 
 	// Data members
 	boolean		m_parsingTagElement		= false;
 	boolean		m_expectClosingQuotes	= false;
 	boolean		m_equalsIsAToken		= false;
 
-	String		m_text					= null;		// This will only have a value when this text block doesn't itself contain any other tags.
+	String		m_text					= null;		// This will only have a value when this text tag doesn't itself contain any other tags.
 
 
 	//*********************************
-	public TextBlock() {
+	public Text() {
 		super("text");
 	}
 
@@ -85,7 +85,7 @@ public class TextBlock extends TemplateBlock_Base {
 	@Override
 	public boolean Init(TagParser p_tagParser) {
 		if (!super.Init(p_tagParser)) {
-			Logger.LogError("TextBlock.Init() failed in the parent Init() at line number [" + p_tagParser.GetLineNumber() + "].");
+			Logger.LogError("Text.Init() failed in the parent Init() at line number [" + p_tagParser.GetLineNumber() + "].");
 			return false;
 		}
 
@@ -95,8 +95,8 @@ public class TextBlock extends TemplateBlock_Base {
 
 	//*********************************
 	@Override
-	public TemplateBlock_Base GetInstance() {
-		return new TextBlock();
+	public Tag_Base GetInstance() {
+		return new Text();
 	}
 
 
@@ -114,7 +114,7 @@ public class TextBlock extends TemplateBlock_Base {
 
 	//*********************************
 	public boolean IsEmpty() {
-		if ((m_text == null) && m_blockList.isEmpty())
+		if ((m_text == null) && ((m_tagList == null) || m_tagList.isEmpty()))
 			return true;
 
 		return false;
@@ -134,18 +134,18 @@ public class TextBlock extends TemplateBlock_Base {
 	@Override
 	public boolean Parse(TemplateTokenizer p_tokenizer) {
 		try {
-			// A general block will parse child tags until it finds a tag that isn't a command.  That tag should be the closing tag for the parent block.
+			// A general block will parse child tags until it finds a tag that isn't a command.  That tag should be the closing tag for the parent tag.
 			StringBuilder		t_collectedText		= new StringBuilder();
 			Token				t_nextToken;
 			TagParser			t_tagParser;
-			TemplateBlock_Base	t_newBlock;
+			Tag_Base	t_newTag;
 
 			while ((t_nextToken = p_tokenizer.GetNextToken()) != null) {
 				switch (t_nextToken.m_tokenType) {
 					case Token.TOKEN_TYPE_OPENING_DELIMITER:
 						t_tagParser = new TagParser();
 						if (!t_tagParser.Parse(p_tokenizer)) {
-							Logger.LogError("TextBlock.Parse() failed to parse the tag at line [" + p_tokenizer.GetLineCount() + "] in the block starting at [" + m_lineNumber + "].");
+							Logger.LogError("Text.Parse() failed to parse the tag at line [" + p_tokenizer.GetLineCount() + "] in the block starting at [" + m_lineNumber + "].");
 							return false;
 						}
 
@@ -156,12 +156,12 @@ public class TextBlock extends TemplateBlock_Base {
 						}
 
 
-						t_newBlock = BlockFactory.GetBlock(t_tagParser.GetTagName());
-						if (t_newBlock == null) {
+						t_newTag = TagFactory.GetTag(t_tagParser.GetTagName());
+						if (t_newTag == null) {
 							// This should be variable tag embedded in the text.
 							ConfigVariable t_configVariable = new ConfigVariable();
 							if (!t_configVariable.Init(t_tagParser, p_tokenizer.GetLineCount())) {
-								Logger.LogError("TextBlock.Parse() failed to initialize the config variable at line [" + p_tokenizer.GetLineCount() + "] in the block starting at [" + m_lineNumber + "].");
+								Logger.LogError("Text.Parse() failed to initialize the config variable at line [" + p_tokenizer.GetLineCount() + "] in the tag starting at [" + m_lineNumber + "].");
 								return false;
 							}
 
@@ -169,16 +169,16 @@ public class TextBlock extends TemplateBlock_Base {
 							m_blockList.add(t_configVariable);
 						}
 						else {
-							// Other than ConfigVariables, these are the only tag types that can appear inside of a TextBlock.  This forces you to keep text blocks simpler which will keep templates simpler (hopefully).
-							if (t_newBlock.IsSafeForTextBlock())
+							// Other than ConfigVariables, these are the only tag types that can appear inside of a Text.  This forces you to keep text tags simpler which will keep templates simpler (hopefully).
+							if (t_newTag.IsSafeForTextTag())
 							{
-								if (!t_newBlock.Init(t_tagParser)) {
-									Logger.LogError("TextBlock.Parse() failed to initialize the block [" + t_newBlock.GetName() + "] at line [" + p_tokenizer.GetLineCount() + "] in the block starting at [" + m_lineNumber + "].");
+								if (!t_newTag.Init(t_tagParser)) {
+									Logger.LogError("Text.Parse() failed to initialize the tag [" + t_newTag.GetName() + "] at line [" + p_tokenizer.GetLineCount() + "] in the tag starting at [" + m_lineNumber + "].");
 									return false;
 								}
 
-								if (!t_newBlock.Parse(p_tokenizer)) {
-									Logger.LogError("TextBlock.Parse() failed to parse the tag [" + t_newBlock.GetName() + "] in the block starting at [" + m_lineNumber + "].");
+								if (!t_newTag.Parse(p_tokenizer)) {
+									Logger.LogError("Text.Parse() failed to parse the tag [" + t_newTag.GetName() + "] in the tag starting at [" + m_lineNumber + "].");
 									return false;
 								}
 
@@ -186,7 +186,7 @@ public class TextBlock extends TemplateBlock_Base {
 								m_blockList.add(t_newBlock);
 							}
 							else {
-								Logger.LogError("TextBlock.Parse() found the tag [" + t_newBlock.GetName() + "] at line [" + p_tokenizer.GetLineCount() + "] which is not allowed inside a text block that started at [" + m_lineNumber + "].");
+								Logger.LogError("Text.Parse() found the tag [" + t_newTag.GetName() + "] at line [" + p_tokenizer.GetLineCount() + "] which is not allowed inside a text tag that started at [" + m_lineNumber + "].");
 								return false;
 							}
 						}
@@ -195,11 +195,11 @@ public class TextBlock extends TemplateBlock_Base {
 
 					case Token.TOKEN_TYPE_CLOSING_DELIMITER:
 						if (!m_parsingTagElement) {
-							Logger.LogError("TextBlock.Parse() is parsing a text block and found an unexpected CLOSING_DELIMITER at line [" + p_tokenizer.GetLineCount() + "] in the block starting at [" + m_lineNumber + "].");
+							Logger.LogError("Text.Parse() is parsing a text tag and found an unexpected CLOSING_DELIMITER at line [" + p_tokenizer.GetLineCount() + "] in the tag starting at [" + m_lineNumber + "].");
 							return false;
 						}
 						else if (m_expectClosingQuotes) {
-							Logger.LogError("TextBlock.Parse() is parsing a tag element and found an unexpected CLOSING_DELIMITER when it should found a DOUBLE_QUOTE at line [" + p_tokenizer.GetLineCount() + "] in the block starting at [" + m_lineNumber + "].");
+							Logger.LogError("Text.Parse() is parsing a tag element and found an unexpected CLOSING_DELIMITER when it should found a DOUBLE_QUOTE at line [" + p_tokenizer.GetLineCount() + "] in the tag starting at [" + m_lineNumber + "].");
 							return false;
 						}
 
@@ -256,7 +256,9 @@ public class TextBlock extends TemplateBlock_Base {
 							}
 							else {
 								// If the quotes are the first token we've found, then we need to turn on the expectation that we will find closing quotes.
-								if (m_blockList.isEmpty() && (t_collectedText.length() == 0)) {
+								if (((m_tagList == null) || m_tagList.isEmpty()) &&
+									(t_collectedText.length() == 0))
+								{
 									m_expectClosingQuotes	= true;
 									m_text					= "";		// And we need to set this to the empty string so that if that is what is also represented in the template then this will not evaluate to NULL.
 									break;
@@ -269,17 +271,17 @@ public class TextBlock extends TemplateBlock_Base {
 						break;
 
 					default:
-						Logger.LogError("TextBlock.Parse() found a token of type [" + t_nextToken.GetTokenTypeName() + "] when it was expecting a WORD for the attribute name at line [" + p_tokenizer.GetLineCount() + "] in the block starting at [" + m_lineNumber + "].");
+						Logger.LogError("Text.Parse() found a token of type [" + t_nextToken.GetTokenTypeName() + "] when it was expecting a WORD for the attribute name at line [" + p_tokenizer.GetLineCount() + "] in the tag starting at [" + m_lineNumber + "].");
 						return false;
 				}
 			}
 
 
-			Logger.LogError("TextBlock.Parse() appears to have hit the end of the file without finding the closing tag of the parent block that started at [" + m_lineNumber + "].");
+			Logger.LogError("Text.Parse() appears to have hit the end of the file without finding the closing tag of the parent tag that started at [" + m_lineNumber + "].");
 			return false;
 		}
 		catch (Throwable t_error) {
-			Logger.LogException("TextBlock.Parse() failed with error at line [" + p_tokenizer.GetLineCount() + "] in the text block starting at [" + m_lineNumber + "]: ", t_error);
+			Logger.LogException("Text.Parse() failed with error at line [" + p_tokenizer.GetLineCount() + "] in the text tag starting at [" + m_lineNumber + "]: ", t_error);
 			return false;
 		}
 	}
@@ -287,9 +289,9 @@ public class TextBlock extends TemplateBlock_Base {
 
 	//*********************************
 	private void SaveCollectedTextBeforeNewTag(StringBuilder p_collectedText) {
-		// If there is parsed text that hasn't been saved, the we need to add it to m_blockList before we add the new tag block that has been found.
+		// If there is parsed text that hasn't been saved, the we need to add it to m_tagList before we add the new tag that has been found.
 		if (p_collectedText.length() != 0) {
-			TextBlock t_newText = new TextBlock();
+			Text t_newText = new Text();
 			t_newText.SetText(p_collectedText.toString());
 			m_blockList.add(t_newText);
 
@@ -302,8 +304,8 @@ public class TextBlock extends TemplateBlock_Base {
 	private void SaveRemainingTextOnExit(StringBuilder p_collectedText) {
 		// If there is parsed text that hasn't been saved, the we need to figure out where to put it.
 		if (p_collectedText.length() != 0) {
-			if (!m_blockList.isEmpty()) {	// If this block contained tags, then there will be objects in the m_blockList.  In that case, we need to create a new TextBlock, put the local text into it and add it to the block list.
-				TextBlock t_newText = new TextBlock();
+			if ((m_tagList != null) && !m_tagList.isEmpty()) {	// If this block contained tags, then there will be objects in the m_tagList.  In that case, we need to create a new Text, put the local text into it and add it to the tag list.
+				Text t_newText = new Text();
 				t_newText.SetText(p_collectedText.toString());
 				m_blockList.add(t_newText);
 			}
@@ -331,7 +333,7 @@ public class TextBlock extends TemplateBlock_Base {
 		p_evaluationContext.PushNewCursor(t_stringCursor);
 
 		if (!Evaluate(p_evaluationContext)) {
-			Logger.LogError("TextBlock.EvaluateToString() failed to evaluate.");
+			Logger.LogError("Text.EvaluateToString() failed to evaluate.");
 			p_evaluationContext.PopCurrentCursor();
 			return null;
 		}
@@ -347,23 +349,23 @@ public class TextBlock extends TemplateBlock_Base {
 	public boolean Evaluate(EvaluationContext p_evaluationContext)
 	{
 		try {
-			// If there are no child blocks, then this is a "leaf" node text object and we have to output its string.
-			if (m_blockList.isEmpty()) {
+			// If there are no child tags, then this is a "leaf" node text object and we have to output its string.
+			if ((m_tagList == null) || m_tagList.isEmpty()) {
 				if (m_text != null)
 					p_evaluationContext.GetCursor().Write(m_text);
 
 				return true;
 			}
 
-			// Otherwise, this is just a parent instance that contains the list of child text/variable blocks that make up the whole "outer" text block.
-			for (TemplateBlock_Base t_nextBlock: m_blockList) {
-				if (!t_nextBlock.Evaluate(p_evaluationContext)) {
+			// Otherwise, this is just a parent instance that contains the list of child text and text-safe tags that make up the whole "outer" text tag.
+			for (Tag_Base t_nextTag: m_tagList) {
+				if (!t_nextTag.Evaluate(p_evaluationContext)) {
 					return false;
 				}
 			}
 		}
 		catch (Throwable t_error) {
-			Logger.LogException("TextBlock.Evaluate() failed with error: ", t_error);
+			Logger.LogException("Text.Evaluate() failed with error: ", t_error);
 			return false;
 		}
 
@@ -376,18 +378,20 @@ public class TextBlock extends TemplateBlock_Base {
 	public String Dump(String p_tabs) {
 		StringBuilder t_dump = new StringBuilder();
 
-		t_dump.append(p_tabs + "Block type name  :  " + m_name 	+ "\n");
+		t_dump.append(p_tabs + "Tag name         :  " + m_name 	+ "\n");
 
 		if ((m_text != null))
 			t_dump.append(p_tabs + "Text             :  " + m_text	+ "\n");
 
-		ListIterator<TemplateBlock_Base> t_blockIterator = m_blockList.listIterator();
-		TemplateBlock_Base t_nextBlock;
-		while (t_blockIterator.hasNext()) {
-			t_nextBlock = t_blockIterator.next();
+		if (m_tagList == null) {
+			ListIterator<Tag_Base> t_tagIterator = m_tagList.listIterator();
+			Tag_Base t_nextTag;
+			while (t_tagIterator.hasNext()) {
+				t_nextTag = t_tagIterator.next();
 
-			t_dump.append("\n\n");
-			t_dump.append(t_nextBlock.Dump(p_tabs + "\t"));
+				t_dump.append("\n\n");
+				t_dump.append(t_nextTag.Dump(p_tabs + "\t"));
+			}
 		}
 
 		return t_dump.toString();

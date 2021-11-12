@@ -88,7 +88,7 @@ import coreutil.logging.*;
 </code></pre>
 
 	<p>This XML structure was set up to handle multiple language maps in the same file if you desire.
-	One or more <code>typeMap</code> tags are wrapped in an outer <code>dataTypeMaps</code> block.</p>
+	One or more <code>typeMap</code> tags are wrapped in an outer <code>dataTypeMaps</code> tag.</p>
 
 	<p>The first two values the <code>targetType</code> are <code>targetLanguage</code> and
 	<code>targetTypeFieldDelimiter</code>.  <code>targetLanguage</code> defines the language mapping
@@ -146,9 +146,9 @@ import coreutil.logging.*;
 	config node returns "tinyint".  Then this example would get the <code>targetType</code> with the
 	groupID of "builtin" which is "int".</p>
  */
-public class TypeConvert extends TemplateBlock_Base {
+public class TypeConvert extends Tag_Base {
 
-	static public final String		BLOCK_NAME						= "typeConvert";
+	static public final String		TAG_NAME						= "typeConvert";
 
 	static private final String		ATTRIBUTE_TARGET_LANGUAGE		= "targetLanguage";
 	static private final String		ATTRIBUTE_SOURCE_TYPE			= "sourceType";
@@ -157,14 +157,14 @@ public class TypeConvert extends TemplateBlock_Base {
 
 	// Data members
 	protected	String				m_targetLanguage	= null;
-	protected	TemplateBlock_Base	m_sourceType		= null;
+	protected	Tag_Base	m_sourceType		= null;
 	protected	String				m_groupID			= null;
 
 
 	//*********************************
 	public TypeConvert() {
-		super(BLOCK_NAME);
-		m_isSafeForTextBlock = true;
+		super(TAG_NAME);
+		m_isSafeForTextTag = true;
 	}
 
 
@@ -229,7 +229,7 @@ public class TypeConvert extends TemplateBlock_Base {
 
 	//*********************************
 	@Override
-	public TemplateBlock_Base GetInstance() {
+	public Tag_Base GetInstance() {
 		return new TypeConvert();
 	}
 
@@ -252,7 +252,7 @@ public class TypeConvert extends TemplateBlock_Base {
 			}
 
 			// Only the source type should require evaluation.  The target language and group IDs should both be string constants.
-			String t_sourceTypeValue = TemplateBlock_Base.EvaluateToString(m_sourceType, p_evaluationContext);
+			String t_sourceTypeValue = Tag_Base.EvaluateToString(m_sourceType, p_evaluationContext);
 			if (t_sourceTypeValue == null) {
 				Logger.LogError("TypeConvert.Evaluate() failed to evaluate the [sourceType] value.");
 				return false;
@@ -280,7 +280,7 @@ public class TypeConvert extends TemplateBlock_Base {
 	public String Dump(String p_tabs) {
 		StringBuilder t_dump = new StringBuilder();
 
-		t_dump.append(p_tabs + "Block type name  :  " + m_name 	+ "\n");
+		t_dump.append(p_tabs + "Tag name         :  " + m_name 	+ "\n");
 
 		if (m_sourceType != null) {
 			t_dump.append("\n\n");

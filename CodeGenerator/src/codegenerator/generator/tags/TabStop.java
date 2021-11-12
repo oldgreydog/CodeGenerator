@@ -52,9 +52,9 @@ import coreutil.logging.*;
 	will risk running two pieces of text together with no white space between them and thereby causing
 	the generation of invalid code.</p>
  */
-public class TabStop extends TemplateBlock_Base {
+public class TabStop extends Tag_Base {
 
-	static public final String		BLOCK_NAME					= "tabStop";
+	static public final String		TAG_NAME					= "tabStop";
 
 	static private final String		ATTRIBUTE_STOP_TYPE			= "stopType";
 	static private final String		ATTRIBUTE_OFFSET			= "offset";
@@ -74,8 +74,8 @@ public class TabStop extends TemplateBlock_Base {
 
 	//*********************************
 	public TabStop() {
-		super(BLOCK_NAME);
-		m_isSafeForTextBlock = true;
+		super(TAG_NAME);
+		m_isSafeForTextTag = true;
 	}
 
 
@@ -138,7 +138,7 @@ public class TabStop extends TemplateBlock_Base {
 
 	//*********************************
 	@Override
-	public TemplateBlock_Base GetInstance() {
+	public Tag_Base GetInstance() {
 		return new TabStop();
 	}
 
@@ -250,7 +250,7 @@ public class TabStop extends TemplateBlock_Base {
 	public String Dump(String p_tabs) {
 		StringBuilder t_dump = new StringBuilder();
 
-		t_dump.append(p_tabs + "Block type name  :  " + m_name		+ "\n");
+		t_dump.append(p_tabs + "Tag name         :  " + m_name		+ "\n");
 		t_dump.append(p_tabs + "Stop type		 :  " + ((m_stopType == STOP_TYPE_STOP) ? STOP_TYPE_LABEL_STOP : STOP_TYPE_LABEL_MARKER) 	+ "\n");
 		t_dump.append(p_tabs + "Offset			 :  " + m_offset 	+ "\n");
 

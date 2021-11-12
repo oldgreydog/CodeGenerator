@@ -117,10 +117,10 @@ import codegenerator.generator.utils.*;
 		&lt;%endIf%&gt;
 	&lt;%endFor%&gt;</code></pre>
  */
-public class OuterContext extends TemplateBlock_Base {
+public class OuterContext extends Tag_Base {
 
-	static public final String		BLOCK_NAME										= "outerContext";
-	static public final String		BLOCK_END_NAME									= "endContext";
+	static public final String		TAG_NAME										= "outerContext";
+	static public final String		TAG_END_NAME									= "endContext";
 
 	static public final String		ATTRIBUTE_CONTEXT_NAME							= "contextName";
 	static public final String		ATTRIBUTE_OPTIONAL_JUMP_TO_PARENT_CONTEXT		= "optionalJumpToParentContext";
@@ -129,12 +129,12 @@ public class OuterContext extends TemplateBlock_Base {
 	// Data members
 	private String			m_contextName				= null;
 	private int				m_jumpToParentContextCount	= 0;	// This will let you jump to a parent context without using a forEach loop.
-	private GeneralBlock	m_contentBlock				= null;
+	private GeneralBlock	m_contents					= null;
 
 
 	//*********************************
 	public OuterContext() {
-		super(BLOCK_NAME);
+		super(TAG_NAME);
 	}
 
 
@@ -202,16 +202,16 @@ public class OuterContext extends TemplateBlock_Base {
 				return false;
 			}
 
-			m_contentBlock = t_generalBlock;
+			m_contents = t_generalBlock;
 
 			String t_endingTagName = t_generalBlock.GetUnknownTag().GetTagName();
-			if (!t_endingTagName.equalsIgnoreCase(BLOCK_END_NAME)) {
-				Logger.LogError("OuterContext.Parse() general block ended on a tag named [" + t_endingTagName + "] at line [" + p_tokenizer.GetLineCount() + "] in the block starting at [" + m_lineNumber + "].  The closing tag [" + BLOCK_END_NAME + "] was expected.");
+			if (!t_endingTagName.equalsIgnoreCase(TAG_END_NAME)) {
+				Logger.LogError("OuterContext.Parse() general block ended on a tag named [" + t_endingTagName + "] at line [" + p_tokenizer.GetLineCount() + "] in the tag starting at [" + m_lineNumber + "].  The closing tag [" + TAG_END_NAME + "] was expected.");
 				return false;
 			}
 		}
 		catch (Throwable t_error) {
-			Logger.LogException("OuterContext.Parse() failed with error at line [" + p_tokenizer.GetLineCount() + "] in the block starting at [" + m_lineNumber + "]: ", t_error);
+			Logger.LogException("OuterContext.Parse() failed with error at line [" + p_tokenizer.GetLineCount() + "] in the tag starting at [" + m_lineNumber + "]: ", t_error);
 			return false;
 		}
 
@@ -237,8 +237,8 @@ public class OuterContext extends TemplateBlock_Base {
 
 			p_evaluationContext.PushNewCurrentNode(t_context);
 
-			if (!m_contentBlock.Evaluate(p_evaluationContext)) {
-				Logger.LogError("OuterContext.Evaluate() failed to evaluate its content block.");
+			if (!m_contents.Evaluate(p_evaluationContext)) {
+				Logger.LogError("OuterContext.Evaluate() failed to evaluate its content tag.");
 				p_evaluationContext.PopCurrentNode();
 				return false;
 			}

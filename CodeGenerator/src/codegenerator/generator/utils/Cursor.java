@@ -44,7 +44,7 @@ public class Cursor {
 	//*********************************
 	public boolean Write(String p_newText) {
 		try {
-			// Since text blocks can contain multiple lines, we have to step through the new text and write it out line by line so that we end up in the end with only the remaining text in the cursor.
+			// Since text tags can contain multiple lines, we have to step through the new text and write it out line by line so that we end up in the end with only the remaining text in the cursor.
 			int		t_nextNewLineIndex	= 0;
 			int		t_lastNewLineIndex	= 0;
 			String	t_fragment			= null;

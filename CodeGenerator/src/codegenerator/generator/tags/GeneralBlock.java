@@ -33,7 +33,7 @@ import coreutil.logging.*;
 	That "unknown" tag should the the end tag for the block.  You can get it from the general block and check its name to be sure.  This can also be an intermediate tag
 	such as "else" or "elseIf".  FirstElseBlock is a good example of its usage.
  */
-public class GeneralBlock extends TemplateBlock_Base {
+public class GeneralBlock extends Tag_Base {
 
 	// Data members
 	TagParser	m_unknownTag	= null;		// This is the unknown tag that the block found and stopped parsing.  This should be the closing tag for the parent block.  Since we can't push it back on the tokenizer, we have to put it here so that the parent can access it when we return.
@@ -55,7 +55,7 @@ public class GeneralBlock extends TemplateBlock_Base {
 
 	//*********************************
 	@Override
-	public TemplateBlock_Base GetInstance() {
+	public Tag_Base GetInstance() {
 		return null;	// This should never be called for this class.
 	}
 
@@ -70,7 +70,7 @@ public class GeneralBlock extends TemplateBlock_Base {
 			// A general block will parse child tags until it finds a tag that isn't a command.  That tag should be the closing tag for the parent block.
 			Token				t_nextToken;
 			TagParser			t_tagParser;
-			TemplateBlock_Base	t_newBlock;
+			Tag_Base	t_newBlock;
 			while ((t_nextToken = p_tokenizer.GetNextToken()) != null) {
 				if (t_nextToken.m_tokenType == Token.TOKEN_TYPE_CLOSING_DELIMITER) {
 					Logger.LogError("GeneralBlock.Parse() found a token of type [" + t_nextToken.GetTokenTypeName() + "] at line [" + p_tokenizer.GetLineCount() + "].");
@@ -83,7 +83,7 @@ public class GeneralBlock extends TemplateBlock_Base {
 						return false;
 					}
 
-					t_newBlock = BlockFactory.GetBlock(t_tagParser.GetTagName());
+					t_newBlock = TagFactory.GetTag(t_tagParser.GetTagName());
 					if (t_newBlock == null) {
 						// This should be the closing tag for the parent block, so we'll save it and return.  The parent will have to examine it and decide if it is actually what it expects.
 						m_unknownTag = t_tagParser;

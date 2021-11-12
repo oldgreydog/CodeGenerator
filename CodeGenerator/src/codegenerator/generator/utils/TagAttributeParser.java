@@ -51,7 +51,7 @@ public class TagAttributeParser {
 
 	//*********************************
 	/**
-	 * Converting the parser to have more flexible name and value typing of TemplateBlock_Base instead of TextBlock lead to
+	 * Converting the parser to have more flexible name and value typing of Tag_Base instead of Text lead to
 	 * adding this helper function that will let most classes that only need plain text attributes to get those values without
 	 * having to do the conversions themselves.  Of course, that means that if the either of the attributes values is changed to
 	 * be a more complex type, then they have to handle a NULL return from this and then check to see if a more complex type is available.
@@ -115,8 +115,8 @@ public class TagAttributeParser {
 			// A general block will parse child tags until it finds a tag that isn't a command.  That tag should be the closing tag for the parent block.
 			Token				t_nextToken;
 			TagParser			t_tagParser;
-			TemplateBlock_Base	t_newBlock;
-			TextBlock			t_textBlock;
+			Tag_Base			t_newTag;
+			Text				t_text;
 
 			while ((t_nextToken = p_tokenizer.GetNextToken()) != null) {
 				switch (t_nextToken.m_tokenType) {
@@ -127,9 +127,9 @@ public class TagAttributeParser {
 							return false;
 						}
 
-						t_newBlock = BlockFactory.GetBlock(t_tagParser.GetTagName());
-						if (t_newBlock == null) {
-							// This should be variable tag embedded in the text.
+						t_newTag = TagFactory.GetTag(t_tagParser.GetTagName());
+						if (t_newTag == null) {
+							// This should be a variable tag embedded in the text.
 							ConfigVariable t_configVariable = new ConfigVariable();
 							if (!t_configVariable.Init(t_tagParser, p_tokenizer.GetLineCount())) {
 								Logger.LogError("TagAttributeParser.Parse() failed to initialize the config variable at line [" + p_tokenizer.GetLineCount() + "].");
@@ -143,31 +143,31 @@ public class TagAttributeParser {
 								return true;
 							}
 
-							break;	// We should get an "=" next.
+							break;
 						}
 						else {
-							// Other than ConfigVariables, these are the only tag types that can appear inside of a TextBlock.  This forces you to keep text blocks simpler which will keep templates simpler (hopefully).
-							if (t_newBlock.IsSafeForTextBlock())
+							// Other than ConfigVariables, these are the only tag types that can appear inside of a Text tag.  This forces you to keep text blocks simpler which will keep templates simpler (hopefully).
+							if (t_newTag.IsSafeForTextTag())
 							{
-								if (!t_newBlock.Init(t_tagParser)) {
-									Logger.LogError("TagAttributeParser.Parse() failed to initialize the block [" + t_newBlock.GetName() + "] at line [" + p_tokenizer.GetLineCount() + "].");
+								if (!t_newTag.Init(t_tagParser)) {
+									Logger.LogError("TagAttributeParser.Parse() failed to initialize the tag [" + t_newTag.GetName() + "] at line [" + p_tokenizer.GetLineCount() + "].");
 									return false;
 								}
 
-								if (!t_newBlock.Parse(p_tokenizer)) {
-									Logger.LogError("TagAttributeParser.Parse() failed to parse the tag [" + t_newBlock.GetName() + "].");
+								if (!t_newTag.Parse(p_tokenizer)) {
+									Logger.LogError("TagAttributeParser.Parse() failed to parse the tag [" + t_newTag.GetName() + "].");
 									return false;
 								}
 
 								if (m_attributeName == null)
-									m_attributeName = t_newBlock;
+									m_attributeName = t_newTag;
 								else {
-									m_value = t_newBlock;
+									m_value = t_newTag;
 									return true;
 								}
 							}
 							else {
-								Logger.LogError("TagAttributeParser.Parse() found the tag [" + t_newBlock.GetName() + "] at line [" + p_tokenizer.GetLineCount() + "] which is not allowed inside a text block.");
+								Logger.LogError("TagAttributeParser.Parse() found the tag [" + t_newTag.GetName() + "] at line [" + p_tokenizer.GetLineCount() + "] which is not allowed inside a text tag.");
 								return false;
 							}
 						}
@@ -191,30 +191,33 @@ public class TagAttributeParser {
 						break;
 
 					case Token.TOKEN_TYPE_WORD:
-						// I think that if we get this outside of tag delimiters, then it's safe to assume that we are getting a single-word constant value and we need to wrap it in a TextBlock and move on.
-						t_textBlock = new TextBlock();
-						t_textBlock.SetText(t_nextToken.m_tokenValue);
+						// I think that if we get this outside of tag delimiters, then it's safe to assume that we are getting a single-word constant value and we need to wrap it in a Text object and move on.
+						t_text = new Text();
+						t_text.SetText(t_nextToken.m_tokenValue);
 
 						if (m_attributeName == null)
-							m_attributeName = t_textBlock;
+							m_attributeName = t_text;
 						else {
-							m_value = t_textBlock;
+							m_value = t_text;
 							return true;
 						}
 
 						break;
 
 					case Token.TOKEN_TYPE_DOUBLE_QUOTE:
-						// We'll use the TextBlock to parse this string constant.
+						// We'll use a Text tag to parse this string constant.
 						p_tokenizer.PushBackToken(t_nextToken);
 
-						t_textBlock = new TextBlock();
-						t_textBlock.ParseTagElement(p_tokenizer, true);
+						t_text = new Text();
+						if (!t_text.ParseTagElement(p_tokenizer, true)) {
+							Logger.LogError("TagAttributeParser.Parse() failed to parse the double-quoted value at line [" + p_tokenizer.GetLineCount() + "].");
+							return false;
+						}
 
 						if (m_attributeName == null)
-							m_attributeName = t_textBlock;
+							m_attributeName = t_text;
 						else {
-							m_value = t_textBlock;
+							m_value = t_text;
 							return true;
 						}
 
@@ -227,7 +230,7 @@ public class TagAttributeParser {
 			}
 
 
-			Logger.LogError("TagAttributeParser.Parse() appears to have hit the end of the file without finding the closing tag of the parent block.");
+			Logger.LogError("TagAttributeParser.Parse() appears to have hit the end of the file without finding the closing tag of the parent tag.");
 			return false;
 		}
 		catch (Throwable t_error) {

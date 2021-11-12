@@ -90,15 +90,15 @@ public class TemplateTokenizer {
 		}
 	}
 
-    protected	File 						m_sourceTempateFile;
-    protected	BufferedReader				m_fileReader;
+	protected	File 						m_sourceTempateFile;
+	protected	BufferedReader				m_fileReader;
 	protected	LinkedList<SpecialSymbol>	m_symbolList		= new LinkedList<TemplateTokenizer.SpecialSymbol>();
 
 	protected	String						m_currentLine		= null;
 	protected	int							m_currentLineIndex	= -1;
 	protected	int							m_lineCount			= 0;
 
-	protected	Token						m_pushBackToken		= null;	// I'm trying this for the time being to kludge ConfigVariable parsing.  Normally, the TemplateParser eats the first string after the opening delimiter and uses that as the block name to get the next block from the BlockFactory, but that screws us up in the ConfigVariable case because then there's nothing for it to parse but its closing delimiter.  Therefore, we'll use the PushBackToken() functionality to push the first string "back on the TemplateTokenizer" so that the ConfigVariable will get it when it calls GetNextToke(), etc.
+	protected	Token						m_pushBackToken		= null;	// I'm trying this for the time being to kludge ConfigVariable parsing.  Normally, the TemplateParser eats the first string after the opening delimiter and uses that as the tag name to get the next tag from the TagFactory, but that screws us up in the ConfigVariable case because then there's nothing for it to parse but its closing delimiter.  Therefore, we'll use the PushBackToken() functionality to push the first string "back on the TemplateTokenizer" so that the ConfigVariable will get it when it calls GetNextToke(), etc.
 
 
 

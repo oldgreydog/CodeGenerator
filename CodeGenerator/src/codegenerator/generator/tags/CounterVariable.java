@@ -32,11 +32,11 @@ import codegenerator.generator.utils.*;
 	If you need to have a counter that guarantees that you only generate a piece of code only once inside
 	a complicated set of nested contexts and/or <code>forEach</code> loops, then you can set up a CounterVariable
 	tag that wraps those contexts/loops and use the new <code>++counter</code> ({@link CounterIncrement}) tag inside the
-	if/else block where the desired code is generated with the same name you put on the counterVariable tag.
+	if/else tag where the desired code is generated with the same name you put on the counterVariable tag.
 	This will ensure that regardless of how the <code>forEach</code> loops traverse the config tree, that code will only get
 	generated once.
 
-	<p>Here's an long but (I think) illuminating real usage example from one of my templates:</p>
+	<p>Here's a long but (I think) illuminating real usage example from one of my templates:</p>
 	<br>
 	<pre><code>&lt;%counterVariable counterName = tableCounter %&gt;
 
@@ -102,13 +102,13 @@ import codegenerator.generator.utils.*;
 </code></pre>
 	<br>
 	<p>If you look at the example closely, you'll see that where I used <code>++counter</code>, I only get one pass through that
-	<code>first</code> block.  But I also use the same counter at the bottom of the example in the <code>first</code> block to only
-	generate a matching block of code in the <code>else</code> if the first <code>first</code> block was executed at least once.</p>
+	<code>first</code> tag.  But I also use the same counter at the bottom of the example in the <code>first</code> tag to only
+	generate a matching block of code in the <code>else</code> if the first <code>first</code> tag was executed at least once.</p>
 */
-public class CounterVariable extends TemplateBlock_Base {
+public class CounterVariable extends Tag_Base {
 
-static public final String		BLOCK_NAME										= "counterVariable";
-static public final String		BLOCK_END_NAME									= "endCounter";
+static public final String		TAG_NAME										= "counterVariable";
+static public final String		TAG_END_NAME									= "endCounter";
 
 static public final String		ATTRIBUTE_COUNTER_NAME							= "counterName";
 
@@ -120,7 +120,7 @@ private GeneralBlock	m_contentBlock				= null;
 
 //*********************************
 public CounterVariable() {
-	super(BLOCK_NAME);
+	super(TAG_NAME);
 }
 
 
@@ -161,7 +161,7 @@ public CounterVariable GetInstance() {
 @Override
 public boolean Parse(TemplateTokenizer p_tokenizer) {
 	try {
-		// Get the general block of tags for the <if> tag.
+		// The GeneralBlock handles parsing of this tag's contents.
 		GeneralBlock t_generalBlock	= new GeneralBlock();
 		if (!t_generalBlock.Parse(p_tokenizer)) {
 			Logger.LogError("CounterVariable.Parse() general block parser failed in the block starting at line number [" + m_lineNumber + "].");
@@ -172,12 +172,12 @@ public boolean Parse(TemplateTokenizer p_tokenizer) {
 
 		String t_endingTagName = t_generalBlock.GetUnknownTag().GetTagName();
 		if (!t_endingTagName.equalsIgnoreCase("endCounter")) {
-			Logger.LogError("CounterVariable.Parse() general block ended on a tag named [" + t_endingTagName + "] at line [" + p_tokenizer.GetLineCount() + "] in the block starting at [" + m_lineNumber + "].  The closing tag [" + BLOCK_END_NAME + "] was expected.");
+			Logger.LogError("CounterVariable.Parse() general block ended on a tag named [" + t_endingTagName + "] at line [" + p_tokenizer.GetLineCount() + "] in the tag starting at [" + m_lineNumber + "].  The closing tag [" + TAG_END_NAME + "] was expected.");
 			return false;
 		}
 	}
 	catch (Throwable t_error) {
-		Logger.LogException("CounterVariable.Parse() failed with error at line [" + p_tokenizer.GetLineCount() + "] in the block starting at [" + m_lineNumber + "]: ", t_error);
+		Logger.LogException("CounterVariable.Parse() failed with error at line [" + p_tokenizer.GetLineCount() + "] in the tag starting at [" + m_lineNumber + "]: ", t_error);
 		return false;
 	}
 

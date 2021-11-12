@@ -22,18 +22,18 @@ package codegenerator.generator.tags;
 
 
 
-import codegenerator.generator.tags.IfElseBlock.*;
+import codegenerator.generator.tags.IfElse.*;
 import codegenerator.generator.utils.*;
 import coreutil.logging.*;
 
 
 
 /**
-	Base class for the tag blocks that will handle the AND, OR or other test conditions for IFs.
+	Base class for the tags that will handle the AND, OR or other test conditions for IFs.
 
-	<p>Refer to {@link IfElseBlock} for more info on how to use the AND and OR tags in an IF tag.</p>
+	<p>Refer to {@link IfElse} for more info on how to use the AND and OR tags in an IF tag.</p>
  */
-public abstract class If_Boolean extends TemplateBlock_Base {
+public abstract class If_Boolean extends Tag_Base {
 
 	// Static members
 	static public final String		RESULT_TRUE		= "true";
@@ -41,23 +41,19 @@ public abstract class If_Boolean extends TemplateBlock_Base {
 
 
 	/**
-	 * Refer to {@link IfElseBlock} for more info on how to use the AND and OR tags in an IF tag.
+	 * Refer to {@link IfElse} for more info on how to use the AND and OR tags in an IF tag.
 	 */
 	static public class And extends If_Boolean {
 
-		static public final String	BLOCK_NAME	= "and";
+		static public final String	TAG_NAME	= "and";
 
 		public And() {
-			super(BLOCK_NAME);
-			m_isSafeForTextBlock = true;
-		}
-
-		public And(String p_blockName) {
-			super(p_blockName);
+			super(TAG_NAME);
+			m_isSafeForTextTag = true;
 		}
 
 		@Override
-		public TemplateBlock_Base GetInstance() {
+		public Tag_Base GetInstance() {
 			return new And();
 		}
 
@@ -66,7 +62,7 @@ public abstract class If_Boolean extends TemplateBlock_Base {
 		{
 			try {
 				Boolean t_result;
-				for (TemplateBlock_Base t_nextCondition: m_blockList) {
+				for (Tag_Base t_nextCondition: m_tagList) {
 					// Since this is an "AND" operation, we can return FALSE on the first condition that fails.
 					t_result = ((IfCondition)t_nextCondition).Test(p_evaluationContext);
 					if (t_result == null)
@@ -86,15 +82,15 @@ public abstract class If_Boolean extends TemplateBlock_Base {
 
 
 	/**
-	 * Refer to {@link IfElseBlock} for more info on how to use the AND and OR tags in an IF tag.
+	 * Refer to {@link IfElse} for more info on how to use the AND and OR tags in an IF tag.
 	 */
 	static public class Or extends If_Boolean {
 
-		static public final String	BLOCK_NAME	= "or";
+		static public final String	TAG_NAME	= "or";
 
 		public Or() {
-			super(BLOCK_NAME);
-			m_isSafeForTextBlock = true;
+			super(TAG_NAME);
+			m_isSafeForTextTag = true;
 		}
 
 		public Or(String p_blockName) {
@@ -102,7 +98,7 @@ public abstract class If_Boolean extends TemplateBlock_Base {
 		}
 
 		@Override
-		public TemplateBlock_Base GetInstance() {
+		public Tag_Base GetInstance() {
 			return new Or();
 		}
 
@@ -111,7 +107,7 @@ public abstract class If_Boolean extends TemplateBlock_Base {
 		{
 			try {
 				Boolean t_result;
-				for (TemplateBlock_Base t_nextCondition: m_blockList) {
+				for (Tag_Base t_nextCondition: m_tagList) {
 					// Since this is an "OR" operation, we can return TRUE on the first condition that succeeds.
 					t_result = ((IfCondition)t_nextCondition).Test(p_evaluationContext);
 					if (t_result == null)
@@ -131,15 +127,15 @@ public abstract class If_Boolean extends TemplateBlock_Base {
 
 
 	/**
-	 * Refer to {@link IfElseBlock} for more info on how to use the AND and OR tags in an IF tag.
+	 * Refer to {@link IfElse} for more info on how to use the AND and OR tags in an IF tag.
 	 */
 	static public class Not extends If_Boolean {
 
-		static public final String	BLOCK_NAME	= "not";
+		static public final String	TAG_NAME	= "not";
 
 		public Not() {
-			super(BLOCK_NAME);
-			m_isSafeForTextBlock = true;
+			super(TAG_NAME);
+			m_isSafeForTextTag = true;
 		}
 
 		public Not(String p_blockName) {
@@ -147,12 +143,10 @@ public abstract class If_Boolean extends TemplateBlock_Base {
 		}
 
 		@Override
-		public TemplateBlock_Base GetInstance() {
+		public Tag_Base GetInstance() {
 			return new Not();
 		}
 
-
-		//*********************************
 		@Override
 		public boolean Init(TagParser p_tagParser) {
 			try {
@@ -161,8 +155,13 @@ public abstract class If_Boolean extends TemplateBlock_Base {
 					return false;
 				}
 
-				if (m_blockList.size() > 1) {
-					Logger.LogError("Not.Init() found more than one child condition block at line number [" + m_lineNumber + "].");
+				if (m_tagList == null) {
+					Logger.LogError("Not.Init() doesn't have any child tags at line [" + m_lineNumber + "].");
+					return false;
+				}
+
+				if (m_tagList.size() > 1) {
+					Logger.LogError("Not.Init() found more than one child condition tag at line number [" + m_lineNumber + "].");
 					return false;
 				}
 
@@ -179,7 +178,7 @@ public abstract class If_Boolean extends TemplateBlock_Base {
 		{
 			try {
 				Boolean t_result;
-				for (TemplateBlock_Base t_nextCondition: m_blockList) {
+				for (Tag_Base t_nextCondition: m_tagList) {
 					// Since this is an "Not" operation, we only execute the first condition.
 					t_result = ((IfCondition)t_nextCondition).Test(p_evaluationContext);
 					if (t_result == null)
@@ -204,8 +203,8 @@ public abstract class If_Boolean extends TemplateBlock_Base {
 
 
 	//*********************************
-	public If_Boolean(String p_blockName) {
-		super(p_blockName);
+	public If_Boolean(String p_tagName) {
+		super(p_tagName);
 	}
 
 
@@ -222,7 +221,7 @@ public abstract class If_Boolean extends TemplateBlock_Base {
 			for (TagAttributeParser t_nextAttributeParser: p_tagParser.GetTagAttributes()) {
 				t_ifCondition = new IfCondition();
 				if (!t_ifCondition.Init(t_nextAttributeParser)) {
-					Logger.LogError("If_Boolean.Init() failed to initialize the first IfCondition block at line number [" + m_lineNumber + "].");
+					Logger.LogError("If_Boolean.Init() failed to initialize the first IfCondition tag at line number [" + m_lineNumber + "].");
 					return false;
 				}
 
@@ -276,11 +275,13 @@ public abstract class If_Boolean extends TemplateBlock_Base {
 	public String Dump(String p_tabs) {
 		StringBuilder t_dump = new StringBuilder();
 
-		t_dump.append(p_tabs + "Block type name  :  " + m_name			+ "\n");
+		t_dump.append(p_tabs + "Tag name         :  " + m_name			+ "\n");
 
-		for (TemplateBlock_Base t_nextBlock: m_blockList) {
-			t_dump.append("\n\n");
-			t_dump.append(t_nextBlock.Dump(p_tabs + "\t"));
+		if (m_tagList != null) {
+			for (Tag_Base t_nextTag: m_tagList) {
+				t_dump.append("\n\n");
+				t_dump.append(t_nextTag.Dump(p_tabs + "\t"));
+			}
 		}
 
 		return t_dump.toString();

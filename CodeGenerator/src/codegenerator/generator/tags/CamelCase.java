@@ -40,23 +40,23 @@ The input value can be any mix of upper and lower case.
 <p>Note that the attribute [optionalSeparator] is just that: optional.  It lets you create camel-cased output with a space or other characters between the words, for example, so that it can be used for a UI label.</p>
 
 */
-public class CamelCase extends TemplateBlock_Base {
+public class CamelCase extends Tag_Base {
 
-	static public final String		BLOCK_NAME						= "camelCase";
+	static public final String		TAG_NAME						= "camelCase";
 
 	static public final String		ATTRIBUTE_VALUE					= "value";
 	static public final String		ATTRIBUTE_OPTIONAL_SEPARATOR	= "optionalSeparator";
 
 
 	// Data members
-	private	TemplateBlock_Base		m_value					= null;
+	private	Tag_Base		m_value					= null;
 	private	String					m_optionalSeparator		= null;
 
 
 	//*********************************
 	public CamelCase() {
-		super(BLOCK_NAME);
-		m_isSafeForTextBlock = true;
+		super(TAG_NAME);
+		m_isSafeForTextTag = true;
 	}
 
 
@@ -101,7 +101,7 @@ public class CamelCase extends TemplateBlock_Base {
 
 	//*********************************
 	@Override
-	public TemplateBlock_Base GetInstance() {
+	public Tag_Base GetInstance() {
 		return new CamelCase();
 	}
 
@@ -152,7 +152,7 @@ public class CamelCase extends TemplateBlock_Base {
 	public String Dump(String p_tabs) {
 		StringBuilder t_dump = new StringBuilder();
 
-		t_dump.append(p_tabs + "Block type name  :  " + m_name 	+ "\n");
+		t_dump.append(p_tabs + "Tag name  :  " + m_name 	+ "\n");
 
 		if (m_value != null) {
 			t_dump.append("\n\n");

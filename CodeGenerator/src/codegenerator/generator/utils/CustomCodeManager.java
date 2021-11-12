@@ -35,7 +35,7 @@ import coreutil.logging.*;
  * insert the custom code back into the new file.  Since the code generator is strictly single threaded, this does
  * not require locking.
  *
- * <p>See {@link codegenerator.generator.tags.CustomCodeBlock} for more info on how custom code tags work.
+ * <p>See {@link codegenerator.generator.tags.CustomCode} for more info on how custom code tags work.
  */
 public class CustomCodeManager {
 

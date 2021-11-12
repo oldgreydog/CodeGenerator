@@ -29,7 +29,7 @@ import coreutil.logging.*;
 
 /**
 	Accesses values in the config tree so that they can be inserted into the template output.  (For
-	an explanation of the config tree and how it is traversed, please see {@link ForEachBlock}.)
+	an explanation of the config tree and how it is traversed, please see {@link ForEach}.)
 
 	<p>There are three modes of use for this tag:</p>
 
@@ -90,9 +90,9 @@ import coreutil.logging.*;
 
 	<p>	- A fully qualified variable reference like <code>&lt;%root.global.databaseName%&gt;</code> will be evaluated to <b><code>Operations</code></b>.</p>
  */
-public class ConfigVariable extends TemplateBlock_Base {
+public class ConfigVariable extends Tag_Base {
 
-	static public final String		BLOCK_NAME			= "ConfigVariable";
+	static public final String		TAG_NAME			= "ConfigVariable";
 
 
 	// Data members
@@ -102,8 +102,8 @@ public class ConfigVariable extends TemplateBlock_Base {
 
 	//*********************************
 	public ConfigVariable() {
-		super(BLOCK_NAME);
-		m_isSafeForTextBlock = true;
+		super(TAG_NAME);
+		m_isSafeForTextTag = true;
 	}
 
 
@@ -117,7 +117,7 @@ public class ConfigVariable extends TemplateBlock_Base {
 
 	//*********************************
 	@Override
-	public TemplateBlock_Base GetInstance() {
+	public Tag_Base GetInstance() {
 		return new ConfigVariable();
 	}
 
@@ -215,7 +215,7 @@ public class ConfigVariable extends TemplateBlock_Base {
 	public String Dump(String p_tabs) {
 		StringBuilder t_dump = new StringBuilder();
 
-		t_dump.append(p_tabs + "Block type name  :  " + m_name 					+ "\n");
+		t_dump.append(p_tabs + "Tag name         :  " + m_name 					+ "\n");
 		t_dump.append(p_tabs + "Variable name    :  " + m_variableName			+ "\n");
 		t_dump.append(p_tabs + "Parent Ref Count :  " + m_parentReferenceCount	+ "\n");
 

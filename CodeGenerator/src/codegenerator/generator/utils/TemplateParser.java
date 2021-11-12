@@ -34,7 +34,7 @@ public class TemplateParser {
 
 
 	//*********************************
-	public TemplateBlock_Base ParseTemplate(File p_templateFile) {
+	public Tag_Base ParseTemplate(File p_templateFile) {
 		try {
 			TemplateTokenizer t_fileTokenizer = new TemplateTokenizer();
 			if (!t_fileTokenizer.Init(p_templateFile)) {

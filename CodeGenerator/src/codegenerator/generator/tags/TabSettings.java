@@ -41,9 +41,9 @@ import coreutil.logging.*;
 	<p>The <code>outputType</code> attribute defines whether a tab character or spaces will be written
 	to the output to represent the tab stop.</p>
  */
-public class TabSettings extends TemplateBlock_Base {
+public class TabSettings extends Tag_Base {
 
-	static public final String		BLOCK_NAME				= "tabSettings";
+	static public final String		TAG_NAME				= "tabSettings";
 
 	static private final String		ATTRIBUTE_TAB_LENGTH	= "tabLength";
 	static private final String		ATTRIBUTE_OUTPUT_TYPE	= "outputType";
@@ -56,7 +56,7 @@ public class TabSettings extends TemplateBlock_Base {
 
 	//*********************************
 	public TabSettings() {
-		super(BLOCK_NAME);
+		super(TAG_NAME);
 	}
 
 
@@ -71,7 +71,7 @@ public class TabSettings extends TemplateBlock_Base {
 
 			TagAttributeParser t_nodeAttribute = p_tagParser.GetNamedAttribute(ATTRIBUTE_TAB_LENGTH);
 			if (t_nodeAttribute == null) {
-				Logger.LogError("TabSettings.Init() did not find the [" + ATTRIBUTE_TAB_LENGTH + "] attribute that is required for [" + BLOCK_NAME + "] tags at line number [" + m_lineNumber + "].");
+				Logger.LogError("TabSettings.Init() did not find the [" + ATTRIBUTE_TAB_LENGTH + "] attribute that is required for [" + TAG_NAME + "] tags at line number [" + m_lineNumber + "].");
 				return false;
 			}
 
@@ -87,7 +87,7 @@ public class TabSettings extends TemplateBlock_Base {
 			// The offset attribute is required for type "stop" but not for "marker".
 			t_nodeAttribute = p_tagParser.GetNamedAttribute(ATTRIBUTE_OUTPUT_TYPE);
 			if (t_nodeAttribute == null) {
-				Logger.LogError("TabSettings.Init() did not find the [" + ATTRIBUTE_OUTPUT_TYPE + "] attribute that is required for [" + BLOCK_NAME + "] tags at line number [" + m_lineNumber + "].");
+				Logger.LogError("TabSettings.Init() did not find the [" + ATTRIBUTE_OUTPUT_TYPE + "] attribute that is required for [" + TAG_NAME + "] tags at line number [" + m_lineNumber + "].");
 				return false;
 			}
 
@@ -113,7 +113,7 @@ public class TabSettings extends TemplateBlock_Base {
 
 	//*********************************
 	@Override
-	public TemplateBlock_Base GetInstance() {
+	public Tag_Base GetInstance() {
 		return new TabSettings();
 	}
 
@@ -157,7 +157,7 @@ public class TabSettings extends TemplateBlock_Base {
 	public String Dump(String p_tabs) {
 		StringBuilder t_dump = new StringBuilder();
 
-		t_dump.append(p_tabs + "Block type name  :  " + m_name			+ "\n");
+		t_dump.append(p_tabs + "Tag name         :  " + m_name			+ "\n");
 		t_dump.append(p_tabs + "Tab length		 :  " + m_tabLength		+ "\n");
 		t_dump.append(p_tabs + "Output type		 :  " + m_outputType 	+ "\n");
 

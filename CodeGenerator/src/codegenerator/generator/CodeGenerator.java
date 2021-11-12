@@ -84,7 +84,7 @@ public class CodeGenerator {
 			long t_startTemplateParse = Calendar.getInstance().getTimeInMillis();
 
 			TemplateParser		t_parser	= new TemplateParser();
-			TemplateBlock_Base	t_template	= t_parser.ParseTemplate(t_templateFile);
+			Tag_Base	t_template	= t_parser.ParseTemplate(t_templateFile);
 			if (t_template == null) {
 				Logger.LogFatal("CodeGenerator.Execute() failed to parse the template file [" + p_templateFilename + "].");
 				Cleanup();
@@ -121,7 +121,7 @@ public class CodeGenerator {
 			Logger.LogInfo("Template parse (millisec):      "	+ (t_endTemplateParse		- t_startTemplateParse));
 			Logger.LogInfo("Config values parse (millisec): "	+ (t_endConfigValuesParse	- t_endTemplateParse));
 			Logger.LogInfo("Generation time (millisec):     "	+ (t_endGenerate			- t_startGenerate));
-			Logger.LogInfo("Generated file count:           "	+ FileBlock.GetFileCount());
+			Logger.LogInfo("Generated file count:           "	+ FileTag.GetFileCount());
 
 			Cleanup();
 

@@ -48,10 +48,12 @@ import codegenerator.generator.utils.*;
 	you gave to the outerContext tag that encloses the nested instance of the file tag.</p>
 
 	<p>Refer to the files in the <code>Examples/codegenerator</code> folders to better understand its usage.</p>
- */
-public class FileBlock extends TemplateBlock_Base {
 
-	static public final String		BLOCK_NAME	= "file";
+	<p>NOTE: I had to change the class name from FileBlock to FileTag instead of just File since file is a java class and it was simpler to just use a non-clashing name.</p>
+ */
+public class FileTag extends Tag_Base {
+
+	static public final String		TAG_NAME	= "file";
 
 	static public final String		ATTRIBUTE_TEMPLATE					= "template";
 	static public final String		ATTRIBUTE_FILENAME					= "filename";
@@ -102,21 +104,21 @@ public class FileBlock extends TemplateBlock_Base {
 	private	String		m_templateFileName;
 	private	String		m_contextName			= null;					// The optional outer context in which to evaluate this variable.
 
-	// These values can themselves be composites of evaluation-time config variables and text, so we have to store them in their TextBlock form and evaluate them at runtime to get their final values.
-	private	TemplateBlock_Base	m_fileNameBlock				= null;
-	private	TemplateBlock_Base	m_destinationDirectoryBlock	= null;
+	// These values can themselves be composites of evaluation-time config variables and text, so we have to store them in their Text object form and evaluate them at runtime to get their final values.
+	private	Tag_Base	m_fileName				= null;
+	private	Tag_Base	m_destinationDirectory	= null;
 
 
 	//*********************************
-	public FileBlock() {
-		super(BLOCK_NAME);
+	public FileTag() {
+		super(TAG_NAME);
 	}
 
 
 	//*********************************
 	@Override
-	public FileBlock GetInstance() {
-		return new FileBlock();
+	public FileTag GetInstance() {
+		return new FileTag();
 	}
 
 
@@ -124,48 +126,48 @@ public class FileBlock extends TemplateBlock_Base {
 	@Override
 	public boolean Init(TagParser p_tagParser) {
 		if (!super.Init(p_tagParser)) {
-			Logger.LogError("FileBlock.Init() failed in the parent Init() at line number [" + p_tagParser.GetLineNumber() + "].");
+			Logger.LogError("FileTag.Init() failed in the parent Init() at line number [" + p_tagParser.GetLineNumber() + "].");
 			return false;
 		}
 
 		TagAttributeParser t_nodeAttribute = p_tagParser.GetNamedAttribute(ATTRIBUTE_TEMPLATE);
 		if (t_nodeAttribute == null) {
-			Logger.LogError("FileBlock.Init() did not find the [" + ATTRIBUTE_TEMPLATE + "] attribute that is required for FileBlock tags at line number [" + m_lineNumber + "].");
+			Logger.LogError("FileTag.Init() did not find the [" + ATTRIBUTE_TEMPLATE + "] attribute that is required for FileTag tags at line number [" + m_lineNumber + "].");
 			return false;
 		}
 
 		m_templateFileName = t_nodeAttribute.GetAttributeValueAsString();
 		if (m_templateFileName == null) {
-			Logger.LogError("FileBlock.Init() did not get the [" + ATTRIBUTE_TEMPLATE + "] string from attribute that is required for FileBlock tags at line number [" + m_lineNumber + "].");
+			Logger.LogError("FileTag.Init() did not get the [" + ATTRIBUTE_TEMPLATE + "] string from attribute that is required for FileTag tags at line number [" + m_lineNumber + "].");
 			return false;
 		}
 
 		t_nodeAttribute = p_tagParser.GetNamedAttribute(ATTRIBUTE_FILENAME);
 		if (t_nodeAttribute == null) {
-			Logger.LogError("FileBlock.Init() did not find the [" + ATTRIBUTE_FILENAME + "] attribute that is required for FileBlock tags at line number [" + m_lineNumber + "].");
+			Logger.LogError("FileTag.Init() did not find the [" + ATTRIBUTE_FILENAME + "] attribute that is required for FileTag tags at line number [" + m_lineNumber + "].");
 			return false;
 		}
 
-		m_fileNameBlock = t_nodeAttribute.GetAttributeValue();
-		if (m_fileNameBlock == null) {
-			Logger.LogError("FileBlock.Init() did not get the [" + ATTRIBUTE_FILENAME + "] value from attribute that is required for FileBlock tags at line number [" + m_lineNumber + "].");
+		m_fileName = t_nodeAttribute.GetAttributeValue();
+		if (m_fileName == null) {
+			Logger.LogError("FileTag.Init() did not get the [" + ATTRIBUTE_FILENAME + "] value from attribute that is required for FileTag tags at line number [" + m_lineNumber + "].");
 			return false;
 		}
 
 		t_nodeAttribute = p_tagParser.GetNamedAttribute(ATTRIBUTE_DEST_DIR);
 		if (t_nodeAttribute == null) {
-			Logger.LogError("FileBlock.Init() did not find the [" + ATTRIBUTE_DEST_DIR + "] attribute that is required for FileBlock tags at line number [" + m_lineNumber + "].");
+			Logger.LogError("FileTag.Init() did not find the [" + ATTRIBUTE_DEST_DIR + "] attribute that is required for FileTag tags at line number [" + m_lineNumber + "].");
 			return false;
 		}
 
-		m_destinationDirectoryBlock = t_nodeAttribute.GetAttributeValue();
-		if (m_destinationDirectoryBlock == null) {
-			Logger.LogError("FileBlock.Init() did not get the [" + ATTRIBUTE_DEST_DIR + "] value from attribute that is required for FileBlock tags at line number [" + m_lineNumber + "].");
+		m_destinationDirectory = t_nodeAttribute.GetAttributeValue();
+		if (m_destinationDirectory == null) {
+			Logger.LogError("FileTag.Init() did not get the [" + ATTRIBUTE_DEST_DIR + "] value from attribute that is required for FileTag tags at line number [" + m_lineNumber + "].");
 			return false;
 		}
 
 
-		// The "contextname" attribute is optional, so it's fine if it doesn't exist.
+		// The "optionalContextName" attribute is optional, so it's fine if it doesn't exist.
 		t_nodeAttribute = p_tagParser.GetNamedAttribute(ATTRIBUTE_OPTIONAL_CONTEXT_NAME);
 		if (t_nodeAttribute != null)
 			m_contextName = t_nodeAttribute.GetAttributeValueAsString();
@@ -180,15 +182,15 @@ public class FileBlock extends TemplateBlock_Base {
 		try {
 			File t_templateFile = new File(m_templateFileName);
 			if (!t_templateFile.exists()) {
-				Logger.LogFatal("FileBlock.Parse() could not open the template file [" + m_templateFileName + "] at line number [" + m_lineNumber + "].");
+				Logger.LogFatal("FileTag.Parse() could not open the template file [" + m_templateFileName + "] at line number [" + m_lineNumber + "].");
 				System.exit(1);
 			}
 
 			// Parse the template file.  The passed in p_tokenizer is from a parent file's contents, but here we are going to parse the indicated template file for this tag and add its execution tree to this tag object so that when the parent's execution tree is being evaluated, this template file's tree can also be evaluated.
 			TemplateParser t_parser = new TemplateParser();
-			TemplateBlock_Base t_template = t_parser.ParseTemplate(t_templateFile);
+			Tag_Base t_template = t_parser.ParseTemplate(t_templateFile);
 			if (t_template == null) {
-				Logger.LogError("FileBlock.Parse() failed in file [" + t_templateFile.getAbsolutePath() + "] at line number [" + m_lineNumber + "].");
+				Logger.LogError("FileTag.Parse() failed in file [" + t_templateFile.getAbsolutePath() + "] at line number [" + m_lineNumber + "].");
 				return false;
 			}
 
@@ -197,7 +199,7 @@ public class FileBlock extends TemplateBlock_Base {
 			return true;
 		}
 		catch (Throwable t_error) {
-			Logger.LogException("FileBlock.Parse() failed with error at line number [" + m_lineNumber + "] in file [" + m_templateFileName + "]: ", t_error);
+			Logger.LogException("FileTag.Parse() failed with error at line number [" + m_lineNumber + "] in file [" + m_templateFileName + "]: ", t_error);
 			return false;
 		}
 	}
@@ -222,7 +224,7 @@ public class FileBlock extends TemplateBlock_Base {
 				s_directoryCreateLock.lock();
 
 				if (!t_destDirectory.exists() && !t_destDirectory.mkdirs()) {
-					Logger.LogError("FileBlock.Evaluate() failed to create the destination directory [" + t_destDirectory.getAbsolutePath() + "].");
+					Logger.LogError("FileTag.Evaluate() failed to create the destination directory [" + t_destDirectory.getAbsolutePath() + "].");
 					p_evaluationContext.PopCurrentCursor();	// We need to clean up the temp cursor before we fail out of the function.
 					return false;
 				}
@@ -237,7 +239,7 @@ public class FileBlock extends TemplateBlock_Base {
 			File t_targetFile = new File(t_fileName.toString());
 			if (t_targetFile.exists()) {
 				if (!p_evaluationContext.GetCustomCodeManager().ScanFile(t_targetFile)) {	// Check to see if the file has any custom code in it.  If it does, this will save it so that the CustomCode tags can re-insert it during the file generation.
-					Logger.LogError("FileBlock.Evaluate() failed to scan the file [" + t_targetFile.getAbsolutePath() + "] for custom code blocks.");
+					Logger.LogError("FileTag.Evaluate() failed to scan the file [" + t_targetFile.getAbsolutePath() + "] for custom code blocks.");
 					p_evaluationContext.PopCurrentCursor();	// We need to clean up the temp cursor before we fail out of the function.
 					return false;
 				}
@@ -246,7 +248,7 @@ public class FileBlock extends TemplateBlock_Base {
 				p_evaluationContext.GetCustomCodeManager().ClearCache();	// If a new file is being generated after an existing file was regenerated and the custom code blocks aren't unique, then the new file will inherit the previous file's custom code blocks.  !!!That's really BAD!!!  This will clear the custom code cache in those cases.
 			}
 
-			Logger.LogDebug("FileBlock.Evaluate() is writing to file [" + t_fileName + "]");
+			Logger.LogDebug("FileTag.Evaluate() is writing to file [" + t_fileName + "]");
 
 			BufferedWriter	t_fileWriter		= new BufferedWriter(new FileWriter(t_targetFile));
 			Cursor			t_fileWriterCursor	= new Cursor(t_fileWriter);
@@ -259,17 +261,17 @@ public class FileBlock extends TemplateBlock_Base {
 			if (m_contextName != null) {
 				t_currentNode = p_evaluationContext.GetOuterContextManager().GetOuterContext(m_contextName);
 				if (t_currentNode == null) {
-					Logger.LogError("FileBlock.Evaluate() failed to find the outer context [" + m_contextName + "] for the evaluation mode at line [" + m_lineNumber + "].");
+					Logger.LogError("FileTag.Evaluate() failed to find the outer context [" + m_contextName + "] for the evaluation mode at line [" + m_lineNumber + "].");
 					return false;
 				}
 			}
 
 			p_evaluationContext.PushNewCurrentNode(t_currentNode);	// This is unnecessarily redundant if we aren't changing the context above, but it simpler and cleaner, particularly if we error out in the if() below.
 
-			for (TemplateBlock_Base t_nextBlock: m_blockList) {
-				if (!t_nextBlock.Evaluate(p_evaluationContext)) {
+			for (Tag_Base t_nextTag: m_tagList) {
+				if (!t_nextTag.Evaluate(p_evaluationContext)) {
 					t_fileWriter.close();
-					Logger.LogError("FileBlock.Evaluate() failed for file [" + t_targetFile.getAbsolutePath() + "].");
+					Logger.LogError("FileTag.Evaluate() failed for file [" + t_targetFile.getAbsolutePath() + "].");
 					p_evaluationContext.PopCurrentCursor();	// We need to clean up the temp cursor before we fail out of the function.
 					return false;
 				}
@@ -281,7 +283,7 @@ public class FileBlock extends TemplateBlock_Base {
 			p_evaluationContext.PopCurrentCursor();	// We need to throw away the file cursor now that we're done with it.
 		}
 		catch (Throwable t_error) {
-			Logger.LogException("FileBlock.Evaluate() failed with error: ", t_error);
+			Logger.LogException("FileTag.Evaluate() failed with error: ", t_error);
 			return false;
 		}
 
@@ -295,15 +297,18 @@ public class FileBlock extends TemplateBlock_Base {
 	public String Dump(String p_tabs) {
 		StringBuilder t_dump = new StringBuilder();
 
-		t_dump.append(p_tabs + "Block type name    :  " + m_name 											+ "\n");
+		t_dump.append(p_tabs + "Tag name           :  " + m_name 											+ "\n");
 		t_dump.append(p_tabs + "Template file name :  " + m_templateFileName								+ "\n");
-		t_dump.append(p_tabs + "Output file name   :  " + m_fileNameBlock.Dump(p_tabs + "\t")				+ "\n");
-		t_dump.append(p_tabs + "Destination Dir    :  " + m_destinationDirectoryBlock.Dump(p_tabs + "\t")	+ "\n");
+		t_dump.append(p_tabs + "Output file name   :  " + m_fileName.Dump(p_tabs + "\t")				+ "\n");
+		t_dump.append(p_tabs + "Destination Dir    :  " + m_destinationDirectory.Dump(p_tabs + "\t")	+ "\n");
 
-		// This will output the child template...
-		for (TemplateBlock_Base t_nextBlock: m_blockList) {
+		if (m_tagList == null)
+			return t_dump.toString();
+
+		// This will output the child template file's contents ...
+		for (Tag_Base t_nextTag: m_tagList) {
 			t_dump.append("\n\n");
-			t_dump.append(t_nextBlock.Dump(p_tabs + "\t"));
+			t_dump.append(t_nextTag.Dump(p_tabs + "\t"));
 		}
 
 		return t_dump.toString();

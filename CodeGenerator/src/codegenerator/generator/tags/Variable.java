@@ -52,10 +52,10 @@ also be valid for that location.</p>
 variables could be made to work even inside inner contexts.
 
 */
-public class VariableBlock extends TemplateBlock_Base {
+public class Variable extends Tag_Base {
 
-	static public final String		BLOCK_NAME							= "variable";
-	static public final String		BLOCK_END_NAME						= "endVariable";
+	static public final String		TAG_NAME							= "variable";
+	static public final String		TAG_END_NAME						= "endVariable";
 
 	static public final String		ATTRIBUTE_NAME						= "name";
 	static public final String		ATTRIBUTE_EVAL_MODE					= "evalMode";
@@ -70,7 +70,7 @@ public class VariableBlock extends TemplateBlock_Base {
 
 
 	// Static members
-	static protected final TreeMap<String, TemplateBlock_Base>		m_variableMap	= new TreeMap<>();
+	static protected final TreeMap<String, Tag_Base>		m_variableMap	= new TreeMap<>();
 
 
 	// Data members
@@ -80,16 +80,16 @@ public class VariableBlock extends TemplateBlock_Base {
 
 
 	//*********************************
-	public VariableBlock() {
-		super(BLOCK_NAME);
-		m_isSafeForTextBlock = true;
+	public Variable() {
+		super(TAG_NAME);
+		m_isSafeForTextTag = true;
 	}
 
 
 	//*********************************
 	@Override
-	public VariableBlock GetInstance() {
-		return new VariableBlock();
+	public Variable GetInstance() {
+		return new Variable();
 	}
 
 
@@ -97,19 +97,19 @@ public class VariableBlock extends TemplateBlock_Base {
 	@Override
 	public boolean Init(TagParser p_tagParser) {
 		if (!super.Init(p_tagParser)) {
-			Logger.LogError("VariableBlock.Init() failed in the parent Init().");
+			Logger.LogError("Variable.Init() failed in the parent Init().");
 			return false;
 		}
 
 		TagAttributeParser t_nodeAttribute = p_tagParser.GetNamedAttribute(ATTRIBUTE_NAME);
 		if (t_nodeAttribute == null) {
-			Logger.LogError("VariableBlock.Init() did not find the [" + ATTRIBUTE_NAME + "] attribute that is required for variable tags at line number [" + m_lineNumber + "].");
+			Logger.LogError("Variable.Init() did not find the [" + ATTRIBUTE_NAME + "] attribute that is required for variable tags at line number [" + m_lineNumber + "].");
 			return false;
 		}
 
 		m_variableName = t_nodeAttribute.GetAttributeValueAsString();
 		if (m_variableName == null) {
-			Logger.LogError("VariableBlock.Init() did not get the value from attribute that is required for variable tags at line number [" + m_lineNumber + "].");
+			Logger.LogError("Variable.Init() did not get the value from attribute that is required for variable tags at line number [" + m_lineNumber + "].");
 			return false;
 		}
 
@@ -117,13 +117,13 @@ public class VariableBlock extends TemplateBlock_Base {
 
 		t_nodeAttribute = p_tagParser.GetNamedAttribute(ATTRIBUTE_EVAL_MODE);
 		if (t_nodeAttribute == null) {
-			Logger.LogError("VariableBlock.Init() did not find the [" + ATTRIBUTE_EVAL_MODE + "] attribute that is required for variable tags at line number [" + m_lineNumber + "].");
+			Logger.LogError("Variable.Init() did not find the [" + ATTRIBUTE_EVAL_MODE + "] attribute that is required for variable tags at line number [" + m_lineNumber + "].");
 			return false;
 		}
 
 		String t_evalMode = t_nodeAttribute.GetAttributeValueAsString();
 		if (t_evalMode == null) {
-			Logger.LogError("VariableBlock.Init() did not get the value from attribute [" + ATTRIBUTE_EVAL_MODE + "] that is required for variable tags at line number [" + m_lineNumber + "].");
+			Logger.LogError("Variable.Init() did not get the value from attribute [" + ATTRIBUTE_EVAL_MODE + "] that is required for variable tags at line number [" + m_lineNumber + "].");
 			return false;
 		}
 
@@ -132,7 +132,7 @@ public class VariableBlock extends TemplateBlock_Base {
 		else if (t_evalMode.equalsIgnoreCase(EVAL_MODE_LABEL_EVALUATE))
 			m_evalMode = EVAL_MODE_VALUE_EVALUATE;
 		else {
-			Logger.LogError("VariableBlock.Init() received and invalid evalmode value [" + t_evalMode + "].");
+			Logger.LogError("Variable.Init() received and invalid evalmode value [" + t_evalMode + "].");
 			return false;
 		}
 
@@ -151,19 +151,19 @@ public class VariableBlock extends TemplateBlock_Base {
 	@Override
 	public boolean Parse(TemplateTokenizer p_tokenizer) {
 		try {
-			// We only parse the variable block in "set" mode.  Otherwise, there is nothing after the opening tag.
+			// We only parse the variable tag in "set" mode.  Otherwise, there is nothing after the opening tag.
 			if (m_evalMode != EVAL_MODE_VALUE_SET)
 				return true;
 
 			GeneralBlock t_generalBlock	= new GeneralBlock();
 			if (!t_generalBlock.Parse(p_tokenizer)) {
-				Logger.LogError("VariableBlock.Parse() general block parser failed in the block starting at [" + m_lineNumber + "].");
+				Logger.LogError("Variable.Parse() general block parser failed in the block starting at [" + m_lineNumber + "].");
 				return false;
 			}
 
 			String t_endingTagName = t_generalBlock.GetUnknownTag().GetTagName();
-			if (!t_endingTagName.equalsIgnoreCase(BLOCK_END_NAME)) {
-				Logger.LogError("VariableBlock.Parse() general block ended on a tag named [" + t_endingTagName + "] at line [" + p_tokenizer.GetLineCount() + "] in the block starting at [" + m_lineNumber + "].  The closing tag [" + BLOCK_END_NAME + "] was expected.");
+			if (!t_endingTagName.equalsIgnoreCase(TAG_END_NAME)) {
+				Logger.LogError("Variable.Parse() general block ended on a tag named [" + t_endingTagName + "] at line [" + p_tokenizer.GetLineCount() + "] in the tag starting at [" + m_lineNumber + "].  The closing tag [" + TAG_END_NAME + "] was expected.");
 				return false;
 			}
 
@@ -172,7 +172,7 @@ public class VariableBlock extends TemplateBlock_Base {
 			return true;
 		}
 		catch (Throwable t_error) {
-			Logger.LogException("VariableBlock.Parse() failed with error at line [" + p_tokenizer.GetLineCount() + "] in the block starting at [" + m_lineNumber + "]: ", t_error);
+			Logger.LogException("Variable.Parse() failed with error at line [" + p_tokenizer.GetLineCount() + "] in the tag starting at [" + m_lineNumber + "]: ", t_error);
 			return false;
 		}
 	}
@@ -186,9 +186,9 @@ public class VariableBlock extends TemplateBlock_Base {
 			if (m_evalMode == EVAL_MODE_VALUE_SET)		// Don't do anything for instances that are "set"s.  Those are never "evaluated".
 				return true;
 			else if (m_evalMode == EVAL_MODE_VALUE_EVALUATE) {
-				TemplateBlock_Base t_evalBlock = m_variableMap.get(m_variableName);
+				Tag_Base t_evalBlock = m_variableMap.get(m_variableName);
 				if (t_evalBlock == null) {
-					Logger.LogError("VariableBlock.Evaluate() did not find a evaluation block for variable [" + m_variableName + "] at line [" + m_lineNumber + "].");
+					Logger.LogError("Variable.Evaluate() did not find a evaluation tag for variable [" + m_variableName + "] at line [" + m_lineNumber + "].");
 					return false;
 				}
 
@@ -197,7 +197,7 @@ public class VariableBlock extends TemplateBlock_Base {
 				if (m_contextName != null) {
 					t_currentNode = p_evaluationContext.GetOuterContextManager().GetOuterContext(m_contextName);
 					if (t_currentNode == null) {
-						Logger.LogError("VariableBlock.Evaluate() failed to find the outer context [" + m_contextName + "] for the evaluation mode at line [" + m_lineNumber + "].");
+						Logger.LogError("Variable.Evaluate() failed to find the outer context [" + m_contextName + "] for the evaluation mode at line [" + m_lineNumber + "].");
 						return false;
 					}
 				}
@@ -212,12 +212,12 @@ public class VariableBlock extends TemplateBlock_Base {
 				p_evaluationContext.PopCurrentNode();
 			}
 			else {
-				Logger.LogError("VariableBlock.Evaluate() found an invalid value [" + m_evalMode + "] for the evaluation mode at line [" + m_lineNumber + "].");
+				Logger.LogError("Variable.Evaluate() found an invalid value [" + m_evalMode + "] for the evaluation mode at line [" + m_lineNumber + "].");
 				return false;
 			}
 		}
 		catch (Throwable t_error) {
-			Logger.LogException("VariableBlock.Evaluate() failed with error at line [" + m_lineNumber + "]: ", t_error);
+			Logger.LogException("Variable.Evaluate() failed with error at line [" + m_lineNumber + "]: ", t_error);
 			return false;
 		}
 
@@ -230,7 +230,7 @@ public class VariableBlock extends TemplateBlock_Base {
 	public String Dump(String p_tabs) {
 		StringBuilder t_dump = new StringBuilder();
 
-		t_dump.append(p_tabs + "Block type name :  " + m_name			+ "\n");
+		t_dump.append(p_tabs + "Tag name        :  " + m_name			+ "\n");
 		t_dump.append(p_tabs + "Variable name   :  " + m_variableName	+ "\n");
 		t_dump.append(p_tabs + "Evaluation mode :  " + m_evalMode		+ "\n");
 

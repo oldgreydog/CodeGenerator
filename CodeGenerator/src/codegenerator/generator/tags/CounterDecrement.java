@@ -30,24 +30,24 @@ import codegenerator.generator.utils.*;
 /**
 	The original use case for this tag was eliminated when the <code>first</code> tag was changed so that it knows
 	the first time its passed through even if the counter it's watching isn't == 1.  That can happen, for example,
-	when the <code>first</code> tag is inside an <code>if</code> tag block.</p>
+	when the <code>first</code> tag is inside an <code>if</code> tag.</p>
 
-	<p>However, you may find a use for it now that there is the <code>counterVariable</code> tag block, so I have left
+	<p>However, you may find a use for it now that there is the <code>counterVariable</code> tag, so I have left
 	it in.  You can use this with <code>counterVariable</code> counters and named <code>forEach</code> counters.</p>
  */
-public class CounterDecrement extends TemplateBlock_Base {
+public class CounterDecrement extends Tag_Base {
 
-	static public final String		BLOCK_NAME							= "--counter";
+	static public final String		TAG_NAME							= "--counter";
 
 	static public final String		ATTRIBUTE_OPTIONAL_COUNTER_NAME		= "optionalCounterName";
 
 	// Data members
-	private	String	m_optionalCounterName	= null;	// Providing a name for the loop counter lets you specify using a named loop counter from a forEach block other than the one directly containing this first block.
+	private	String	m_optionalCounterName	= null;	// Providing a name for the loop counter lets you specify using a named loop counter from a forEach tag other than the one directly containing this first tag.
 
 
 	//*********************************
 	public CounterDecrement() {
-		super(BLOCK_NAME);
+		super(TAG_NAME);
 	}
 
 
@@ -128,7 +128,7 @@ public class CounterDecrement extends TemplateBlock_Base {
 	public String Dump(String p_tabs) {
 		StringBuilder t_dump = new StringBuilder();
 
-		t_dump.append(p_tabs + "Block type name :  --counter\n");
+		t_dump.append(p_tabs + "Tag name        :  " + m_name 	+ "\n");
 
 		return t_dump.toString();
 	}

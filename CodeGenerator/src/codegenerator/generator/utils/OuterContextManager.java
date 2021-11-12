@@ -40,7 +40,7 @@ public class OuterContextManager {
 
 	//*********************************
 	/**
-	 * In shifting to multithreading on the "file" evaluations (and allowing nested file blocks), we have to snap-shot the context so that
+	 * In shifting to multithreading on the "file" evaluations (and allowing nested file tags), we have to snap-shot the context so that
 	 * we have the correct values while we are in the file evaluation.  If we didn't, the context would be changing outside the file
 	 * eval and would completely pollute any usage of those context values inside the file evaluation.
 	 *

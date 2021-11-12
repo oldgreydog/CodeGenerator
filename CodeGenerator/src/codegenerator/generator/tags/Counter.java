@@ -32,23 +32,23 @@ import codegenerator.generator.utils.*;
 
 	<pre><code>&lt;%counter  optionalCounterName = "loop1" %&gt;</code></pre>
 
-	<p>The optionalCounterName attribute lets you specify using a named loop counter from a forEach block other than the
-	one directly containing this counter block.</p>
+	<p>The optionalCounterName attribute lets you specify using a named loop counter from a forEach tag other than the
+	one directly containing this counter tag.</p>
 */
-public class Counter extends TemplateBlock_Base {
+public class Counter extends Tag_Base {
 
-	static public final String		BLOCK_NAME							= "counter";
+	static public final String		TAG_NAME							= "counter";
 
 	static public final String		ATTRIBUTE_OPTIONAL_COUNTER_NAME		= "optionalCounterName";
 
 	// Data members
-	private	String	m_optionalCounterName	= null;	// Providing a name for the loop counter lets you specify using a named loop counter from a forEach block other than the one directly containing this first block.
+	private	String	m_optionalCounterName	= null;	// Providing a name for the loop counter lets you specify using a named loop counter from a forEach tag other than the one directly containing this first tag.
 
 
 	//*********************************
 	public Counter() {
-		super("counter");
-		m_isSafeForTextBlock = true;
+		super(TAG_NAME);
+		m_isSafeForTextTag = true;
 	}
 
 
@@ -130,7 +130,7 @@ public class Counter extends TemplateBlock_Base {
 	public String Dump(String p_tabs) {
 		StringBuilder t_dump = new StringBuilder();
 
-		t_dump.append(p_tabs + "Block type name :  counter\n");
+		t_dump.append(p_tabs + "Tag name        :  " + m_name 	+ "\n");
 
 		return t_dump.toString();
 	}

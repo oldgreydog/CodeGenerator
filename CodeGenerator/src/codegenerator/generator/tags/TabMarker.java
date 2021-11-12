@@ -38,9 +38,9 @@ import coreutil.logging.*;
 	attribute set to <code>marker</code> can use that marker location as its offset by itself or
 	it can add an offset to place a column relative to the marker.  Please refer to the examples.</p>
  */
-public class TabMarker extends TemplateBlock_Base {
+public class TabMarker extends Tag_Base {
 
-	static public final String		BLOCK_NAME		= "tabMarker";
+	static public final String		TAG_NAME		= "tabMarker";
 
 
 	// Data members
@@ -48,8 +48,8 @@ public class TabMarker extends TemplateBlock_Base {
 
 	//*********************************
 	public TabMarker() {
-		super(BLOCK_NAME);
-		m_isSafeForTextBlock = true;
+		super(TAG_NAME);
+		m_isSafeForTextTag = true;
 	}
 
 
@@ -67,7 +67,7 @@ public class TabMarker extends TemplateBlock_Base {
 
 	//*********************************
 	@Override
-	public TemplateBlock_Base GetInstance() {
+	public Tag_Base GetInstance() {
 		return new TabMarker();
 	}
 

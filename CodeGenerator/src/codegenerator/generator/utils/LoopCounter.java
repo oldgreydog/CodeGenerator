@@ -52,7 +52,7 @@ public class LoopCounter {
 
 	//*********************************
 	/**
-	 * In shifting to multithreading on the "file" evaluations (and allowing nested file blocks), we have to snap-shot the parent loop counters so that
+	 * In shifting to multithreading on the "file" evaluations (and allowing nested file tags), we have to snap-shot the parent loop counters so that
 	 * we have the correct static values while we are in the file evaluation.  If we didn't, the parent loop counters would be changing outside the file
 	 * eval and would completely pollute any usage of those parent loop counters inside the file evaluation.
 	 *

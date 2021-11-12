@@ -36,9 +36,9 @@ import coreutil.logging.*;
 	<pre><code>&lt;%typeConvertLoadFile file = "DataType_Conversion_Java_to_Java.xml" %&gt;</code></pre>
 
  */
-public class TypeConvertLoadFile extends TemplateBlock_Base {
+public class TypeConvertLoadFile extends Tag_Base {
 
-	static public final String		BLOCK_NAME			= "typeConvertLoadFile";
+	static public final String		TAG_NAME			= "typeConvertLoadFile";
 
 	static public final String		ATTRIBUTE_FILE		= "file";
 
@@ -48,7 +48,7 @@ public class TypeConvertLoadFile extends TemplateBlock_Base {
 
 	//*********************************
 	public TypeConvertLoadFile() {
-		super(BLOCK_NAME);
+		super(TAG_NAME);
 	}
 
 
@@ -91,7 +91,7 @@ public class TypeConvertLoadFile extends TemplateBlock_Base {
 
 	//*********************************
 	@Override
-	public TemplateBlock_Base GetInstance() {
+	public Tag_Base GetInstance() {
 		return new TypeConvertLoadFile();
 	}
 
@@ -116,7 +116,7 @@ public class TypeConvertLoadFile extends TemplateBlock_Base {
 	public String Dump(String p_tabs) {
 		StringBuilder t_dump = new StringBuilder();
 
-		t_dump.append(p_tabs + "Block type name  :  " + m_name + "\n");
+		t_dump.append(p_tabs + "Tag name         :  " + m_name + "\n");
 
 		t_dump.append(p_tabs + "\tFile path : " + ((m_filePath != null) ? m_filePath : "NULL") + "\n");
 

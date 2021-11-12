@@ -36,7 +36,7 @@ public class EvaluationContext {
 	private final LinkedList<ConfigNode>		m_currentNodeStack			= new LinkedList<>();
 	private ConfigNode							m_rootNode;
 	private final LinkedList<Cursor> 			m_writerStack			= new LinkedList<>();
-	private final LinkedList<LoopCounter>		m_iterationCounterStack	= new LinkedList<>();	// There are rare cases (i.e. FirstElseBlock) where we need to grab a named counter from the current counter and set it as the temporary counter for the evaluation of the block.
+	private final LinkedList<LoopCounter>		m_iterationCounterStack	= new LinkedList<>();	// There are rare cases (i.e. FirstElse) where we need to grab a named counter from the current counter and set it as the temporary counter for the evaluation of the tag.
 	private final TreeMap<String, LoopCounter>	m_counterVariableMap	= new TreeMap<>();		// Since counter variables aren't tied to forEach loops, we need to handle them separately.  If we pushed them onto the forEach loop counter stack, we could potentially seriously poison that stack because any first tags that weren't naming the counter they were working with could possibly use the wrong counter.
 	private OuterContextManager					m_contextManager		= null;
 	private CustomCodeManager					m_customCodeManager		= null;

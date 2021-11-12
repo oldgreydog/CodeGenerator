@@ -47,7 +47,7 @@ import codegenerator.generator.utils.*;
  * that whitespace on the next line before the end-comment.  That ensures that the two comments start
  * with the same, and correct, indentation in the output code.</p>
  *
- * <p>Here are two samples of the tag that represents this block:</p>
+ * <p>Here are two samples of this tag's usage:</p>
  *
  * <pre><code>&lt;%customCode key=LoadAll&lt;%className%&gt;CacheCode openingCommentCharacters=// %&gt;</code></pre>
  *
@@ -60,20 +60,20 @@ import codegenerator.generator.utils.*;
   * <p><b><code>optionalClosingCommentCharacters</code></b> - this optional attribute is used for the closing comment characters for languages or file types that require them.  In this example, it's "-->" that close the "<!--" opening comment for xml.</p>
  *
  * <p>The key is critical.  It has to be unique in the file.  If the code where this tag is used is
- * outside a <code>forEach</code> block, then you can optionally give it a key that is fixed, such
- * as <code>StaticMembers</code>.  However, if this tag is used inside a <code>forEach</code> block,
+ * outside a <code>forEach</code> tag, then you can optionally give it a key that is fixed, such
+ * as <code>StaticMembers</code>.  However, if this tag is used inside a <code>forEach</code> tag,
  * then you must define a key that uses a raw or type-converted config value to make it unique within
  * the context. The <code>LoadAll&lt;%className%&gt;CacheCode</code> used in the example above is a
  * perfect example.  The config variable <code>&lt;%className%&gt;</code> will cause a unique tag to
- * be generated at that location in every pass through the <code>forEach</code> block.</p>
+ * be generated at that location in every pass through the <code>forEach</code> tag.</p>
  *
  * <p><b>If you don't make the key unique, you will loose custom code the next time you regenerate
  * on top of existing files!!</b></p>
  *
- * <p>To that end, if you are inside nested <code>forEach</code> blocks, then you will probably need
+ * <p>To that end, if you are inside nested <code>forEach</code> tags, then you will probably need
  * to add a config value for each context, using the parent reference caret (^) where necessary.  So,
- * for example, if you were inside a <code>forEach</code> block iterating over the "member" nodes under
- * an outer <code>forEach</code> block that's iterating over "class" nodes, then you might create a tag like:</p>
+ * for example, if you were inside a <code>forEach</code> tag iterating over the "member" nodes under
+ * an outer <code>forEach</code> tag that's iterating over "class" nodes, then you might create a tag like:</p>
  *
  * <p><code>&lt;%customCode key=Validate&lt;%memberName%&gt;Of&lt;%^className%&gt; openingCommentCharacters=// %&gt;</code></p>
  *
@@ -81,9 +81,9 @@ import codegenerator.generator.utils.*;
  * to find the value named "className".  Since that parent node will be the one that the outer loop is
  * currently pointed at, you will get the correct value for the context.</p>
  */
-public class CustomCodeBlock extends TemplateBlock_Base {
+public class CustomCode extends Tag_Base {
 
-	static public final String		BLOCK_NAME									= "customCode";
+	static public final String		TAG_NAME									= "customCode";
 
 	static public final String		ATTRIBUTE_KEY								= "key";
 	static public final String		ATTRIBUTE_OPENING_COMMENT_CHARS				= "openingCommentCharacters";
@@ -91,22 +91,22 @@ public class CustomCodeBlock extends TemplateBlock_Base {
 
 
 	// Data members
-	protected	TemplateBlock_Base	m_key							= null;
+	protected	Tag_Base	m_key							= null;
 	protected	String				m_openingCommentCharacters		= null;
 	protected	String				m_closingCommentCharacters		= null;
 
 
 	//*********************************
-	public CustomCodeBlock() {
-		super(BLOCK_NAME);
-		m_isSafeForTextBlock = true;
+	public CustomCode() {
+		super(TAG_NAME);
+		m_isSafeForTextTag = true;
 	}
 
 
 	//*********************************
 	@Override
-	public CustomCodeBlock GetInstance() {
-		return new CustomCodeBlock();
+	public CustomCode GetInstance() {
+		return new CustomCode();
 	}
 
 
@@ -114,31 +114,31 @@ public class CustomCodeBlock extends TemplateBlock_Base {
 	@Override
 	public boolean Init(TagParser p_tagParser) {
 		if (!super.Init(p_tagParser)) {
-			Logger.LogError("CustomCodeBlock.Init() failed in the parent Init() at line number [" + p_tagParser.GetLineNumber() + "].");
+			Logger.LogError("CustomCode.Init() failed in the parent Init() at line number [" + p_tagParser.GetLineNumber() + "].");
 			return false;
 		}
 
 		TagAttributeParser t_nodeAttribute = p_tagParser.GetNamedAttribute(ATTRIBUTE_KEY);
 		if (t_nodeAttribute == null) {
-			Logger.LogError("CustomCodeBlock.Init() did not find the [" + ATTRIBUTE_KEY + "] attribute that is required for CustomCodeBlock tags at line number [" + m_lineNumber + "].");
+			Logger.LogError("CustomCode.Init() did not find the [" + ATTRIBUTE_KEY + "] attribute that is required for CustomCode tags at line number [" + m_lineNumber + "].");
 			return false;
 		}
 
 		m_key = t_nodeAttribute.GetAttributeValue();
 		if (m_key == null) {
-			Logger.LogError("CustomCodeBlock.Init() did not get the [" + ATTRIBUTE_KEY + "] string from attribute that is required for CustomCodeBlock tags at line number [" + m_lineNumber + "].");
+			Logger.LogError("CustomCode.Init() did not get the [" + ATTRIBUTE_KEY + "] string from attribute that is required for CustomCode tags at line number [" + m_lineNumber + "].");
 			return false;
 		}
 
 		t_nodeAttribute = p_tagParser.GetNamedAttribute(ATTRIBUTE_OPENING_COMMENT_CHARS);
 		if (t_nodeAttribute == null) {
-			Logger.LogError("CustomCodeBlock.Init() did not find the [" + ATTRIBUTE_OPENING_COMMENT_CHARS + "] attribute that is required for CustomCodeBlock tags at line number [" + m_lineNumber + "].");
+			Logger.LogError("CustomCode.Init() did not find the [" + ATTRIBUTE_OPENING_COMMENT_CHARS + "] attribute that is required for CustomCode tags at line number [" + m_lineNumber + "].");
 			return false;
 		}
 
 		m_openingCommentCharacters = t_nodeAttribute.GetAttributeValueAsString();
 		if (m_openingCommentCharacters == null) {
-			Logger.LogError("CustomCodeBlock.Init() did not get the [" + ATTRIBUTE_OPENING_COMMENT_CHARS + "] value from attribute that is required for CustomCodeBlock tags at line number [" + m_lineNumber + "].");
+			Logger.LogError("CustomCode.Init() did not get the [" + ATTRIBUTE_OPENING_COMMENT_CHARS + "] value from attribute that is required for CustomCode tags at line number [" + m_lineNumber + "].");
 			return false;
 		}
 
@@ -146,7 +146,7 @@ public class CustomCodeBlock extends TemplateBlock_Base {
 		if (t_nodeAttribute != null) {
 			m_closingCommentCharacters = t_nodeAttribute.GetAttributeValueAsString();
 			if (m_closingCommentCharacters == null) {
-				Logger.LogError("CustomCodeBlock.Init() did not get the [" + ATTRIBUTE_OPTIONAL_CLOSING_COMMENT_CHARS + "] value from attribute that is required for CustomCodeBlock tags at line number [" + m_lineNumber + "].");
+				Logger.LogError("CustomCode.Init() did not get the [" + ATTRIBUTE_OPTIONAL_CLOSING_COMMENT_CHARS + "] value from attribute that is required for CustomCode tags at line number [" + m_lineNumber + "].");
 				return false;
 			}
 		}
@@ -193,13 +193,13 @@ public class CustomCodeBlock extends TemplateBlock_Base {
 			if (t_customCode != null)
 				t_writer.Write(t_customCode);
 
-			t_writer.Write(t_leadingWhiteSpace + m_openingCommentCharacters + "	" + CustomCodeManager.END_CUSTOM_CODE + ":" + t_keyWriter.toString());	// This doesn't have "\n" on the end because it's used in text blocks and the text block will keep the newline after the tag itself and add it here so we don't have to.
+			t_writer.Write(t_leadingWhiteSpace + m_openingCommentCharacters + "	" + CustomCodeManager.END_CUSTOM_CODE + ":" + t_keyWriter.toString());	// This doesn't have "\n" on the end because it's used in text tags and the text tag will keep the newline after the tag itself and add it here so we don't have to.
 
 			if (m_closingCommentCharacters != null)
-				t_writer.Write("	" + m_closingCommentCharacters);	// This doesn't have "\n" on the end because it's used in text blocks and the text block will keep the newline after the tag itself and add it here so we don't have to.
+				t_writer.Write("	" + m_closingCommentCharacters);	// This doesn't have "\n" on the end because it's used in text tags and the text tag will keep the newline after the tag itself and add it here so we don't have to.
 		}
 		catch (Throwable t_error) {
-			Logger.LogException("CustomCodeBlock.Evaluate() failed with error at line number [" + m_lineNumber + "]: ", t_error);
+			Logger.LogException("CustomCode.Evaluate() failed with error at line number [" + m_lineNumber + "]: ", t_error);
 			return false;
 		}
 
@@ -212,7 +212,7 @@ public class CustomCodeBlock extends TemplateBlock_Base {
 	public String Dump(String p_tabs) {
 		StringBuilder t_dump = new StringBuilder();
 
-		t_dump.append(p_tabs + "Block type name    :  " + m_name 				+ "\n");
+		t_dump.append(p_tabs + "Tag name           :  " + m_name 				+ "\n");
 		t_dump.append(p_tabs + "Comment Characters :  " + m_openingCommentCharacters	+ "\n");
 		t_dump.append(p_tabs + "Key                :\n");
 

@@ -91,7 +91,7 @@ public class TagParser {
 
 			m_tagName = t_nextToken.m_tokenValue;
 
-//			if (m_tagName.equals(TypeConvert.BLOCK_NAME))
+//			if (m_tagName.equals(TypeConvert.TAG_NAME))
 //				Logger.LogVerbose("Pause");
 
 
