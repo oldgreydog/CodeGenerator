@@ -33,46 +33,25 @@ import coreutil.logging.*;
 
 
 /**
-	An embeddable control class that executes the steps necessary to initialize and execute code generation.
+	This class encapsulates the code necessary to initialize and execute code generation.
  */
 public class CodeGenerator {
 
 
-	//===========================================
+	//*********************************
 	/**
-	 * Takes in the pathnames of the three files necessary to run the generator and executes all of
+	 * Takes in the pathnames of the two files necessary to run the generator and executes all of
 	 * the file loads/parses and then executes the generation.
 	 *
-	 * @param p_configFileName		File contains the general config info for the generator in ConfigManager XML format.  Currently that is the data conversion filenames and the logger config.
 	 * @param p_templateFilename	File contains the "root" template to be used for the generation run.
 	 * @param p_variablesFilename	File contains the values that will be substituted into the template(s).  It is in the same ConfigManager XML format as is used in p_configFileName.
 	 * @return
 	 */
-	public boolean Execute(String p_configFileName,
-						   String p_templateFilename,
-						   String p_variablesFilename)
+	public synchronized boolean Execute(String p_templateFilename,
+										String p_variablesFilename)
 	{
 		try
 		{
-			// The ConfigManager can be given, theoretically, any number of configuration info sources.  In practice, it will probably only be a couple of sources: the config file as default first source and either a database source or network source depending on whether the app is a client/server or a multi-tier architecture (respectively).
-			// Load the config file and add its "source" to the ConfigManager first.  This will make its values the "default" values for anything not in other config sources added later.
-			FileConfigValueSet	t_configValues = new FileConfigValueSet();
-			if (!t_configValues.Load(p_configFileName)) {
-				System.out.println("CodeGenerator.Execute() failed to import the config file [" + p_configFileName + "].");
-				Cleanup();
-				System.exit(1);
-			}
-
-			ConfigManager.AddValueSetFirst(t_configValues);
-
-
-			// Set up the logger(s) that we need for this app.  This is controlled by the logging config info in the config file.
-			if (!Logger.Init()) {
-				System.out.println("CodeGenerator.Execute() failed initializing the Logger.");
-				return false;
-			}
-
-
 			// Parse the template file, which should be the next parameter.
 			File t_templateFile = new File(p_templateFilename);
 			if (!t_templateFile.exists()) {
@@ -87,7 +66,6 @@ public class CodeGenerator {
 			Tag_Base	t_template	= t_parser.ParseTemplate(t_templateFile);
 			if (t_template == null) {
 				Logger.LogFatal("CodeGenerator.Execute() failed to parse the template file [" + p_templateFilename + "].");
-				Cleanup();
 				return false;
 			}
 
@@ -101,8 +79,7 @@ public class CodeGenerator {
 			ConfigNode t_templateConfig = null;
 			XMLConfigParser t_configParser = new XMLConfigParser();
 			if ((t_templateConfig = t_configParser.ParseConfigFile(t_templateConfigFile)) == null) {
-				Logger.LogFatal("CodeGenerator.Execute() failed to parse the template variables file [" + p_variablesFilename + "].");
-				Cleanup();
+				Logger.LogFatal("CodeGenerator.Execute() failed to parse the config variables file [" + p_variablesFilename + "].");
 				return false;
 			}
 
@@ -113,7 +90,10 @@ public class CodeGenerator {
 
 			// And finally, "evaluate" the template with the config to generate the all of the file outputs.
 			EvaluationContext t_context = new EvaluationContext(t_templateConfig, t_templateConfig, null, new LoopCounter());
-			t_template.Evaluate(t_context);
+			if (!t_template.Evaluate(t_context)) {
+				Logger.LogFatal("CodeGenerator.Execute() to evaluate the template file [" + t_templateFile.getAbsolutePath() + "].");
+				return false;
+			}
 
 			long t_endGenerate = Calendar.getInstance().getTimeInMillis();
 
@@ -123,29 +103,12 @@ public class CodeGenerator {
 			Logger.LogInfo("Generation time (millisec):     "	+ (t_endGenerate			- t_startGenerate));
 			Logger.LogInfo("Generated file count:           "	+ FileTag.GetFileCount());
 
-			Cleanup();
-
 			return true;
 		}
 		catch (Throwable t_error)
 		{
 			Logger.LogFatal("CodeGenerator.Execute() failed with error: ", t_error);
-
-			Cleanup();
-
 			return false;
-		}
-	}
-
-
-	//===========================================
-	private void Cleanup() {
-		try {
-			Logger.Shutdown();
-		}
-		catch (Throwable t_error)
-		{
-			Logger.LogException("CodeGenerator.Cleanup() failed with error: ", t_error);
 		}
 	}
 }
