@@ -63,7 +63,7 @@ public class FirstElse extends Tag_Base {
 	static public final String		TAG_ELSE_NAME						= "else";
 	static public final String		TAG_END_NAME						= "endFirst";
 
-	static public final String		ATTRIBUTE_OPTIONAL_COUNTER_NAME		= "optionalCounterName";
+	static private final String		ATTRIBUTE_OPTIONAL_COUNTER_NAME		= "optionalCounterName";
 
 	private GeneralBlock		m_firstBlock			= null;
 	private GeneralBlock		m_elseBlock				= null;

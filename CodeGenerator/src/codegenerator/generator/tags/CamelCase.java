@@ -44,8 +44,8 @@ public class CamelCase extends Tag_Base {
 
 	static public final String		TAG_NAME						= "camelCase";
 
-	static public final String		ATTRIBUTE_VALUE					= "value";
-	static public final String		ATTRIBUTE_OPTIONAL_SEPARATOR	= "optionalSeparator";
+	static private final String		ATTRIBUTE_VALUE					= "value";
+	static private final String		ATTRIBUTE_OPTIONAL_SEPARATOR	= "optionalSeparator";
 
 
 	// Data members

@@ -167,8 +167,8 @@ public class ForEach extends Tag_Base {
 	static public final String		TAG_NAME							= "forEach";
 	static public final String		TAG_END_NAME						= "endFor";
 
-	static public final String		ATTRIBUTE_NODE						= "node";
-	static public final String		ATTRIBUTE_OPTIONAL_COUNTER_NAME		= "optionalCounterName";
+	static private final String		ATTRIBUTE_NODE						= "node";
+	static private final String		ATTRIBUTE_OPTIONAL_COUNTER_NAME		= "optionalCounterName";
 
 
 	// Data members

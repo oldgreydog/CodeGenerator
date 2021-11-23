@@ -39,7 +39,7 @@ public class Counter extends Tag_Base {
 
 	static public final String		TAG_NAME							= "counter";
 
-	static public final String		ATTRIBUTE_OPTIONAL_COUNTER_NAME		= "optionalCounterName";
+	static private final String		ATTRIBUTE_OPTIONAL_COUNTER_NAME		= "optionalCounterName";
 
 	// Data members
 	private	String	m_optionalCounterName	= null;	// Providing a name for the loop counter lets you specify using a named loop counter from a forEach tag other than the one directly containing this first tag.

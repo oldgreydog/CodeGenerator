@@ -32,7 +32,7 @@ import java.util.*;
 public class TagFactory {
 
 	// Data Members
-	protected static	TreeMap<String, Tag_Base>	m_tags = new TreeMap<>();
+	private static	TreeMap<String, Tag_Base>	m_tags = new TreeMap<>();
 
 
 	// The tag name is converted to lower case so that we can universally force the names searched for in GetTag() below to lower case and thereby make it possible to handle whatever capitalization the user uses in their templates (i.e. camelcase, all lower, all cap, etc.).

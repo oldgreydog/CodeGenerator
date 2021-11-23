@@ -96,8 +96,8 @@ public class ConfigVariable extends Tag_Base {
 
 
 	// Data members
-	protected	String		m_variableName			= null;
-	protected	int			m_parentReferenceCount	= 0;		// (i.e. "^varname") This count tells us how many levels up to go to reference the following variable name on a parent node (or a parent-of-a-parent node "^^varname", etc.)
+	private	String		m_variableName			= null;
+	private	int			m_parentReferenceCount	= 0;		// (i.e. "^varname") This count tells us how many levels up to go to reference the following variable name on a parent node (or a parent-of-a-parent node "^^varname", etc.)
 
 
 	//*********************************

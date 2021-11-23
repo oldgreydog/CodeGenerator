@@ -44,8 +44,8 @@ public class OuterContextEval extends Tag_Base {
 
 	static public final String		TAG_NAME					= "outerContextEval";
 
-	static public final String		ATTRIBUTE_CONTEXT_NAME		= "contextName";
-	static public final String		ATTRIBUTE_TARGET_VALUE		= "targetValue";
+	static private final String		ATTRIBUTE_CONTEXT_NAME		= "contextName";
+	static private final String		ATTRIBUTE_TARGET_VALUE		= "targetValue";
 
 
 	// Data members

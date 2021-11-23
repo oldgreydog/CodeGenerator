@@ -40,11 +40,12 @@ public class TypeConvertLoadFile extends Tag_Base {
 
 	static public final String		TAG_NAME			= "typeConvertLoadFile";
 
-	static public final String		ATTRIBUTE_FILE		= "file";
+	static private final String		ATTRIBUTE_FILE		= "file";
 
 
 	// Data members
 	private String m_filePath	= null;
+
 
 	//*********************************
 	public TypeConvertLoadFile() {

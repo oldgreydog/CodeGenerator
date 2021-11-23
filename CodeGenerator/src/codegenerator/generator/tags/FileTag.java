@@ -55,10 +55,10 @@ public class FileTag extends Tag_Base {
 
 	static public final String		TAG_NAME	= "file";
 
-	static public final String		ATTRIBUTE_TEMPLATE					= "template";
-	static public final String		ATTRIBUTE_FILENAME					= "filename";
-	static public final String		ATTRIBUTE_DEST_DIR					= "destDir";
-	static public final String		ATTRIBUTE_OPTIONAL_CONTEXT_NAME		= "optionalContextName";
+	static private final String		ATTRIBUTE_TEMPLATE					= "template";
+	static private final String		ATTRIBUTE_FILENAME					= "filename";
+	static private final String		ATTRIBUTE_DEST_DIR					= "destDir";
+	static private final String		ATTRIBUTE_OPTIONAL_CONTEXT_NAME		= "optionalContextName";
 
 
 	// Static members

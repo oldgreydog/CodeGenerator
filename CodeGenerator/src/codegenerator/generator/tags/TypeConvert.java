@@ -156,9 +156,9 @@ public class TypeConvert extends Tag_Base {
 
 
 	// Data members
-	protected	String				m_targetLanguage	= null;
-	protected	Tag_Base	m_sourceType		= null;
-	protected	String				m_groupID			= null;
+	private	String		m_targetLanguage	= null;
+	private	Tag_Base	m_sourceType		= null;
+	private	String		m_groupID			= null;
 
 
 	//*********************************

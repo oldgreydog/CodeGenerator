@@ -36,8 +36,8 @@ import coreutil.logging.*;
 public abstract class If_Boolean extends Tag_Base {
 
 	// Static members
-	static public final String		RESULT_TRUE		= "true";
-	static public final String		RESULT_FALSE	= "false";
+	static private final String		RESULT_TRUE		= "true";
+	static private final String		RESULT_FALSE	= "false";
 
 
 	/**

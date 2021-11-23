@@ -57,16 +57,16 @@ public class Variable extends Tag_Base {
 	static public final String		TAG_NAME							= "variable";
 	static public final String		TAG_END_NAME						= "endVariable";
 
-	static public final String		ATTRIBUTE_NAME						= "name";
-	static public final String		ATTRIBUTE_EVAL_MODE					= "evalMode";
-	static public final String		ATTRIBUTE_OPTIONAL_CONTEXT_NAME		= "optionalContextName";
+	static private final String		ATTRIBUTE_NAME						= "name";
+	static private final String		ATTRIBUTE_EVAL_MODE					= "evalMode";
+	static private final String		ATTRIBUTE_OPTIONAL_CONTEXT_NAME		= "optionalContextName";
 
-	static public final String		EVAL_MODE_LABEL_SET					= "set";
-	static public final String		EVAL_MODE_LABEL_EVALUATE			= "evaluate";
+	static private final String		EVAL_MODE_LABEL_SET					= "set";
+	static private final String		EVAL_MODE_LABEL_EVALUATE			= "evaluate";
 
-	static public final int			EVAL_MODE_VALUE_UNDEFINED			= -1;
-	static public final int			EVAL_MODE_VALUE_SET					= 1;
-	static public final int			EVAL_MODE_VALUE_EVALUATE			= 2;
+	static private final int		EVAL_MODE_VALUE_UNDEFINED			= -1;
+	static private final int		EVAL_MODE_VALUE_SET					= 1;
+	static private final int		EVAL_MODE_VALUE_EVALUATE			= 2;
 
 
 	// Static members

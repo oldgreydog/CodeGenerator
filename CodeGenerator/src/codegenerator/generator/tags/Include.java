@@ -41,7 +41,7 @@ public class Include extends Tag_Base {
 
 	static public final String		TAG_NAME				= "include";
 
-	static public final String		ATTRIBUTE_TEMPLATE		= "template";
+	static private final String		ATTRIBUTE_TEMPLATE		= "template";
 
 
 	// Data members

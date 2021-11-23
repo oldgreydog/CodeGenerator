@@ -122,8 +122,8 @@ public class OuterContext extends Tag_Base {
 	static public final String		TAG_NAME										= "outerContext";
 	static public final String		TAG_END_NAME									= "endContext";
 
-	static public final String		ATTRIBUTE_CONTEXT_NAME							= "contextName";
-	static public final String		ATTRIBUTE_OPTIONAL_JUMP_TO_PARENT_CONTEXT		= "optionalJumpToParentContext";
+	static private final String		ATTRIBUTE_CONTEXT_NAME							= "contextName";
+	static private final String		ATTRIBUTE_OPTIONAL_JUMP_TO_PARENT_CONTEXT		= "optionalJumpToParentContext";
 
 
 	// Data members

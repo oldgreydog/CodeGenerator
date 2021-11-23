@@ -68,11 +68,11 @@ public class Text extends Tag_Base {
 	static public final String	TAG_NAME		= "text";
 
 	// Data members
-	boolean		m_parsingTagElement		= false;
-	boolean		m_expectClosingQuotes	= false;
-	boolean		m_equalsIsAToken		= false;
+	private boolean		m_parsingTagElement		= false;
+	private boolean		m_expectClosingQuotes	= false;
+	private boolean		m_equalsIsAToken		= false;
 
-	String		m_text					= null;		// This will only have a value when this text tag doesn't itself contain any other tags.
+	private String		m_text					= null;		// This will only have a value when this text tag doesn't itself contain any other tags.
 
 
 	//*********************************

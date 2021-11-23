@@ -85,15 +85,15 @@ public class CustomCode extends Tag_Base {
 
 	static public final String		TAG_NAME									= "customCode";
 
-	static public final String		ATTRIBUTE_KEY								= "key";
-	static public final String		ATTRIBUTE_OPENING_COMMENT_CHARS				= "openingCommentCharacters";
-	static public final String		ATTRIBUTE_OPTIONAL_CLOSING_COMMENT_CHARS	= "optionalClosingCommentCharacters";
+	static private final String		ATTRIBUTE_KEY								= "key";
+	static private final String		ATTRIBUTE_OPENING_COMMENT_CHARS				= "openingCommentCharacters";
+	static private final String		ATTRIBUTE_OPTIONAL_CLOSING_COMMENT_CHARS	= "optionalClosingCommentCharacters";
 
 
 	// Data members
-	protected	Tag_Base	m_key							= null;
-	protected	String				m_openingCommentCharacters		= null;
-	protected	String				m_closingCommentCharacters		= null;
+	private	Tag_Base	m_key							= null;
+	private	String		m_openingCommentCharacters		= null;
+	private	String		m_closingCommentCharacters		= null;
 
 
 	//*********************************

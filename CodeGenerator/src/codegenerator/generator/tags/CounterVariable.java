@@ -110,7 +110,7 @@ public class CounterVariable extends Tag_Base {
 static public final String		TAG_NAME										= "counterVariable";
 static public final String		TAG_END_NAME									= "endCounter";
 
-static public final String		ATTRIBUTE_COUNTER_NAME							= "counterName";
+	static private final String		ATTRIBUTE_COUNTER_NAME		= "counterName";
 
 
 // Data members

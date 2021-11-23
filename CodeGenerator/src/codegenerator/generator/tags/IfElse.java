@@ -129,10 +129,10 @@ public class IfElse extends Tag_Base {
 		static public final String		ATTRIBUTE_EXISTS	= "exists";
 
 
-		public boolean		m_testExists			= false;
-		public Tag_Base		m_attributeName			= null;
-		public Tag_Base		m_attributeValue		= null;
-		public int			m_lineNumber			= -1;
+		private boolean		m_testExists			= false;
+		private Tag_Base	m_attributeName			= null;
+		private Tag_Base	m_attributeValue		= null;
+		private int			m_lineNumber			= -1;
 
 
 		//*********************************

@@ -45,11 +45,11 @@ public class FirstLetterToLowerCase extends Tag_Base {
 
 	static public final String		TAG_NAME			= "firstLetterToLowerCase";
 
-	static public final String		ATTRIBUTE_VALUE		= "value";
+	static private final String		ATTRIBUTE_VALUE		= "value";
 
 
 	// Data members
-	protected	Tag_Base		m_value		= null;
+	private	Tag_Base	m_value		= null;
 
 
 	//*********************************
