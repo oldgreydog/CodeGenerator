@@ -92,7 +92,7 @@ import coreutil.logging.*;
  */
 public class ConfigVariable extends Tag_Base {
 
-	static public final String		TAG_NAME			= "ConfigVariable";
+	static public final String		TAG_NAME		= "ConfigVariable";
 
 
 	// Data members

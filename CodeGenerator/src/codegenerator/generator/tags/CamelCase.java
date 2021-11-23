@@ -50,7 +50,7 @@ public class CamelCase extends Tag_Base {
 
 	// Data members
 	private	Tag_Base		m_value					= null;
-	private	String					m_optionalSeparator		= null;
+	private	String			m_optionalSeparator		= null;
 
 
 	//*********************************
@@ -169,7 +169,7 @@ public class CamelCase extends Tag_Base {
 		StringBuilder t_newValue = new StringBuilder();
 
 		if (p_className == null) {
-			Logger.LogError("DDLParser.CreateCamelCaseName(): A NULL was passed in.");
+			Logger.LogError("CamelCase.CreateCamelCaseName(): A NULL was passed in.");
 			return null;
 		}
 

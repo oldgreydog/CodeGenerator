@@ -18,11 +18,11 @@
  */
 
 
-package codegenerator.generator.tags;
+package codegenerator.generator.utils;
 
 
 
-import codegenerator.generator.utils.*;
+import codegenerator.generator.tags.*;
 import codegenerator.generator.utils.TemplateTokenizer.*;
 import coreutil.logging.*;
 
@@ -36,7 +36,7 @@ import coreutil.logging.*;
 public class GeneralBlock extends Tag_Base {
 
 	// Data members
-	TagParser	m_unknownTag	= null;		// This is the unknown tag that the block found and stopped parsing.  This should be the closing tag for the parent block.  Since we can't push it back on the tokenizer, we have to put it here so that the parent can access it when we return.
+	private TagParser	m_unknownTag	= null;		// This is the unknown tag that the block found and stopped parsing.  This should be the closing tag for the parent block.  Since we can't push it back on the tokenizer, we have to put it here so that the parent can access it when we return.
 
 
 	//*********************************

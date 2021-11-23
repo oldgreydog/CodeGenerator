@@ -169,6 +169,7 @@ public class CustomCode extends Tag_Base {
 	public boolean Evaluate(EvaluationContext p_evaluationContext)
 	{
 		try {
+			// The vast majority of the time, the key will have one or more tags embedded in it, so we must evaluate it to get the correct final value.
 			StringWriter	t_keyWriter = new StringWriter();
 			Cursor			t_keyCursor	= new Cursor(t_keyWriter);
 

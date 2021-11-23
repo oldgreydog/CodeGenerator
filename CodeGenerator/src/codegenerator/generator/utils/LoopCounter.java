@@ -21,7 +21,9 @@
 package codegenerator.generator.utils;
 
 
-
+/**
+ * This is used by {@link ForEach} and {@link CounterVariable} to hold their counter values in the {@link EvaluationContext} objects.
+ */
 public class LoopCounter {
 
 	// Static members
@@ -31,6 +33,7 @@ public class LoopCounter {
 		return ++s_idSource;
 	}
 
+	// Data members
 	private LoopCounter		m_parentCounter			= null;			// This lets us find name counters by recursing up the parent pointers.
 	private int				m_counterID				= GetNextID();
 	private String			m_optionalCounterName	= null;
@@ -42,29 +45,31 @@ public class LoopCounter {
 
 
 	//*********************************
-	private LoopCounter(LoopCounter p_parentCounter) {
-		m_parentCounter			= p_parentCounter.m_parentCounter;
-		m_counterID				= p_parentCounter.m_counterID;
-		m_optionalCounterName	= p_parentCounter.m_optionalCounterName;
-		m_counter				= p_parentCounter.m_counter;
-	}
+	// This was only used when I tried to set up multi-threading of {@link FileTag} objects.  Since I backed that out when I realized it required more context management than I was willing to mess with at the time, this function is no longer needed.  However, since I can't say "Never" on trying multi-threading again, I'm going to leave it hear just in case.
+//	private LoopCounter(LoopCounter p_parentCounter) {
+//		m_parentCounter			= p_parentCounter.m_parentCounter;
+//		m_counterID				= p_parentCounter.m_counterID;
+//		m_optionalCounterName	= p_parentCounter.m_optionalCounterName;
+//		m_counter				= p_parentCounter.m_counter;
+//	}
 
 
 	//*********************************
-	/**
-	 * In shifting to multithreading on the "file" evaluations (and allowing nested file tags), we have to snap-shot the parent loop counters so that
-	 * we have the correct static values while we are in the file evaluation.  If we didn't, the parent loop counters would be changing outside the file
-	 * eval and would completely pollute any usage of those parent loop counters inside the file evaluation.
-	 *
-	 * @param p_parentCounter
-	 */
-	public LoopCounter DuplicateCountersForNewFile() {
-		LoopCounter t_newCounter = new LoopCounter(this);
-		if (m_parentCounter != null)
-			t_newCounter.SetParentCounter(m_parentCounter.DuplicateCountersForNewFile());
-
-		return t_newCounter;
-	}
+	// This was only used when I tried to set up multi-threading of {@link FileTag} objects.  Since I backed that out when I realized it required more context management than I was willing to mess with at the time, this function is no longer needed.  However, since I can't say "Never" on trying multi-threading again, I'm going to leave it hear just in case.
+//	/**
+//	 * In shifting to multithreading on the "file" evaluations (and allowing nested file tags), we have to snap-shot the parent loop counters so that
+//	 * we have the correct static values while we are in the file evaluation.  If we didn't, the parent loop counters would be changing outside the file
+//	 * eval and would completely pollute any usage of those parent loop counters inside the file evaluation.
+//	 *
+//	 * @param p_parentCounter
+//	 */
+//	public LoopCounter DuplicateCountersForNewFile() {
+//		LoopCounter t_newCounter = new LoopCounter(this);
+//		if (m_parentCounter != null)
+//			t_newCounter.SetParentCounter(m_parentCounter.DuplicateCountersForNewFile());
+//
+//		return t_newCounter;
+//	}
 
 
 	//*********************************

@@ -23,9 +23,9 @@ package codegenerator.generator.utils;
 
 
 import java.util.*;
-import java.util.Map.*;
 
 import coreutil.config.*;
+import coreutil.logging.*;
 
 
 
@@ -58,30 +58,30 @@ public class EvaluationContext {
 
 		m_contextManager		= new OuterContextManager();
 		m_customCodeManager		= new CustomCodeManager();
-		m_tabSettingsManager	= new TabSettingsManager();
 	}
 
 
 	//*********************************
-	public EvaluationContext(EvaluationContext	p_otherEvaluationContext)
-	{
-		m_currentNodeStack.addAll(p_otherEvaluationContext.m_currentNodeStack);
-
-		m_rootNode			= p_otherEvaluationContext.m_rootNode;
-		//m_writerStack		= ;		// This copy constructor should never be called in a context where we don't create a new Cursor, so we'll skip this member here.
-
-		// In situations where this copy constructor is used, there is no way the new context we are entering can know about the other loop counters that may exist "outside", so we only need the "current" counter from here on.
-		if (!p_otherEvaluationContext.m_iterationCounterStack.isEmpty())
-			m_iterationCounterStack.push(p_otherEvaluationContext.m_iterationCounterStack.getFirst().DuplicateCountersForNewFile());
-
-		// Copy all of the named counter variables.
-		for (Entry<String, LoopCounter> t_nextCounterVariable: p_otherEvaluationContext.m_counterVariableMap.entrySet())
-			m_counterVariableMap.put(t_nextCounterVariable.getKey(), t_nextCounterVariable.getValue().DuplicateCountersForNewFile());
-
-		m_contextManager		= new OuterContextManager(p_otherEvaluationContext.m_contextManager);
-		m_customCodeManager		= new CustomCodeManager();
-		m_tabSettingsManager	= new TabSettingsManager();
-	}
+// This was only used when I tried to set up multi-threading of {@link FileTag} objects.  Since I backed that out when I realized it required more context management than I was willing to mess with at the time, this function is no longer needed.  However, since I can't say "Never" on trying multi-threading again, I'm going to leave it hear just in case.
+//	public EvaluationContext(EvaluationContext	p_otherEvaluationContext)
+//	{
+//		m_currentNodeStack.addAll(p_otherEvaluationContext.m_currentNodeStack);
+//
+//		m_rootNode			= p_otherEvaluationContext.m_rootNode;
+//		//m_writerStack		= ;		// This copy constructor should never be called in a context where we don't create a new Cursor, so we'll skip this member here.
+//
+//		// In situations where this copy constructor is used, there is no way the new context we are entering can know about the other loop counters that may exist "outside", so we only need the "current" counter from here on.
+//		if (!p_otherEvaluationContext.m_iterationCounterStack.isEmpty())
+//			m_iterationCounterStack.push(p_otherEvaluationContext.m_iterationCounterStack.getFirst().DuplicateCountersForNewFile());
+//
+//		// Copy all of the named counter variables.
+//		for (Entry<String, LoopCounter> t_nextCounterVariable: p_otherEvaluationContext.m_counterVariableMap.entrySet())
+//			m_counterVariableMap.put(t_nextCounterVariable.getKey(), t_nextCounterVariable.getValue().DuplicateCountersForNewFile());
+//
+//		m_contextManager		= new OuterContextManager(p_otherEvaluationContext.m_contextManager);
+//		m_customCodeManager		= new CustomCodeManager();
+//		m_tabSettingsManager	= new TabSettingsManager();
+//	}
 
 
 	//*********************************
@@ -92,13 +92,30 @@ public class EvaluationContext {
 
 	//*********************************
 	public ConfigNode GetCurrentNode() {
-		return m_currentNodeStack.getFirst();
+		try {
+			if (m_currentNodeStack.isEmpty())
+				return null;
+
+			return m_currentNodeStack.getFirst();
+		}
+		catch (Throwable t_error) {
+			Logger.LogException("EvaluationContext.GetCurrentNode() failed with error: ", t_error);
+			return null;
+		}
 	}
 
 
 	//*********************************
 	public void PopCurrentNode() {
-		m_currentNodeStack.pop();
+		try {
+			if (m_currentNodeStack.isEmpty())
+				return;
+
+			m_currentNodeStack.pop();
+		}
+		catch (Throwable t_error) {
+			Logger.LogException("EvaluationContext.PopCurrentNode() failed with error: ", t_error);
+		}
 	}
 
 
@@ -116,13 +133,30 @@ public class EvaluationContext {
 
 	//*********************************
 	public Cursor GetCursor() {
-		return m_writerStack.getFirst();
+		try {
+			if (m_writerStack.isEmpty())
+				return null;
+
+			return m_writerStack.getFirst();
+		}
+		catch (Throwable t_error) {
+			Logger.LogException("EvaluationContext.GetCursor() failed with error: ", t_error);
+			return null;
+		}
 	}
 
 
 	//*********************************
 	public void PopCurrentCursor() {
-		m_writerStack.pop();
+		try {
+			if (m_writerStack.isEmpty())
+				return;
+
+			m_writerStack.pop();
+		}
+		catch (Throwable t_error) {
+			Logger.LogException("EvaluationContext.PopCurrentCursor() failed with error: ", t_error);
+		}
 	}
 
 
@@ -134,13 +168,30 @@ public class EvaluationContext {
 
 	//*********************************
 	public LoopCounter GetLoopCounter() {
-		return m_iterationCounterStack.getFirst();
+		try {
+			if (m_iterationCounterStack.isEmpty())
+				return null;
+
+			return m_iterationCounterStack.getFirst();
+		}
+		catch (Throwable t_error) {
+			Logger.LogException("EvaluationContext.GetLoopCounter() failed with error: ", t_error);
+			return null;
+		}
 	}
 
 
 	//*********************************
 	public void PopCurrentLoopCounter() {
-		m_iterationCounterStack.pop();
+		try {
+			if (m_iterationCounterStack.isEmpty())
+				return;
+
+			m_iterationCounterStack.pop();
+		}
+		catch (Throwable t_error) {
+			Logger.LogException("EvaluationContext.PopCurrentLoopCounter() failed with error: ", t_error);
+		}
 	}
 
 

@@ -62,6 +62,7 @@ public class FileTag extends Tag_Base {
 
 
 	// Static members
+	// These locks were only really necessary when I was trying to multi-thread the file tags.  Now that I've backed that out and gone back to single-threading for the time being, these aren't strictly necessary but I'll leave them in anyway.
 	static private final ReentrantLock	s_directoryCreateLock	= new ReentrantLock();
 
 	static private final ReentrantLock	s_countLock				= new ReentrantLock();
@@ -102,7 +103,7 @@ public class FileTag extends Tag_Base {
 
 	// Data members
 	private	String		m_templateFileName;
-	private	String		m_contextName			= null;					// The optional outer context in which to evaluate this variable.
+	private	String		m_contextName			= null;		// The optional outer context in which to evaluate this variable.
 
 	// These values can themselves be composites of evaluation-time config variables and text, so we have to store them in their Text object form and evaluate them at runtime to get their final values.
 	private	Tag_Base	m_fileName				= null;
