@@ -37,6 +37,13 @@ public class TabSettingsManager {
 
 
 	//*********************************
+	public TabSettingsManager(int p_tabSize, int p_outputType) {
+		m_tabSize		= p_tabSize;
+		m_outputType	= p_outputType;
+	}
+
+
+	//*********************************
 	public void SetTabSize(int p_tabSize) {
 		m_tabSize = p_tabSize;
 	}

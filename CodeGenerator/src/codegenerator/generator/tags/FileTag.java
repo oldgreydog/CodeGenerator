@@ -279,6 +279,8 @@ public class FileTag extends Tag_Base {
 
 			p_evaluationContext.PushNewCurrentNode(t_currentNode);	// This is unnecessarily redundant if we aren't changing the context above, but it simpler and cleaner, particularly if we error out in the if() below.
 
+			int t_tagSettingsManagerStackDepth = p_evaluationContext.GetTabSettingsManagerStackDepth();	// This is kinda fugly, but it's the only way I could come up with to figure out if the file contains a TagSettings tag so that we can pop it below if it does.
+
 			for (Tag_Base t_nextTag: m_tagList) {
 				if (!t_nextTag.Evaluate(p_evaluationContext)) {
 					t_fileWriter.close();
@@ -287,6 +289,10 @@ public class FileTag extends Tag_Base {
 					return false;
 				}
 			}
+
+			// If the file added a TabSettingsManager, then we need to pop it here.  And since it's possible for someone to have accidently included more than one tabSettings tag, we need to loop here to be sure that we've gotten all of them.
+			while(t_tagSettingsManagerStackDepth < p_evaluationContext.GetTabSettingsManagerStackDepth())
+				p_evaluationContext.PopTabSettingsManager();
 
 			p_evaluationContext.PopCurrentNode();
 

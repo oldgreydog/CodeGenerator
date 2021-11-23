@@ -140,8 +140,7 @@ public class TabSettings extends Tag_Base {
 				return false;
 			}
 
-			p_evaluationContext.GetTabSettingsManager().SetTabSize(m_tabLength);
-			p_evaluationContext.GetTabSettingsManager().SetOutputType(m_outputType);
+			p_evaluationContext.PushTabSettingsManager(new TabSettingsManager(m_tabLength, m_outputType));
 		}
 		catch (Throwable t_error) {
 			Logger.LogException("TabSettings.Evaluate() failed with error: ", t_error);

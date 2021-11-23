@@ -84,7 +84,13 @@ public class TabMarker extends Tag_Base {
 	public boolean Evaluate(EvaluationContext p_evaluationContext)
 	{
 		try {
-			p_evaluationContext.GetTabSettingsManager().SetMarker(p_evaluationContext.GetTabSettingsManager().GetCurrentLineLength(p_evaluationContext.GetCursor().GetCurrentLineContents()));
+			TabSettingsManager t_tabsManager = p_evaluationContext.GetTabSettingsManager();
+			if (t_tabsManager == null) {
+				Logger.LogError("TabMarker.Evaluate() got a NULL TabSettingsManager reference from the evaluation context.");
+				return false;
+			}
+
+			t_tabsManager.SetMarker(t_tabsManager.GetCurrentLineLength(p_evaluationContext.GetCursor().GetCurrentLineContents()));
 		}
 		catch (Throwable t_error) {
 			Logger.LogException("TabMarker.Evaluate() failed with error: ", t_error);

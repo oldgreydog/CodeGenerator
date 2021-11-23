@@ -124,12 +124,20 @@ public class Include extends Tag_Base {
 				return false;
 			}
 
+			// We don't do all of the context changes that a regular FileTab object does because an include is always executing inside another file, so the passed-in context is correct and should not be changed.
+			// However, it is possible that the included file has its own TabSettings tag, so we do need to be able to pop it if it gets added.
+			int t_tagSettingsManagerStackDepth = p_evaluationContext.GetTabSettingsManagerStackDepth();	// This is kinda fugly, but it's the only way I could come up with to figure out if the file contains a TagSettings tag so that we can pop it below if it does.
+
 			for (Tag_Base t_nextTag: m_tagList) {
 				if (!t_nextTag.Evaluate(p_evaluationContext)) {
 					Logger.LogError("Include.Evaluate() failed.");
 					return false;
 				}
 			}
+
+			// If the file added a TabSettingsManager, then we need to pop it here.  And since it's possible for someone to have accidently included more than one tabSettings tag, we need to loop here to be sure that we've gotten all of them.
+			while(t_tagSettingsManagerStackDepth < p_evaluationContext.GetTabSettingsManagerStackDepth())
+				p_evaluationContext.PopTabSettingsManager();
 		}
 		catch (Throwable t_error) {
 			Logger.LogException("Include.Evaluate() failed with error: ", t_error);

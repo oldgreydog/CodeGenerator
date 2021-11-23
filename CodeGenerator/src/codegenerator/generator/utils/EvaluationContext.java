@@ -33,14 +33,16 @@ import coreutil.config.*;
  * This holds everything that needs to be passed down through the execution tree of objects in the Evaluate() function call.
  */
 public class EvaluationContext {
-	private final LinkedList<ConfigNode>		m_currentNodeStack			= new LinkedList<>();
-	private ConfigNode							m_rootNode;
-	private final LinkedList<Cursor> 			m_writerStack			= new LinkedList<>();
-	private final LinkedList<LoopCounter>		m_iterationCounterStack	= new LinkedList<>();	// There are rare cases (i.e. FirstElse) where we need to grab a named counter from the current counter and set it as the temporary counter for the evaluation of the tag.
-	private final TreeMap<String, LoopCounter>	m_counterVariableMap	= new TreeMap<>();		// Since counter variables aren't tied to forEach loops, we need to handle them separately.  If we pushed them onto the forEach loop counter stack, we could potentially seriously poison that stack because any first tags that weren't naming the counter they were working with could possibly use the wrong counter.
-	private OuterContextManager					m_contextManager		= null;
-	private CustomCodeManager					m_customCodeManager		= null;
-	private TabSettingsManager					m_tabSettingsManager	= null;
+
+	// Data members
+	private final LinkedList<ConfigNode>			m_currentNodeStack		= new LinkedList<>();
+	private ConfigNode								m_rootNode;
+	private final LinkedList<Cursor> 				m_writerStack			= new LinkedList<>();
+	private final LinkedList<LoopCounter>			m_iterationCounterStack	= new LinkedList<>();	// There are rare cases (i.e. FirstElse) where we need to grab a named counter from the current counter and set it as the temporary counter for the evaluation of the tag.
+	private final TreeMap<String, LoopCounter>		m_counterVariableMap	= new TreeMap<>();		// Since counter variables aren't tied to forEach loops, we need to handle them separately.  If we pushed them onto the forEach loop counter stack, we could potentially seriously poison that stack because any first tags that weren't naming the counter they were working with could possibly use the wrong counter.
+	private OuterContextManager						m_contextManager		= null;
+	private CustomCodeManager						m_customCodeManager		= null;
+	private final LinkedList<TabSettingsManager>	m_tabSettingsManager	= new LinkedList<>();
 
 
 	//*********************************
@@ -173,7 +175,42 @@ public class EvaluationContext {
 
 
 	//*********************************
+	public void PushTabSettingsManager(TabSettingsManager p_tabManager) {
+		m_tabSettingsManager.push(p_tabManager);
+	}
+
+
+	//*********************************
+	public int GetTabSettingsManagerStackDepth() {
+		return m_tabSettingsManager.size();
+	}
+
+
+	//*********************************
 	public TabSettingsManager GetTabSettingsManager() {
-		return m_tabSettingsManager;
+		try {
+			if (m_tabSettingsManager.isEmpty())
+				return null;
+
+			return m_tabSettingsManager.getFirst();
+		}
+		catch (Throwable t_error) {
+			Logger.LogException("EvaluationContext.GetTabSettingsManager() failed with error: ", t_error);
+			return null;
+		}
+	}
+
+
+	//*********************************
+	public void PopTabSettingsManager() {
+		try {
+			if (m_tabSettingsManager.isEmpty())
+				return;
+
+			m_tabSettingsManager.pop();
+		}
+		catch (Throwable t_error) {
+			Logger.LogException("EvaluationContext.GetTabSettingsManager() failed with error: ", t_error);
+		}
 	}
 }
