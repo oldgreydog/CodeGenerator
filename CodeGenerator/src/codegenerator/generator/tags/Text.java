@@ -170,7 +170,7 @@ public class Text extends Tag_Base {
 						}
 						else {
 							// Other than ConfigVariables, these are the only tag types that can appear inside of a Text.  This forces you to keep text tags simpler which will keep templates simpler (hopefully).
-							if (t_newTag.IsSafeForTextTag())
+							if (t_newTag.IsSafeForText())
 							{
 								if (!t_newTag.Init(t_tagParser)) {
 									Logger.LogError("Text.Parse() failed to initialize the tag [" + t_newTag.GetName() + "] at line [" + p_tokenizer.GetLineCount() + "] in the tag starting at [" + m_lineNumber + "].");

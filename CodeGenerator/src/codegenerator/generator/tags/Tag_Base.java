@@ -39,7 +39,8 @@ public abstract class Tag_Base {
 
 	// Data members
 	protected	String					m_name					= null;
-	protected	boolean					m_isSafeForTextTag		= false;	// This is a simple flag that should elliminate the need to hard-code which tags are allowed inside a Text tag.
+	protected	boolean					m_isSafeForText			= false;	// This is a simple flag that should elliminate the need to hard-code which tags are allowed inside a Text tag.
+	protected	boolean					m_isSafeForAttributes	= false;	// This is a simple flag that lets us mark which tags are allowed inside an attribute's name or value.  This represents a set that does not completely overlap with those that are safe for use in text tags.
 	protected	LinkedList<Tag_Base>	m_tagList				= null;		// Tags that have child content should use this list to hold them.
 	protected	int						m_state					= -1;
 
@@ -60,8 +61,14 @@ public abstract class Tag_Base {
 
 
 	//*********************************
-	public boolean IsSafeForTextTag() {
-		return m_isSafeForTextTag;
+	public boolean IsSafeForText() {
+		return m_isSafeForText;
+	}
+
+
+	//*********************************
+	public boolean IsSafeForAttributes() {
+		return m_isSafeForAttributes;
 	}
 
 

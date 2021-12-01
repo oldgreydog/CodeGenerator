@@ -49,7 +49,7 @@ public class TabMarker extends Tag_Base {
 	//*********************************
 	public TabMarker() {
 		super(TAG_NAME);
-		m_isSafeForTextTag = true;
+		m_isSafeForText = true;
 	}
 
 

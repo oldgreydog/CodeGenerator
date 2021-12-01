@@ -99,7 +99,7 @@ public class CustomCode extends Tag_Base {
 	//*********************************
 	public CustomCode() {
 		super(TAG_NAME);
-		m_isSafeForTextTag = true;
+		m_isSafeForText = true;
 	}
 
 

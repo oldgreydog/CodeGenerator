@@ -103,7 +103,8 @@ public class ConfigVariable extends Tag_Base {
 	//*********************************
 	public ConfigVariable() {
 		super(TAG_NAME);
-		m_isSafeForTextTag = true;
+		m_isSafeForText			= true;
+		m_isSafeForAttributes	= true;
 	}
 
 

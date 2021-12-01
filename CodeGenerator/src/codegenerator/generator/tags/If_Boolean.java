@@ -49,7 +49,7 @@ public abstract class If_Boolean extends Tag_Base {
 
 		public And() {
 			super(TAG_NAME);
-			m_isSafeForTextTag = true;
+			m_isSafeForAttributes	= true;
 		}
 
 		@Override
@@ -95,7 +95,7 @@ public abstract class If_Boolean extends Tag_Base {
 
 		public Or() {
 			super(TAG_NAME);
-			m_isSafeForTextTag = true;
+			m_isSafeForAttributes	= true;
 		}
 
 		@Override
@@ -141,7 +141,7 @@ public abstract class If_Boolean extends Tag_Base {
 
 		public Not() {
 			super(TAG_NAME);
-			m_isSafeForTextTag = true;
+			m_isSafeForAttributes	= true;
 		}
 
 		@Override

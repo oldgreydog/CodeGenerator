@@ -82,7 +82,8 @@ public class Variable extends Tag_Base {
 	//*********************************
 	public Variable() {
 		super(TAG_NAME);
-		m_isSafeForTextTag = true;
+		m_isSafeForText			= true;
+		m_isSafeForAttributes	= true;
 	}
 
 

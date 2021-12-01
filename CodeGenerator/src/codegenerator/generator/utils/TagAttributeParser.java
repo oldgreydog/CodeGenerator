@@ -50,6 +50,7 @@ public class TagAttributeParser {
 	private GeneralBlock		m_attributeName;
 	private GeneralBlock		m_value;
 	private int					m_lineNumber		= -1;
+	private boolean				m_failedWithError	= false;
 
 
 	//*********************************
@@ -133,6 +134,12 @@ public class TagAttributeParser {
 
 
 	//*********************************
+	public boolean FailedWithError() {
+		return m_failedWithError;
+	}
+
+
+	//*********************************
 	public boolean Parse(TemplateTokenizer p_tokenizer) {
 		try {
 			m_lineNumber = p_tokenizer.GetLineCount();
@@ -141,7 +148,8 @@ public class TagAttributeParser {
 			TagParser	t_tagParser;
 			Tag_Base	t_newTag;
 			Text		t_text;
-			ParseState	t_parseState = ParseState.START_NAME;
+			boolean		t_expectDoubleQuote		= false;
+			ParseState	t_parseState			= ParseState.START_NAME;
 
 			while ((t_nextToken = p_tokenizer.GetNextToken()) != null) {
 				switch (t_nextToken.m_tokenType) {
@@ -158,6 +166,7 @@ public class TagAttributeParser {
 							ConfigVariable t_configVariable = new ConfigVariable();
 							if (!t_configVariable.Init(t_tagParser, p_tokenizer.GetLineCount())) {
 								Logger.LogError("TagAttributeParser.Parse() failed to initialize the config variable at line [" + p_tokenizer.GetLineCount() + "].");
+								m_failedWithError = true;
 								return false;
 							}
 
@@ -173,6 +182,7 @@ public class TagAttributeParser {
 
 								case EXPECT_EQUALS:
 									Logger.LogError("TagAttributeParser.Parse() is expecting the equals sign but found config variable at line [" + p_tokenizer.GetLineCount() + "].");
+									m_failedWithError = true;
 									return false;
 
 								case START_VALUE:
@@ -189,15 +199,17 @@ public class TagAttributeParser {
 						}
 						else {
 							// Other than ConfigVariables, these are the only tag types that can appear inside of a Text tag.  This forces you to keep text blocks simpler which will keep templates simpler (hopefully).
-							if (t_newTag.IsSafeForTextTag())
+							if (t_newTag.IsSafeForAttributes())
 							{
 								if (!t_newTag.Init(t_tagParser)) {
 									Logger.LogError("TagAttributeParser.Parse() failed to initialize the tag [" + t_newTag.GetName() + "] at line [" + p_tokenizer.GetLineCount() + "].");
+									m_failedWithError = true;
 									return false;
 								}
 
 								if (!t_newTag.Parse(p_tokenizer)) {
 									Logger.LogError("TagAttributeParser.Parse() failed to parse the tag [" + t_newTag.GetName() + "].");
+									m_failedWithError = true;
 									return false;
 								}
 
@@ -213,6 +225,7 @@ public class TagAttributeParser {
 
 									case EXPECT_EQUALS:
 										Logger.LogError("TagAttributeParser.Parse() is expecting the tag [" + t_newTag.GetName() + "] at line [" + p_tokenizer.GetLineCount() + "].");
+										m_failedWithError = true;
 										return false;
 
 									case START_VALUE:
@@ -227,6 +240,7 @@ public class TagAttributeParser {
 							}
 							else {
 								Logger.LogError("TagAttributeParser.Parse() found the tag [" + t_newTag.GetName() + "] at line [" + p_tokenizer.GetLineCount() + "] which is not allowed inside a text tag.");
+								m_failedWithError = true;
 								return false;
 							}
 						}
@@ -239,7 +253,7 @@ public class TagAttributeParser {
 						// If either of the name or value members didn't get initialized, then we've run off of the end of the attributes and found the closing delimiter for the tag and we need to return false.
 						if ((m_attributeName == null) ||
 							(m_value == null))
-							return false;
+							return false;	// This is a valid FALSE since we have run out of attributes to parse and this is how that is signaled to the calling code.
 
 						return true;
 
@@ -247,6 +261,7 @@ public class TagAttributeParser {
 						switch (t_parseState) {
 							case START_NAME:
 								Logger.LogError("TagAttributeParser.Parse() found an equals sign at line [" + p_tokenizer.GetLineCount() + "] but it was expecting to find the attribute name.");
+								m_failedWithError = true;
 								return false;
 
 							case IN_NAME:
@@ -257,6 +272,7 @@ public class TagAttributeParser {
 							case START_VALUE:
 							case IN_VALUE:
 								Logger.LogError("TagAttributeParser.Parse() found an equals sign at line [" + p_tokenizer.GetLineCount() + "] but it was expecting to find the attribute value.");
+								m_failedWithError = true;
 								return false;
 						}
 
@@ -268,7 +284,20 @@ public class TagAttributeParser {
 							case START_NAME:
 								break;	// Just eat any white space before the name.
 							case IN_NAME:
-								t_parseState = ParseState.EXPECT_EQUALS;
+								// If we are inside double quotes, then we need to keep the white space, not ignore it.
+								if (t_expectDoubleQuote) {
+									t_text = new Text();
+									t_text.SetText(t_nextToken.m_tokenValue);
+
+									if (m_attributeName == null)
+										m_attributeName = new GeneralBlock();
+
+									m_attributeName.AddChildNode(t_text);
+								}
+								else {	// Otherwise, we're done with the attribute name and we need to look for the equals.
+									t_parseState = ParseState.EXPECT_EQUALS;
+								}
+
 								break;
 
 							case EXPECT_EQUALS:
@@ -277,7 +306,19 @@ public class TagAttributeParser {
 							case START_VALUE:
 								break;	// Just eat any white space between the equals and the value.
 							case IN_VALUE:
-								return true;	// We're done with the attribute value and, therefore, the attribute, so it's time to return.
+								// If we are inside double quotes, then we need to keep the white space, not ignore it.
+								if (t_expectDoubleQuote) {
+									t_text = new Text();
+									t_text.SetText(t_nextToken.m_tokenValue);
+
+									if (m_value == null)
+										m_value = new GeneralBlock();
+
+									m_value.AddChildNode(t_text);
+								}
+								else {	// Otherwise, we're done with the attribute name and we need to look for the equals.
+									return true;	// We're done with the attribute value and, therefore, the attribute, so it's time to return.
+								}
 						}
 
 						break;
@@ -317,36 +358,46 @@ public class TagAttributeParser {
 						break;
 
 					case Token.TOKEN_TYPE_DOUBLE_QUOTE:
-						// We'll use a Text tag to parse this string constant.
-						p_tokenizer.PushBackToken(t_nextToken);
-
-						t_text = new Text();
-						if (!t_text.ParseTagElement(p_tokenizer, true)) {
-							Logger.LogError("TagAttributeParser.Parse() failed to parse the double-quoted value at line [" + p_tokenizer.GetLineCount() + "].");
-							return false;
-						}
-
 						switch (t_parseState) {
 							case START_NAME:
-							case IN_NAME:
 								if (m_attributeName == null)
 									m_attributeName = new GeneralBlock();
 
-								m_attributeName.AddChildNode(t_text);
+								t_expectDoubleQuote	= true;
+								t_parseState		= ParseState.IN_NAME;
+								break;
 
-								t_parseState = ParseState.EXPECT_EQUALS;	// Since this was a double-quoted value, we are done with the name and now expect the equals sign.
+							case IN_NAME:
+								if (!t_expectDoubleQuote) {
+									Logger.LogError("TagAttributeParser.Parse() found an unexpected double-quote in the attribute name that was not preceded by an matching opening double-quote at line [" + p_tokenizer.GetLineCount() + "] but .");
+									m_failedWithError = true;
+									return false;
+								}
+
+								t_expectDoubleQuote	= false;					// Now that we've found the closing quote, we need to clear this flag in case we need it for the value parsing.
+								t_parseState		= ParseState.EXPECT_EQUALS;	// Since this was a double-quoted value, we are done with the name and now expect the equals sign.
 								break;
 
 							case EXPECT_EQUALS:
-								Logger.LogError("TagAttributeParser.Parse() is expecting the equals sign at line [" + p_tokenizer.GetLineCount() + "] but found the start of a double-quoted value.");
+								Logger.LogError("TagAttributeParser.Parse() is expecting the equals sign at line [" + p_tokenizer.GetLineCount() + "] but found an unexpected double-quote.");
+								m_failedWithError = true;
 								return false;
 
 							case START_VALUE:
-							case IN_VALUE:
 								if (m_value == null)
 									m_value = new GeneralBlock();
 
-								m_value.AddChildNode(t_text);
+								t_expectDoubleQuote	= true;
+								t_parseState = ParseState.IN_VALUE;
+								break;
+
+
+							case IN_VALUE:
+								if (!t_expectDoubleQuote) {
+									Logger.LogError("TagAttributeParser.Parse() found an unexpected double-quote in the attribute value that was not preceded by an matching opening double-quote at line [" + p_tokenizer.GetLineCount() + "] but .");
+									m_failedWithError = true;
+									return false;
+								}
 
 								return true;	// Since this was a double-quoted value, we are done with the attribute value and can return.
 						}
@@ -355,16 +406,19 @@ public class TagAttributeParser {
 
 					default:
 						Logger.LogError("TagAttributeParser.Parse() found a token of type [" + t_nextToken.GetTokenTypeName() + "] when it was expecting a WORD for the attribute name at line [" + p_tokenizer.GetLineCount() + "].");
+						m_failedWithError = true;
 						return false;
 				}
 			}
 
 
 			Logger.LogError("TagAttributeParser.Parse() appears to have hit the end of the file without finding the closing tag of the parent tag.");
+			m_failedWithError = true;
 			return false;
 		}
 		catch (Throwable t_error) {
 			Logger.LogException("TagAttributeParser.Parse() failed with error at line [" + p_tokenizer.GetLineCount() + "]: ", t_error);
+			m_failedWithError = true;
 			return false;
 		}
 	}

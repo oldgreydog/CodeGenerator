@@ -121,6 +121,10 @@ public class TagParser {
 				t_nextAttribute = new TagAttributeParser();
 			}
 
+			if (t_nextAttribute.FailedWithError()) {
+				Logger.LogError("TagParser.Parse() failed to parse the attributes for the tag [" + m_tagName + "] at line [" + p_tokenizer.GetLineCount() + "].");
+				return false;
+			}
 
 			// The last thing to do should be to eat the closing delimiter.
 			t_nextToken = p_tokenizer.GetNextToken();

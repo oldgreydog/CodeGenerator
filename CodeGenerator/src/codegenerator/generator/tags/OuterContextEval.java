@@ -56,7 +56,8 @@ public class OuterContextEval extends Tag_Base {
 	//*********************************
 	public OuterContextEval() {
 		super(TAG_NAME);
-		m_isSafeForTextTag = true;
+		m_isSafeForText			= true;
+		m_isSafeForAttributes	= true;
 	}
 
 
