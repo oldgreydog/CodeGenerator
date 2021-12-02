@@ -3,6 +3,45 @@ This contains important info about each release.
 To run the code generator using the contents of the code_generator.zip file, extract the file into the folder of your choice.
 
 
+1.6
+
+	Build Change (again)!!
+
+	I realized recently that I should just add the lib/coreutil.jar back to repository so that you no longer have to build it yourself.  Sorry about the
+	on-going flip-flopping about that.  I still down-compiled that jar to java 8 so that you should be able to use it regardless of which compiler you use locally.
+
+	NOTE:  I still haven't gotten ahold of a windows machine to create, change or test windows versions of some of the scripts.  All of my development for this release
+		   has been done on Kubuntu with OpenJDK 17.
+
+
+
+	Change summary:
+		a) I had been thinking for years about replacing the use of the term "block" with "tag".  I finally did it.  I think it makes things much cleaner/clearer.
+		b) Added an "include" tag.  This lets you reuse template chunks across multiple templates/projects without otherwise having to duplicate them.  Works just like you would expect.
+		c) Cleaned up how the tag attribute parser does its thing.
+		d) Back when I made file tags nestable and added the evaluation context, I forgot that I had to now handle nested tab settings so that's fixed now.
+		e) Added a "safe for attributes" flag to Tag_Base that lets me correctly mark which tags are safe for use in text and which are safe for use in attributes.
+		f) Finally went through the javadoc comments in the code and updated and cleaned them up.  I'm sure they still aren't perfect, but they'er hopefully better than they were.
+		g) There are a number of misc. fixes/cleanups on things like error messages and making the generator die on errors where it wasn't before.
+		h) As noted above, I added the coreutil.jar back to this project.
+
+
+	Detailed change notes:
+		a) Unfortunately, changing "block" to "tag" and removing "Block" from class names will break your build if you have created your own tag classes.  On the other hand,
+			all of the classes are still there and otherwise unchanged so you'll only have to change the names of the parent class and you're done.
+		c) I got to thinking about the tag attribute parser and realized that I really needed to normalize the way that it dealt with double quotes and embedded tags.
+			It now works the way you would logically expect it to.  It previously required that you add double quotes around attribute names and/or values
+			with embedded tags even if they didn't have embedded white space.  That's fixed so now you're only required to use double quotes if there is embedded white space.
+		e) Adding the "safe for attributes" flag means that I no longer have to mark the and/or/not tags as "safe for text" to let them be parsed by the tag
+			attribute parser.  Incorrectly overloading the "safe for text" flag made it possible to use those boolean tags in text when they should have been
+			forbidden.
+		h) As noted above, I added the coreutil.jar back to this project.  I had removed it because I was worried that if I checked in jars or did release builds
+			with the java version I was using locally (which is generally always the latest one), then it would not run for people that were forced for some reason
+			to work in an environment that restricted them to earlier versions of java.  My previous decision to remove the jars and force you to pull in the
+			CoreUtils repository and build it yourself so that it was in your local java version was unnecessarily burdensome.  By down-compiling the jar
+			and adding it back to this repository, I think it reaches a better middle ground.
+
+
 1.5.1
 
 	Change summary:

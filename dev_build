@@ -9,8 +9,8 @@
 # Remove any existing jars so that we get a clean build.
 rm lib/code_generator.jar
 #rm lib/coreutil.jar
-
-
+#
+#
 ## Build CoreUtils
 #pushd ../CoreUtils
 #
