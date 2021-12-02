@@ -31,7 +31,7 @@ import coreutil.logging.*;
 
 
 /**
-	Loads the data type mapping files into memory so that the <code>typeConvert</code> tag can access it.
+	<p>This is used by the type conversion tags to load data type mapping files into memory and then retrieve values.</p>
 
 	<p>Refer to {@link codegenerator.generator.tags.TypeConvert} for more discussion of the data type
 	file.</p>

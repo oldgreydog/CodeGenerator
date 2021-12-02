@@ -33,7 +33,7 @@ import coreutil.logging.*;
 
 	<p>There are three modes of use for this tag:</p>
 
-	<p>	- Simple variable: a single child variable name is looked for on the current parent node</p>
+	<p>	- Simple variable: a single child variable name is looked for on the current parent context node</p>
 
 	<p>	- Parent references: the caret ( ^ ) is used one or more times before the variable name to
 	indicate that it should be found that number of parent nodes above the current parent</p>
@@ -81,8 +81,8 @@ import coreutil.logging.*;
 &lt;/Node&gt;
 </code></pre>
 
-	<p>Let's assume that we are at a point in the template such that the current node pointer is at the
-	first "member" node under the "class" node.</p>
+	<p>Let's assume that we are at a point in the template such that the current context node pointer is at the
+	first "column" node under the "table" node (i.e. you are inside a <code>&lt;%foreach node=column %&gt;</code> tag).</p>
 
 	<p>	- A simple variable reference like <code>&lt;%sqlName%&gt;</code> will be evaluated to <b><code>USER_ID</code></b>.</p>
 

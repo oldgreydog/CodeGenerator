@@ -29,6 +29,10 @@ import coreutil.logging.*;
 
 
 
+/**
+ * The tokenizer used to convert a template file's contents into tokens that are used by the various
+ * parsers.
+ */
 public class TemplateTokenizer {
 
 	static public class Token {

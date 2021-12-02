@@ -28,7 +28,7 @@ import coreutil.logging.*;
 
 
 /**
-	Loads the type config file into the DataTypeManager so that it is available for any typeConversion
+	Loads the type conversion config file into the DataTypeManager so that it is available for any typeConversion
 	tags in the template(s).  This will typically be used in the root template file.
 
 	<p>Example use of this tag:</p>

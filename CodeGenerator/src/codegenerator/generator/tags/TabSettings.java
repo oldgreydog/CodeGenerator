@@ -28,18 +28,21 @@ import coreutil.logging.*;
 
 
 /**
-	Sets the tab parameters for the template until the next <code>tabSettings</code> changes them.
+	Sets the tab parameters for the template until the next <code><B>tabSettings</B></code> changes them.
 
 	<p>Example use of this tag:</p>
 
-	<pre><code>&lt;%tabSettings tabLength = "4" outputType = "tabs" %&gt;</code></pre>
+	<pre>	<code>&lt;%tabSettings tabLength = "4" outputType = "tabs" %&gt;</code></pre>
 
-	<pre><code>&lt;%tabSettings tabLength = "4" outputType = "spaces" %&gt;</code></pre>
+	<pre>	<code>&lt;%tabSettings tabLength = "4" outputType = "spaces" %&gt;</code></pre>
 
-	<p>The <code>tabLength</code> attribute defines how many columns will be represented by a tab.</p>
+	<p>The <code><B>tabLength</B></code> attribute defines how many spaces will be represented by a tab.  This
+	is used by the code when it is asked to do an offset of N spaces and the output type is "tabs".  It divides
+	the offset by the tabLength to get how many tabs to write and then it adds any spaces needed to reach the final
+	offset if it doesn't fall on a tab boundary.</p>
 
-	<p>The <code>outputType</code> attribute defines whether a tab character or spaces will be written
-	to the output to represent the tab stop.</p>
+	<p>The <code><B>outputType</B></code> attribute defines whether a tab character or spaces will be written
+	to the output to represent a tab's worth of spacing.</p>
  */
 public class TabSettings extends Tag_Base {
 

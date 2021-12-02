@@ -29,6 +29,11 @@ import codegenerator.generator.utils.TemplateTokenizer.*;
 
 
 
+/**
+ * Used any time a new opening tag delimiter is found to parse the contents of the tag.  Then the calling code can
+ * use the tag parser's contents to get an instant of the tag from the {@link TagFactory} and then pass the tag
+ * parser to the new tag to initialize it.
+ */
 public class TagParser {
 
 	// Data members

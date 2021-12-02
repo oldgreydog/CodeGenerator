@@ -28,6 +28,9 @@ import coreutil.config.*;
 
 
 
+/**
+ * Used by the outer context tags to hold and retrieve the named context references from the evaluation context.
+ */
 public class OuterContextManager {
 
 	// Data members

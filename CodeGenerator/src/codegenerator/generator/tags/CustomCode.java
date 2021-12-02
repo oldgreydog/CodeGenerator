@@ -31,29 +31,27 @@ import codegenerator.generator.utils.*;
 
 
 /**
- * Generates a special pair of start and end comments between which the user can insert their custom
- * code so that on subsequent re-generations over existing files, the custom code will be saved and
+ * <p>Generates a special pair of start and end comments between which the user can insert their custom
+ * code.  This guarantees that on subsequent re-generations over existing files, the custom code will be saved and
  * re-inserted in the correct place in the newly generated version of the file.  An example would
- * look like this:
+ * look like this:</p>
  *
  * <pre><code> // StartCustomCode:ExtraMembers
  * private String m_name;
  * // EndCustomCode:ExtraMembers</code></pre>
  *
- * <p>The original version of this tag required that you passed in the amount of whitespace that you
- * wanted inserted before the end-comment because it had no way of knowing where the start-tag was on
- * the current line.  I added the {@link codegenerator.generator.utils.Cursor} to fix that.  Now this
- * code can grab the whitespace in the current line before it adds the start-comment and then write
- * that whitespace on the next line before the end-comment.  That ensures that the two comments start
- * with the same, and correct, indentation in the output code.</p>
+ * <p>This tag is meant to be used by itself on an otherwise empty line inside a <code>text</code> tag.  The indentation before this tag
+ * will be used to indent both the start and end comments the same amount in the output code.</p>
  *
- * <p>Here are two samples of this tag's usage:</p>
+ * <p>Here are a few samples of this tag's usage (the first example would generate the comments shown above):</p>
+ *
+ * <pre><code>&lt;%customCode key=ExtraMembers openingCommentCharacters=// %&gt;</code></pre>
  *
  * <pre><code>&lt;%customCode key=LoadAll&lt;%className%&gt;CacheCode openingCommentCharacters=// %&gt;</code></pre>
  *
- * <pre><code>&lt;%customCode key=LoadAll&lt;%className%&gt;CacheCode openingCommentCharacters="<!--" optionalClosingCommentCharacters="-->" %&gt;</code></pre>
+ * <pre><code>&lt;%customCode key=XmlCustomValues openingCommentCharacters="&lt;!--" optionalClosingCommentCharacters="--&gt;" %&gt;</code></pre>
  *
- * <p><b><code>key</code></b> - this is the unique name that will be generated for the start/end tags.</p>
+ * <p><b><code>key</code></b> - this is the unique name that will identify the start/end tags.</p>
  *
  * <p><b><code>openingCommentCharacters</code></b> - this is either the single-line comment characters or the opening comment characters that are used by whatever language is being generated.  In this example, it's "//" for java, c++, etc..</p>
  *
@@ -67,19 +65,21 @@ import codegenerator.generator.utils.*;
  * perfect example.  The config variable <code>&lt;%className%&gt;</code> will cause a unique tag to
  * be generated at that location in every pass through the <code>forEach</code> tag.</p>
  *
- * <p><b>If you don't make the key unique, you will loose custom code the next time you regenerate
- * on top of existing files!!</b></p>
+ * <p><b>If you don't make the key unique, it will probably generate the first time you run the corrupted template, but
+ * from that point on, you will get an error when you run the generate and you will have to delete the file or fix it by
+ * renaming it and then re-merging the custom code after you've generated the new version of the file.  This is why you
+ * should generate to a separate directory from the one you have your working code tree in, particularly if you are
+ * creating/editing a template.</b></p>
  *
- * <p>To that end, if you are inside nested <code>forEach</code> tags, then you will probably need
+ * <p>So if you are inside nested <code>forEach</code> tags, then you will probably need
  * to add a config value for each context, using the parent reference caret (^) where necessary.  So,
  * for example, if you were inside a <code>forEach</code> tag iterating over the "member" nodes under
  * an outer <code>forEach</code> tag that's iterating over "class" nodes, then you might create a tag like:</p>
  *
  * <p><code>&lt;%customCode key=Validate&lt;%memberName%&gt;Of&lt;%^className%&gt; openingCommentCharacters=// %&gt;</code></p>
  *
- * <p>The caret (^) in front of "className" tells {@link ConfigVariable} to go up one node before trying
- * to find the value named "className".  Since that parent node will be the one that the outer loop is
- * currently pointed at, you will get the correct value for the context.</p>
+ * <p>The caret (^) in front of "className" tells {@link ConfigVariable} to go up one config node before trying
+ * to find the value named "className".</p>
  */
 public class CustomCode extends Tag_Base {
 

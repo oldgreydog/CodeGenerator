@@ -28,12 +28,37 @@ import codegenerator.generator.utils.*;
 
 
 /**
-	This lets you output the counter value.
+	<p>This lets you use a counter value in the text output.  By default, the value comes from the {@link ForEach ForEach} tag that
+	immediately encloses this tag.  Or if you use the optional <code>optionalCounterName</code> attribute, you can name a different enclosing
+	<code>foreach</code> tag or a <code>counterVariable</code> tag to get the value from.</p>
 
-	<pre><code>&lt;%counter  optionalCounterName = "loop1" %&gt;</code></pre>
+	<h3>Examples</h3>
 
-	<p>The optionalCounterName attribute lets you specify using a named loop counter from a forEach tag other than the
-	one directly containing this counter tag.</p>
+	<p>We'll use the following template code for the examples:</p>
+
+
+	<p><pre><code>&lt;%foreach node = table  optionalCounterName = tableCounter %&gt;
+	&lt;%foreach node = column %&gt;
+
+		&lt;%text%&gt;	Table &lt;%counter  optionalCounterName = tableCounter %&gt;		Column &lt;%counter%&gt;
+&lt;%endtext%&gt;
+
+	&lt;%endfor%&gt;
+&lt;%endfor%&gt;</code></pre></p>
+
+	<p>This would give you an output that looks like this for however many tables/columns you have in the config.</p>
+
+	<pre><code>
+	Table 1		Column 1
+	Table 1		Column 2
+	Table 1		Column 3
+	...
+	Table 2		Column 1
+	Table 2		Column 2
+	Table 2		Column 3
+	...</code></pre>
+
+	<p><B>However</B>, if you had ten tables and one of them was named USER, then you would only get <B>nine</B> table counts output!</p>
 */
 public class Counter extends Tag_Base {
 

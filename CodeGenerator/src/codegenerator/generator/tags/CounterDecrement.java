@@ -28,12 +28,55 @@ import codegenerator.generator.utils.*;
 
 
 /**
-	The original use case for this tag was eliminated when the <code>first</code> tag was changed so that it knows
+	Allows you to alter a counter by decrementing it.
+
+	The original use case for this tag was eliminated when the {@link First} tag was changed so that it knows
 	the first time its passed through even if the counter it's watching isn't == 1.  That can happen, for example,
 	when the <code>first</code> tag is inside an <code>if</code> tag.</p>
 
 	<p>However, you may find a use for it now that there is the <code>counterVariable</code> tag, so I have left
 	it in.  You can use this with <code>counterVariable</code> counters and named <code>forEach</code> counters.</p>
+
+	<h3>Examples</h3>
+
+	<p>We'll use the following template code for the examples:</p>
+
+
+	<p><pre><code>&lt;%foreach node = table  optionalCounterName = tableCounter %&gt;
+	&lt;%foreach node = column %&gt;
+
+		&lt;%if &lt;%^tableName%&gt; = USER %&gt;
+
+			&lt;%first  optionalCounterName = tableCounter %&gt;
+
+				&lt;%--counter  optionalCounterName = tableCounter %&gt;
+
+			&lt;%endfirst%&gt;
+
+		&lt;%else%&gt;
+
+			&lt;%text%&gt;	Table &lt;%counter  optionalCounterName = tableCounter %&gt;		Column &lt;%counter%&gt;
+&lt;%endtext%&gt;
+
+		&lt;%endif%&gt;
+
+	&lt;%endfor%&gt;
+&lt;%endfor%&gt;</code></pre></p>
+
+	<p>This would give you an output that looks like this for however many tables/columns you have in the config.</p>
+
+	<pre><code>
+	Table 1		Column 1
+	Table 1		Column 2
+	Table 1		Column 3
+	...
+	Table 2		Column 1
+	Table 2		Column 2
+	Table 2		Column 3
+	...</code></pre>
+
+	<p><B>However</B>, if you had <B>ten</B> tables and one of them was named USER, then you would only get <B>nine</B>
+	table counts output since the USER table would be skipped but the table counts would still be correct.</p>
  */
 public class CounterDecrement extends Tag_Base {
 

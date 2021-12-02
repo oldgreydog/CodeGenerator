@@ -42,8 +42,8 @@ import codegenerator.generator.utils.*;
 
 	<p>When you start the code generator, the "current" node pointer is, conceptually, pointed at the
 	root node of the config value tree.  The evaluation of each template file is started with whatever
-	the current node pointer is pointed at at the start of the <code>file</code> tag or at "root" for
-	the template file that the code generator was started with.</p>
+	the current node pointer is pointed at at the start of the <code>file</code> tag.  For the "root" template
+	file that is passed into the generator, it's the "root" node in the config file.</p>
 
 	<p>Each node in the config value tree can have both values and child nodes.  That means that at any
 	point in a template, you can access the values under the "current" node or you can use the <code>forEach</code>

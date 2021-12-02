@@ -32,10 +32,33 @@ import codegenerator.generator.utils.TemplateTokenizer.*;
 
 
 /**
-	This class expects to parse attributes of the forms:
-	<p>name=value</p>
-	<p>name="value with white spaces bound by double quotes"</p>
-	<p>It will stop parsing when it finds the closing delimiter for the tag. It will accept those forms with white space between any or all of the elements and between the value and the closing delimiter.</p>
+	<p>This class parses a single attribute name/value pair.  The {@link TagParser} uses new instances to parse all of a
+	tag's attributes until it finds the closing delimiter for tag.  Here is a compressed list of examples of valid attributes:</p>
+
+	<pre>	<code>name=value
+	name = value
+	name = "value with white spaces bound by double quotes"
+	nameWith&lt;%embeddedTags%&gt; = valueWith&lt;%embeddedTags%&gt;</code></pre>
+
+	<p>This list is "compressed" in that it tries to show examples of all of the rules below without showing every possible combination.
+	Here are the general rules for what the parser accepts for valid attributes:</p>
+
+	<pre>	- white space before or after all elements: attribute name, the equals, the value
+	- or no white space between the elements
+	- embedded tags in the name and/or the value
+	- double quotes around the name and/or the value.  This makes it possible to have white space embedded in either one.
+		- NOTE: The double quotes are only required for names/values that include white space.  They are optional in all other cases.</pre>
+
+	<p>Here is the current list of allowed embedded tags:</p>
+
+	<pre>	<code><B>camelCase
+	&lt;%DataType%&gt; </B>(i.e. config values)<B>
+	counter
+	firstLetterToLowerCase
+	and/or/not	</B>(i.e. for if statements)<B>
+	outerContextEval
+	typeConvert
+	variable</B></code></pre>
  */
 public class TagAttributeParser {
 

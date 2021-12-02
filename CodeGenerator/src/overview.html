@@ -4,11 +4,11 @@
 	<h3>Introduction</h3>
 
 	<p>I built this code generator because I couldn't find anything that would generate whatever code
-	I wanted the way that I wanted.  Even now, more than ten years later, most of the generators
+	I wanted the way that I wanted.  Even now, more than seventeen years later, most of the generators
 	you will find are only able to output very specific files for very specific uses.  This generator,
 	on the other hand, should be thought more as text generator than just a code generator.</p>
 
-	<p>It might be best to start with the work flow of the generator.</p>
+	<p>Let's start with the work flow of the generator.</p>
 
 	<img src="Figure_1.svg" alt="Code Generator Overview" style="width:300px;height:300px;">
 
@@ -17,9 +17,7 @@
 	output tags, probably in one or more <code>foreach</code> blocks.</p>
 
 	<p>At the moment, there is only one output type tag: <code>file</code>.  While I have not yet needed
-	any other outputs, it is possible to write new ones that output to other targets.  I guess one easy
-	example (but I'll deny it if you tell anyone I said this) would be generating email to a network
-	address.  As with every other possible use for this generator, the only limitation is your imagination.</p>
+	any other outputs, it is possible to write new ones that output to other targets.</p>
 
 	<p>In fact, that's why I'm putting this out into the ether.  I'm really hoping people will come up
 	with interesting things to do with this.  Of course, given the massive haystack that Github
@@ -110,9 +108,8 @@
 	instead of trying to create the template from scratch.</p>
 
 	<p>While the example templates are going to be your best resource for seeing how to use the various
-	tags, I've tried to give some useful documentaion for them in the <code>CodeGenerator/doc</code>
-	javadocs.  But there may be things I've missed or should reemphasize so I'll cover some of the
-	ones that come to mind here.</p>
+	tags, I've tried to give some useful documentaion for them in the javadocs you can find in the release.
+	But there are some tags that you will need when you start to create your own templates.</p>
 
 	<p>Probably the most important one is the one <i>required</i> element for a template: the header
 	record.  Here's the one in all of the examples:</p>
@@ -120,7 +117,7 @@
 	<pre><code>%%HEADER%% openingDelimiter=&lt;% closingDelimiter=%&gt;</code></pre>
 
 	<p>Every tag needs an opening and closing delimiter so that the parser can separate them from
-	other text in the template.  But since one my major goals for this generator was that it not be
+	other text in the template.  But since one of my major goals for this generator was that it not be
 	language specific, I had to have a way to specify delimiters that might need to be different for
 	each language that a template might be written for. (The other major goal was that it had to
 	generate pretty code.) And it couldn't be limited to just one character each, or even two, because
@@ -130,7 +127,7 @@
 	conflicts with the language.  The header record lets you tell the parser what delimiters to
 	look for in the rest of the template.</p>
 
-	<h4>Tag Usage</h4>
+	<h4>Flow Control Tags</h4>
 
 	<p>The flow control tags can be used anywhere, including nested inside other flow control tags
 	(or themselves, for that matter). For a more in-depth look at each of the tags, please refer to
@@ -140,7 +137,6 @@
 ...
 &lt;%endfor%&gt;</code></pre>
 
-	<br>
 	Note: any number of <code>elseif</code> tags can be used inside an <code>if</code> tag.
 	<pre><code>&lt;%if  &lt;%type%&gt; = Integer %&gt;
 ...
@@ -150,9 +146,8 @@
 ...
 &lt;%endif%&gt;</code></pre>
 
-	<br>
-	<code>first</code> blocks can technically be nested inside themselves, but it wouldn't make
-	any sense to do so.
+	<code>first</code> blocks can technically be nested inside themselves, but it probably wouldn't make
+	any sense to do so unless you were using multiple forEach and/or outer contexts.
 	<pre><code>&lt;%first%&gt;
 ...
 &lt;%else%&gt;
@@ -160,8 +155,10 @@
 &lt;%endfirst%&gt;</code></pre>
 
 
-	<br>
-	<p>The <code>text</code> tag is special.  You can have text inside or outside of flow control
+	<h4>The Text Tag</h4>
+
+	<p>The <code>text</code> tag is special.  It is the only tag that outputs text to the desired target
+	(usually a file).  You can have text inside or outside of flow control
 	blocks, but you <i>can not</i> have flow control blocks inside a <code>text</code> tag.  A
 	<code>text</code> tag can have anything from a single character in it up to any number of lines.
 	There are also certain special tags that can appear inside a <code>text</code> tag.  Here's the
@@ -171,11 +168,11 @@
 ...
 <%endtext%></code></pre>
 
-	<br>Here are the tags that be inside a <code>text</code> block.  Note that the one common aspect of
-	all of these tags is that none of them have closing tags like the flow control tags.
+	<p>It is also possible to put certain tags inside a <code>text</code> block with or without text.  Note that the
+	one common aspect of all of these tags is that none of them have closing tags like the flow control tags.</p>
 
-	<p>The config variable is a unique tag type because it looks like all the other tags because
-	it uses the opening and closing delimiters, but the name inside the delimiters is the name of a
+	<p>The most used of these tags is the config variable.  It is a unique tag type because it looks like all the other
+	tags since it uses the opening and closing delimiters, but the name inside the delimiters is the name of a
 	value from the config values file.  That also means that the other tag names are reserved and
 	cannot be used as config value names.  Here's an example:</p>
 
@@ -183,37 +180,35 @@
 
 	<p>These are the other tags that can appear inside a <code>text</code> block:</p>
 
-	<pre><code>&lt;%customCode key=LoadAll&lt;%className%&gt;CacheCode commentCharacters=// %&gt;</code></pre>
+	<pre>	<code><B>camelCase
+	counter
+	customCode
+	firstLetterToLowerCase
+	outerContextEval
+	tabMarker
+	tabStop
+	typeConvert
+	variable</B></code></pre>
 
-	<pre><code>&lt;%firstLetterToLowerCase member = &lt;%className%&gt; %&gt;</code></pre>
+	<p>Note that any of these tags that evaluate to strings can be used in the values of other tag's
+	attributes (such as the <code>if</code>/<code>elseif</code> tags).  Please refer to the javadocs
+	for Text and TagAttributeParser for more on which tags can be used in those respective locations.</p>
 
-	<pre><code>&lt;%tabMarker%&gt;</code></pre>
 
-	<pre><code>&lt;%tabStop stopType = "stop" offset = "40" %&gt;</code></pre>
+	<h4>Other Core Tags</h4>
 
-	<pre><code>&lt;%typeConvert targetLanguage = "java" sourceType = &lt;%type%&gt; groupID = "builtin" %&gt;</code></pre>
-
-	<p>Note that, as you can see in the examples, since the config variable and <code>typeConvert</code> tags
-	(and technically the <code>firstLetterToLowerCase</code> tag) evaluate to strings, they can be
-	used in the values of other tag's attributes (usually the <code>if</code>/<code>elseif</code> tags).</p>
-
-	<p>There are two tags left.  The first is the <code>tabSettings</code> tag.  If a template uses
-	either <code>tabMarker</code> or <code>tabStop</code>, then you have to have a <code>tabSettings</code>
-	that appears first to define the tab length and whether the tabs will be output as spaces or tabs.
-	Here is an example:</p>
+	<p>There are three tags important for formatting output.  The first is the <code>tabSettings</code> tag.
+	If a template uses either <code>tabMarker</code> or <code>tabStop</code>, then you have to have a
+	<code>tabSettings</code> that appears first to define the tab length and whether the tabs will be
+	output as spaces or tabs. Here is an example:</p>
 
 	<pre><code>&lt;%tabSettings tabLength = "4" outputType = "tabs" %&gt;</code></pre>
 
-	<p>And the last tag is the decrement counter tag.  It looks like this:</p>
-
-	<pre><code>&lt;%--counter%&gt;</code></pre>
-
-	<p>This is a special tag to use inconjuction with a <code>first</code> block inside a <code>foreach</code>
-	block.  There will be times when you need to build a delimited list of values (such as a parameter
-	list), but one or more of the first items in the list may need to be skipped.  When that happens,
-	you need to use the <code>--counter</code> tag to bump the loop counter back one each time you skip
-	so that when you do get to the first item you want to add to the list, then the <code>first</code>
-	block will work correctly.</p>
+	<p>And the last tag that you'll probably need to get started is the <code>first</code> tag.
+	When you need to build something like a comma-delimited list of values (such as a parameter
+	list), the <code>first</code> tag lets you do one thing the first time through the loop (or maybe
+	nothing in this case) and then on every other pass the <code>else</code> can add ", " to the output
+	between each parameter.</p>
 
 
 
@@ -224,13 +219,17 @@
 	example from above:</p>
 
 	<pre><code>&lt;%customCode key=LoadAll&lt;%className%&gt;CacheCode commentCharacters=// %&gt;</code></pre>
+	<pre><code>&lt;%customCode key=LoadAll&lt;%className%&gt;CacheCode commentCharacters=/* optionalClosingCommentCharacters=*/ %&gt;</code></pre>
 
 	<p>The <code>commentCharacters</code> attribute lets you specify the single-line comment symble(s)
-	that are appropriate for the language being generated.  The <code>key</code> attribute is the
-	critical one to get right though.  When you run the generator on top of existing files, it parses
-	each existing file that it finds before it generates on top of it to see if it has custom code in
-	it.  Each time it finds a custom code block, it uses the key to store the text found in that block
-	in a map.  When the generator is then generating the new version of the file, each time a
+	that are appropriate for the language being generated.  If the language requires both opening and
+	closing delimiters for comments, you can use the <code>optionalClosingCommentCharacters</code> attribute
+	to specify the closing comment character(s).</p>
+
+	<p>The <code>key</code> attribute is the critical one to get right.  When you run the generator on
+	top of existing files, it parses each existing file that it finds before it generates on top of it to see if
+	it has custom code in it.  Each time it finds a custom code block, it uses the key to store the text found in
+	that block in a map.  When the generator is then generating the new version of the file, each time a
 	<code>customCode</code> handler is evaluated, it builds the key and then uses it to search in the
 	map of custom code pulled from the old file.  If it finds it, then it inserts that custom code
 	back into the new file.</p>

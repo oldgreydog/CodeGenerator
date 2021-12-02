@@ -29,9 +29,11 @@ import coreutil.logging.*;
 
 
 /**
-	Base class for the tags that will handle the AND, OR or other test conditions for IFs.
+	<p>Base class for the tags that will handle the <code><B>and</B></code>, <code><B>or</B></code> or <code><B>not</B></code> or
+	other test conditions for <code><B>if</B></code>s.</p>
 
-	<p>Refer to {@link IfElse} for more info on how to use the AND and OR tags in an IF tag.</p>
+	<p>Refer to {@link IfElse} for more info on how to use the <code><B>and</B></code>, <code><B>or</B></code> or <code><B>not</B></code>
+	tags in an <code><B>if</B></code> tag.</p>
  */
 public abstract class If_Boolean extends Tag_Base {
 
@@ -41,7 +43,15 @@ public abstract class If_Boolean extends Tag_Base {
 
 
 	/**
-	 * Refer to {@link IfElse} for more info on how to use the AND and OR tags in an IF tag.
+	 * <p>The <code><B>and</B></code> tag implements the expected boolean logic for use in <code><B>if</B></code> tags with short-circuit
+	 * evaluation.  It can have any number and mix of <code><B>and</B></code>, <code><B>or</B></code> or <code><B>not</B></code> boolean tags as attributes.
+	 * It can also include <code>[string value] = [string value]</code> boolean attributes.</p>
+	 *
+	 * <p>The <code><B>and</B></code> returns either "true" or "false" strings.  Since it is used as a tag attribute, it must have the form:</p>
+	 *
+	 *	<p><code>&lt;%and  [two or more boolean attributes] %&gt; = [true|false]</code></p>
+	 *
+	 * <p>Refer to {@link IfElse} for more info on how to use the <code><B>and</B></code> tag in an <code><B>if</B></code> tag.</p>
 	 */
 	static public class And extends If_Boolean {
 
@@ -87,7 +97,15 @@ public abstract class If_Boolean extends Tag_Base {
 
 
 	/**
-	 * Refer to {@link IfElse} for more info on how to use the AND and OR tags in an IF tag.
+	 * <p>The <code><B>or</B></code> tag implements the expected boolean logic for use in <code><B>if</B></code> tags with short-circuit
+	 * evaluation.  It can have any number and mix of <code><B>and</B></code>, <code><B>or</B></code> or <code><B>not</B></code> boolean tags as attributes.
+	 * It can also include <code>[string value] = [string value]</code> boolean attributes.</p>
+	 *
+	 * <p>The <code><B>or</B></code> returns either "true" or "false" strings.  Since it is used as a tag attribute, it must have the form:</p>
+	 *
+	 *	<p><code>&lt;%or  [two or more boolean attributes] %&gt; = [true|false]</code></p>
+	 *
+	 * <p>Refer to {@link IfElse} for more info on how to use the <code><B>or</B></code> tag in an <code><B>if</B></code> tag.</p>
 	 */
 	static public class Or extends If_Boolean {
 
@@ -133,7 +151,15 @@ public abstract class If_Boolean extends Tag_Base {
 
 
 	/**
-	 * Refer to {@link IfElse} for more info on how to use the AND and OR tags in an IF tag.
+	 * <p>The <code><B>not</B></code> tag implements the expected boolean logic for use in <code><B>if</B></code> tags.
+	 * It can have only one <code><B>and</B></code>, <code><B>or</B></code>, <code><B>not</B></code> boolean tag or one
+	 * <code>[string value] = [string value]</code> comparison.</p>
+	 *
+	 * <p>The <code><B>not</B></code> returns either "true" or "false" strings.  Since it is used as a tag attribute, it must have the form:</p>
+	 *
+	 *	<p><code>&lt;%or  [one boolean attribute] %&gt; = [true|false]</code></p>
+	 *
+	 * <p>Refer to {@link IfElse} for more info on how to use the <code><B>not</B></code> tag in an <code><B>if</B></code> tag.</p>
 	 */
 	static public class Not extends If_Boolean {
 

@@ -28,7 +28,7 @@ import coreutil.logging.*;
 
 
 /**
-	Allows for multiple code-language-based mappings in the same template set.
+	<p>Allows for multiple alternate value mappings in the same template set.</p>
 
 	<p>Example use of this tag:</p>
 
@@ -52,39 +52,39 @@ import coreutil.logging.*;
 	<code>DataType_Conversion_SQL_Server_to_Java.xml</code>.  We'll use a snip from the top of that
 	file to discuss it's features.</p>
 
-	<pre><code>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
-&lt;Node name="root"&gt;
-	&lt;Node name="dataTypeMaps"&gt;
-		&lt;Node name="typeMap"&gt;
-			&lt;Value name="targetLanguage"&gt;java&lt;/Value&gt;
-			&lt;Value name="targetTypeFieldDelimiter"&gt;:&lt;/Value&gt;
+	<pre>	<code>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+	&lt;Node name="root"&gt;
+		&lt;Node name="dataTypeMaps"&gt;
+			&lt;Node name="typeMap"&gt;
+				&lt;Value name="targetLanguage"&gt;java&lt;/Value&gt;
+				&lt;Value name="targetTypeFieldDelimiter"&gt;:&lt;/Value&gt;
 
-			&lt;!--	The targetType field is defined as:	&lt;groupID(i.e. builtin,object)&gt;:&lt;type&gt;	--&gt;
-			&lt;!--	The "groupID" subfield allows you to have as many mappings as you need for a particular type, including, for example, specific functions needed to read and write that value to the database.	--&gt;
-			&lt;Node name="type"&gt;
-				&lt;Value name="sourceType"	&gt;int&lt;/Value&gt;
+				&lt;!--	The targetType field is defined as:	&lt;groupID(i.e. builtin,object)&gt;:&lt;type&gt;	--&gt;
+				&lt;!--	The "groupID" subfield allows you to have as many mappings as you need for a particular type, including, for example, specific functions needed to read and write that value to the database.	--&gt;
+				&lt;Node name="type"&gt;
+					&lt;Value name="sourceType"	&gt;int&lt;/Value&gt;
 
-				&lt;Value name="targetType"	&gt;builtin:int&lt;/Value&gt;
-				&lt;Value name="targetType"	&gt;object:Integer&lt;/Value&gt;
-				&lt;Value name="targetType"	&gt;objectParseFunc:Integer.parseInt&lt;/Value&gt;
-				&lt;Value name="targetType"	&gt;prepStmntSetFunc:setInt&lt;/Value&gt;
-				&lt;Value name="targetType"	&gt;prepStmntSetNullConst:INTEGER&lt;/Value&gt;
-				&lt;Value name="targetType"	&gt;resultSetGetFunc:getInt&lt;/Value&gt;
-				&lt;Value name="targetType"	&gt;jsonGetParamFunc:GetIntParameterValue&lt;/Value&gt;
-			&lt;/Node&gt;
+					&lt;Value name="targetType"	&gt;builtin:int&lt;/Value&gt;
+					&lt;Value name="targetType"	&gt;object:Integer&lt;/Value&gt;
+					&lt;Value name="targetType"	&gt;objectParseFunc:Integer.parseInt&lt;/Value&gt;
+					&lt;Value name="targetType"	&gt;prepStmntSetFunc:setInt&lt;/Value&gt;
+					&lt;Value name="targetType"	&gt;prepStmntSetNullConst:INTEGER&lt;/Value&gt;
+					&lt;Value name="targetType"	&gt;resultSetGetFunc:getInt&lt;/Value&gt;
+					&lt;Value name="targetType"	&gt;jsonGetParamFunc:GetIntParameterValue&lt;/Value&gt;
+				&lt;/Node&gt;
 
-			&lt;Node name="type"&gt;
-				&lt;Value name="sourceType"	&gt;tinyint&lt;/Value&gt;
+				&lt;Node name="type"&gt;
+					&lt;Value name="sourceType"	&gt;tinyint&lt;/Value&gt;
 
-				&lt;Value name="targetType"	&gt;builtin:int&lt;/Value&gt;
-				&lt;Value name="targetType"	&gt;object:Integer&lt;/Value&gt;
-				&lt;Value name="targetType"	&gt;objectParseFunc:Integer.parseInt&lt;/Value&gt;
-				&lt;Value name="targetType"	&gt;prepStmntSetFunc:setInt&lt;/Value&gt;
-				&lt;Value name="targetType"	&gt;prepStmntSetNullConst:INTEGER&lt;/Value&gt;
-				&lt;Value name="targetType"	&gt;resultSetGetFunc:getInt&lt;/Value&gt;
-				&lt;Value name="targetType"	&gt;jsonGetParamFunc:GetIntParameterValue&lt;/Value&gt;
-			&lt;/Node&gt;
-...
+					&lt;Value name="targetType"	&gt;builtin:int&lt;/Value&gt;
+					&lt;Value name="targetType"	&gt;object:Integer&lt;/Value&gt;
+					&lt;Value name="targetType"	&gt;objectParseFunc:Integer.parseInt&lt;/Value&gt;
+					&lt;Value name="targetType"	&gt;prepStmntSetFunc:setInt&lt;/Value&gt;
+					&lt;Value name="targetType"	&gt;prepStmntSetNullConst:INTEGER&lt;/Value&gt;
+					&lt;Value name="targetType"	&gt;resultSetGetFunc:getInt&lt;/Value&gt;
+					&lt;Value name="targetType"	&gt;jsonGetParamFunc:GetIntParameterValue&lt;/Value&gt;
+				&lt;/Node&gt;
+	...
 </code></pre>
 
 	<p>This XML structure was set up to handle multiple language maps in the same file if you desire.

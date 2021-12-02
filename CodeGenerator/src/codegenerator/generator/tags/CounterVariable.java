@@ -29,15 +29,17 @@ import codegenerator.generator.utils.*;
 
 
 /**
-	If you need to have a counter that guarantees that you only generate a piece of code only once inside
+ * 	<p>Creates a counter that is independent of the counters built into the <code>forEach</code> tags.</p>
+ *
+	<p>For example, if you need to have a counter that guarantees that you only generate a piece of code only once inside
 	a complicated set of nested contexts and/or <code>forEach</code> loops, then you can set up a CounterVariable
 	tag that wraps those contexts/loops and use the new <code>++counter</code> ({@link CounterIncrement}) tag inside the
 	if/else tag where the desired code is generated with the same name you put on the counterVariable tag.
 	This will ensure that regardless of how the <code>forEach</code> loops traverse the config tree, that code will only get
-	generated once.
+	generated once.</p>
 
 	<p>Here's a long but (I think) illuminating real usage example from one of my templates:</p>
-	<br>
+
 	<pre><code>&lt;%counterVariable counterName = tableCounter %&gt;
 
 	&lt;&lt;&lt; This section finds all foreign key references to this table and add the child parent nodes for each of them. &gt;&gt;&gt;

@@ -30,7 +30,7 @@ import coreutil.logging.*;
 
 
 /**
- * This is a simple singleton that will scan a file and catalog all of the custom code blocks that it finds so that
+ * This is used to scan a file and catalog all of the custom code blocks that it finds so that
  * when the file is regenerated, the custom code tags can generate their keys and then use this manager to find and
  * insert the custom code back into the new file.  Since the code generator is strictly single threaded, this does
  * not require locking.

@@ -30,6 +30,10 @@ import codegenerator.generator.tags.*;
 
 
 
+/**
+ * This is the top-level template parser.  It is used to parse a new template file into an
+ * executable tree of tag objects that can be used by the generator.
+ */
 public class TemplateParser {
 
 

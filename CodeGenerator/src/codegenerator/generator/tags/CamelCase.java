@@ -30,14 +30,19 @@ import coreutil.logging.*;
 
 
 /**
-Takes any config value of the form "aa_bb_cc" or "aa-bb-cc" and outputs it in camel case "AaBbCc".
-The input value can be any mix of upper and lower case.
+Takes any value from the config that has underscores or dashes such as "aa_Bb_cC", "AA_bB_Cc", "aa-Bb-cC" or "AA-bB-Cc" and
+outputs it in camel case "AaBbCc".  The input value can be any mix of upper and lower case.
+
+For example, if you name a database table CONTACT_METHOD in the config, then you can use this tag to convert it to camel case to create a
+class name such as "ContactMethod".  You can also use this tag's output as the input for the {@link FirstLetterToLowerCase}
+tag and use it to create variable names such as "t_contactMethod" for instances of the same class.
 
 <p>Example use of this tag:</p>
 
 <pre><code>&lt;%camelCase value = &lt;%className%&gt; optionalSeparator = " " %&gt;</code></pre>
 
-<p>Note that the attribute [optionalSeparator] is just that: optional.  It lets you create camel-cased output with a space or other characters between the words, for example, so that it can be used for a UI label.</p>
+<p>Note that the attribute [optionalSeparator] is just that: optional.  It lets you create camel-cased output with a space or other
+characters between the words so that, for example, it can be used for a UI label such as "Contact Method".</p>
 
 */
 public class CamelCase extends Tag_Base {

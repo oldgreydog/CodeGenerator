@@ -35,7 +35,7 @@ import codegenerator.generator.utils.*;
 
 	<p>Here's an example of this tag:</p>
 
-	<pre><code>&lt;%include template = templates/cached_templates/marshalling/marshalling_interface_variables.template %&gt;</code></pre>
+	<pre>	<code>&lt;%include template = templates/marshalling/marshalling_interface_variables.template %&gt;</code></pre>
  */
 public class Include extends Tag_Base {
 

@@ -39,21 +39,20 @@ import codegenerator.generator.utils.*;
 
 	<pre><code>&lt;%file template = templates/cached_templates/marshalling/marshalling_interface.template	filename = "&lt;%className%&gt;Marshalling.java"	destDir = "&lt;%root.global.outputPath%&gt;/marshalling" optionalContextName = "parentTable"%&gt;</code></pre>
 
-	<p>As the example shows, you can use tags that evaluate to strings in the values of the attributes, but if you do, you are
-	required to surround the value with double quotes as shown.</p>
+	<p>As the example shows, you can use tags that evaluate to strings in the values of the attributes.  The quotes are optional unless you have spaces in the file and/or path name.</p>
 
 	<p>Note that it is now possible to nest this file tag inside another file template.  To that ends, the optional
-	attribute "optionalContextName" is used if you need to have the	nested file tag execute inside an outer context
-	instead of the local context it is defined in.  The value you give this attribute will be the contextname
-	you gave to the outerContext tag that encloses the nested instance of the file tag.</p>
+	attribute <code>optionalContextName</code> is used if you need to have the	nested file tag execute inside an outer context
+	instead of the local context it is defined in.  The value you give this attribute will be the <code>contextName</code>
+	you gave to the <code>outerContext</code> tag that encloses the nested instance of the <code>file</code> tag.</p>
 
 	<p>Refer to the files in the <code>Examples/codegenerator</code> folders to better understand its usage.</p>
 
-	<p>NOTE: I had to change the class name from FileBlock to FileTag instead of just File since file is a java class and it was simpler to just use a non-clashing name.</p>
+	<p>NOTE: I changed the class name from FileBlock to FileTag instead of just File since file is a java class and it was simpler to just use a non-clashing name.</p>
  */
 public class FileTag extends Tag_Base {
 
-	static public final String		TAG_NAME	= "file";
+	static public final String		TAG_NAME							= "file";
 
 	static private final String		ATTRIBUTE_TEMPLATE					= "template";
 	static private final String		ATTRIBUTE_FILENAME					= "filename";

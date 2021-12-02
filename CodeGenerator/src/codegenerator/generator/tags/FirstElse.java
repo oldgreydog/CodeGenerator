@@ -39,23 +39,28 @@ import codegenerator.generator.utils.*;
 	tags let you do that.  For example:</p>
 
 	<pre><code>&lt;%forEach node = member  optionalCounterName = "loop1" %&gt;
+
 	&lt;%first%&gt;
-		&lt;%text%&gt;&lt;%endtext%&gt;
+
+		&lt;&lt;&lt; comment: note that it is possible to leave this block empty so that the first pass is essentially a NULLOP. &gt;&gt;&gt;
+
 	&lt;%else%&gt;
+
 		&lt;%text%&gt;,
 &lt;%endtext%&gt;
+
 	&lt;%endFirst%&gt;
 
 	&lt;%text%&gt;       &lt;%typeConvert targetLanguage = "java" sourceType = &lt;%type%&gt; class = "object" %&gt; p_&lt;%firstLetterToLowerCase member = &lt;%name%&gt;%&gt;&lt;%endtext%&gt;
-&lt;%endFor%&gt;
-</code></pre>
 
-	<p>The first pass through this loop that is iterating over "member" nodes, the loop will add an
-	empty text tag in front of the parameter definition.  But for every iteration after that, the
-	<code>else</code> tag will add a comma and a new-line in front of the parameter definition.</p>
+&lt;%endFor%&gt;</code></pre>
 
-	<p>The optionalCounterName attribute lets you specify using a named loop counter from a forEach tag other than the
-	one directly containing this first tag.</p>
+	<p>On the first pass through this loop, the <code>first</code> tag will do nothing.  But
+	for every iteration after that, the <code>else</code> tag will add a comma and a new-line in front of the
+	parameter definition.</p>
+
+	<p>The optionalCounterName attribute lets you specify using a named loop counter from a {@link ForEach} tag or {@link CounterVariable} other than the
+	 {@link ForEach} directly containing this <code>first</code> tag.</p>
  */
 public class FirstElse extends Tag_Base {
 

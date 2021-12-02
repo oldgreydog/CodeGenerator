@@ -36,11 +36,16 @@ import coreutil.logging.*;
 
 	<p>Example use of this tag:</p>
 
-	<pre><code>&lt;%firstLetterToLowerCase value = &lt;%className%&gt;%&gt;</code></pre>
+	<pre><code>&lt;%firstLetterToLowerCase value = &lt;%className%&gt; %&gt;</code></pre>
 
 	<p>So a class name like <code>FooBar</code> could also be used to generate a local variable called
 	<code>t_fooBar</code>.</p>
- */
+
+	<pre><code>&lt;%firstLetterToLowerCase value = &lt;%camelCase value = &lt;%className%&gt; %&gt; %&gt;</code></pre>
+
+	<p>Or you can take the output of another tag such as {@link CamelCase} as the input to this one and thereby convert
+	a config value like "FOO_BAR" into "fooBar".
+*/
 public class FirstLetterToLowerCase extends Tag_Base {
 
 	static public final String		TAG_NAME			= "firstLetterToLowerCase";
