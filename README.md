@@ -1,26 +1,10 @@
-## Build Change!!
+## Build Change (again)!!
 
-I've re-exposed the CoreUtils code but in a way that, unfortunately, changes how you need to build the code generator.  That code was originally just inside this repository but I eventually got to a point where I didn't think anyone would care about it, so I removed it and started just including the jar file.  Then when I was starting the v1.5 commits, I realized that if I compiled that jar locally where I usually run the latest OpenJDK (v14 at the moment), then people that can't run the latest jdk can't use it.  I shot myself in the foot with that one.
+I realized recently that I should just add the lib/coreutil.jar back to repository so that you no longer have to build it yourself.  Sorry about the on-going flip-flopping about that.  I still down-compiled that jar to java 8 so that you should be able to use it regardless of which compiler you use locally.
 
-I've been thinking about it and I decided that I needed to put that code back out here but that it should be in a separate repository since the config management and logger code it contains aren't restricted to the code generator.  To that end, you also need to clone this repository
+NOTE:  I still haven't gotten ahold of a windows machine to create, change or test windows versions of some of the scripts.  All of my development has been done on Kubuntu.
 
-oldgreydog/CoreUtils
-
-into the same parent directory where you cloned CodeGenerator. If you don't want to pull both projects into your IDE of choice (Eclipse project files are included in the repositories), then use the build script
-
-./dev_build
-
-the first time to build the CoreUtils jar and have it added it to the CodeGenerator lib directory.  From that point on, you can can just use the CodeGenerator project and include the lib/coreutil.jar file.
-
-Or you can run the script
-
-./release_build
-
-if you want to create the release zip file that contains the "install" folder that you can then use to run the code generator.
-
-!!NOTE!! I noted here that I didn't think I would add a release build zip file to the GitHub releases anymore, but I've changed my mind again.  I have added a zip that contains jar files compiled to java version 1.8 compatibility.  It looks like the current long-term support version of java is version 1.11, but I couldn't get a down-compile to anything after 1.8, so 1.8 it is.
-
-!!NOTE 2!!  I haven't had a windows machine in years and it just occurred to me that these scripts only cover Linux, which is a problem.  I'll try to borrow a windows laptop from somebody and use it to create/test the windows versions of these scripts.  I'll add them as soon as I can.  Sorry!
+NOTE 2: The v1.6 release has a number of updates in the javadoc, but I haven't gotten to making similar changes to the wiki so refer to the javadocs first.
 
 
 ## Now we return to the original programming...
