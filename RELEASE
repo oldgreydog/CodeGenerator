@@ -21,7 +21,7 @@ To run the code generator using the contents of the code_generator.zip file, ext
 		c) Cleaned up how the tag attribute parser does its thing.
 		d) Back when I made file tags nestable and added the evaluation context, I forgot that I had to now handle nested tab settings so that's fixed now.
 		e) Added a "safe for attributes" flag to Tag_Base that lets me correctly mark which tags are safe for use in text and which are safe for use in attributes.
-		f) Finally went through the javadoc comments in the code and updated and cleaned them up.  I'm sure they still aren't perfect, but they'er hopefully better than they were.
+		f) Finally went through the javadoc comments in the code and updated and cleaned them up.  I'm sure they still aren't perfect, but they're hopefully better than they were.
 		g) There are a number of misc. fixes/cleanups on things like error messages and making the generator die on errors where it wasn't before.
 		h) As noted above, I added the coreutil.jar back to this project.
 
