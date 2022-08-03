@@ -186,8 +186,8 @@ public class TagAttributeParser {
 						t_newTag = TagFactory.GetTag(t_tagParser.GetTagName());
 						if (t_newTag == null) {
 							// This should be a variable tag embedded in the text.
-							ConfigVariable t_configVariable = new ConfigVariable();
-							if (!t_configVariable.Init(t_tagParser, p_tokenizer.GetLineCount())) {
+							ConfigValue t_configValue = new ConfigValue();
+							if (!t_configValue.Init(t_tagParser, p_tokenizer.GetLineCount())) {
 								Logger.LogError("TagAttributeParser.Parse() failed to initialize the config variable at line [" + p_tokenizer.GetLineCount() + "].");
 								m_failedWithError = true;
 								return false;
@@ -200,7 +200,7 @@ public class TagAttributeParser {
 									if (m_attributeName == null)
 										m_attributeName = new GeneralBlock();
 
-									m_attributeName.AddChildNode(t_configVariable);
+									m_attributeName.AddChildNode(t_configValue);
 									break;
 
 								case EXPECT_EQUALS:
@@ -214,14 +214,14 @@ public class TagAttributeParser {
 									if (m_value == null)
 										m_value = new GeneralBlock();
 
-									m_value.AddChildNode(t_configVariable);
+									m_value.AddChildNode(t_configValue);
 									break;
 							}
 
 							break;
 						}
 						else {
-							// Other than ConfigVariables, these are the only tag types that can appear inside of a Text tag.  This forces you to keep text blocks simpler which will keep templates simpler (hopefully).
+							// Other than ConfigValues, these are the only tag types that can appear inside of a Text tag.  This forces you to keep text blocks simpler which will keep templates simpler (hopefully).
 							if (t_newTag.IsSafeForAttributes())
 							{
 								if (!t_newTag.Init(t_tagParser)) {

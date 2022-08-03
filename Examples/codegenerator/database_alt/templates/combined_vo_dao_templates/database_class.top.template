@@ -5,13 +5,13 @@
 
 
 // This is dummy text to make sure the parser ignores it since it isn't in a text block.
-<%file template=templates/combined_vo_dao_templates/ddl.template						filename=database.ddl								destDir="<%root.global.outputPath%>/combined/ddl"%>
+<%file template=templates/combined_vo_dao_templates/ddl.template						filename=database.ddl								destDir="<%root.global.outputPath%>/combined/ddl"						optionalUseTempFile=<%root.global.useTempFiles%> %>
 
 <%foreach node=table%>
-	<%file template=templates/combined_vo_dao_templates/database_class.template			filename="<%className%>.java"						destDir="<%root.global.outputPath%>/combined"%>
-	<%file template=templates/combined_vo_dao_templates/marshalling_interface.template	filename="<%className%>Marshalling.java"			destDir="<%root.global.outputPath%>/combined/marshalling"%>
-	<%file template=templates/combined_vo_dao_templates/marshalling_gson.template		filename="Gson<%className%>Marshalling.java"		destDir="<%root.global.outputPath%>/combined/marshalling/gson"%>
-	<%file template=templates/combined_vo_dao_templates/marshalling_dmapi.template		filename="DMAPIJson<%className%>Marshalling.java"	destDir="<%root.global.outputPath%>/combined/marshalling/dmapijson"%>
+	<%file template=templates/combined_vo_dao_templates/database_class.template			filename="<%className%>.java"						destDir="<%root.global.outputPath%>/combined"							optionalUseTempFile=<%root.global.useTempFiles%> %>
+	<%file template=templates/combined_vo_dao_templates/marshalling_interface.template	filename="<%className%>Marshalling.java"			destDir="<%root.global.outputPath%>/combined/marshalling"				optionalUseTempFile=<%root.global.useTempFiles%> %>
+	<%file template=templates/combined_vo_dao_templates/marshalling_gson.template		filename="Gson<%className%>Marshalling.java"		destDir="<%root.global.outputPath%>/combined/marshalling/gson"			optionalUseTempFile=<%root.global.useTempFiles%> %>
+	<%file template=templates/combined_vo_dao_templates/marshalling_dmapi.template		filename="DMAPIJson<%className%>Marshalling.java"	destDir="<%root.global.outputPath%>/combined/marshalling/dmapijson"		optionalUseTempFile=<%root.global.useTempFiles%> %>
 <%endfor%>
 
-<%file template=templates/combined_vo_dao_templates/marshalling_factory.template		filename="<%root.global.databaseName%>MarshallingFactory.java"	destDir="<%root.global.outputPath%>/combined/marshalling"%>
+<%file template=templates/combined_vo_dao_templates/marshalling_factory.template		filename="<%root.global.databaseName%>MarshallingFactory.java"	destDir="<%root.global.outputPath%>/combined/marshalling"	optionalUseTempFile=<%root.global.useTempFiles%> %>

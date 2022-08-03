@@ -78,7 +78,7 @@ import codegenerator.generator.utils.*;
  *
  * <p><code>&lt;%customCode key=Validate&lt;%memberName%&gt;Of&lt;%^className%&gt; openingCommentCharacters=// %&gt;</code></p>
  *
- * <p>The caret (^) in front of "className" tells {@link ConfigVariable} to go up one config node before trying
+ * <p>The caret (^) in front of "className" tells {@link ConfigValue} to go up one config node before trying
  * to find the value named "className".</p>
  */
 public class CustomCode extends Tag_Base {

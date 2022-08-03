@@ -1,25 +1,26 @@
-## Build Change (again)!!
+## Getting started
 
-I realized recently that I should just add the lib/coreutil.jar back to repository so that you no longer have to build it yourself.  Sorry about the on-going flip-flopping about that.  I still down-compiled that jar to java 8 so that you should be able to use it regardless of which compiler you use locally.
+First, thank you for stopping to look at this project!  This is a code generator that I have slowly evolved over the last 17 years or so to make my job a little easier.  Before I started this, I had been exposed to a couple of code generation efforts, one for Corba and another for a one-off code conversion/code generator.  The Corba generator was part of the package we were using (I don't remember which) and while it did generate working code, the output was an unreadable mess.  The other example was a one-off effort that did output reasonably readable code, but it was hand coded specifically for that project and it's code.  There was nothing reusable about it.  I wanted to have a code generator that could output code (or any other text) exactly the way I wanted it to look and to be reusable for anything I wanted.  This is the result of that effort.
 
-NOTE:  I still haven't gotten ahold of a windows machine to create, change or test windows versions of some of the scripts.  All of my development has been done on Kubuntu.
-
-NOTE 2: The v1.6 release has a number of updates in the javadoc, but I haven't gotten to making similar changes to the wiki so refer to the javadocs first.
+You should really only need this repository if you are trying to write your own new tag handlers so that you can debug things.  Otherwise, you should just grab the latest release.  The release also has a javadoc.zip file with all of the generated javadoc files.  That should be the most detailed reference for using each of the tags.  The wiki here on the project is not the same as the javadoc.  The wiki has more of a high-level discussion of the how and why of using the generator whereas the javadocs are a more detailed tag reference.  You'll need to read both to get started, starting with the wiki first.
 
 
-## Now we return to the original programming...
+## Try the examples first
 
-First, thank you for stopping to look at this project!  This landing page has been completely stripped down and most of the project information has been moved to the wiki tab above.
+The "Examples" folder has its own README and the batch files necessary to generate the example output code with the provided config and templates.  The templates use most, but maybe not all, of the tags so that's a great place to reference when you're trying to create your first templates.  And if you want, you can play with the templates and the config and keep re-running the generation so that you can see how the changes affect the output.
+
+
+## If you decide to write your own tags...
+
+You'll need to pull this repository to do debugging.  Please refer to the "Building the code" section in the wiki for more info, particularly about changing the logging level to see the parsing output.
+
+
+## Let me know what you think
 
 If you have questions, comments or problems, please email me.
 
 helots54612@mypacks.net
 
 I would be particularly interested in discussing internationalization (foreign language support) if anyone needs changes for that.
-
-
-## Note for existing users!
-
-If you have version 1.3 or earlier and you want to get new code, you must read the RELEASE file!  Later versions might break your templates in a various ways and they are explained there.
 
 

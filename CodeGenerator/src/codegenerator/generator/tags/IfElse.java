@@ -154,7 +154,7 @@ import codegenerator.generator.utils.*;
 
 	<p><code>&lt;%if  &lt;%typeConvert targetLanguage = "java" sourceType = &lt;%type%&gt; class = "object" %&gt; = Integer %&gt;</code></p>
 
-	<p>Where &lt;%type%&gt; is a {@link ConfigVariable} tag that inputs a config value of the name "type" into the {@link TypeConvert} tag
+	<p>Where &lt;%type%&gt; is a {@link ConfigValue} tag that inputs a config value of the name "type" into the {@link TypeConvert} tag
 	which, in this case, maps it to an equivalent Java object type as the tag output.  Therefore the example is checking to see if the type is <code><B>Integer</B></code>.</p>
 
 

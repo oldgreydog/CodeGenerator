@@ -169,17 +169,17 @@ public class Text extends Tag_Base {
 						t_newTag = TagFactory.GetTag(t_tagParser.GetTagName());
 						if (t_newTag == null) {
 							// This should be variable tag embedded in the text.
-							ConfigVariable t_configVariable = new ConfigVariable();
-							if (!t_configVariable.Init(t_tagParser, p_tokenizer.GetLineCount())) {
+							ConfigValue t_configValue = new ConfigValue();
+							if (!t_configValue.Init(t_tagParser, p_tokenizer.GetLineCount())) {
 								Logger.LogError("Text.Parse() failed to initialize the config variable at line [" + p_tokenizer.GetLineCount() + "] in the tag starting at [" + m_lineNumber + "].");
 								return false;
 							}
 
 							SaveCollectedTextBeforeNewTag(t_collectedText);
-							AddChildNode(t_configVariable);
+							AddChildNode(t_configValue);
 						}
 						else {
-							// Other than ConfigVariables, these are the only tag types that can appear inside of a Text.  This forces you to keep text tags simpler which will keep templates simpler (hopefully).
+							// Other than ConfigValues, these are the only tag types that can appear inside of a Text.  This forces you to keep text tags simpler which will keep templates simpler (hopefully).
 							if (t_newTag.IsSafeForText())
 							{
 								if (!t_newTag.Init(t_tagParser)) {

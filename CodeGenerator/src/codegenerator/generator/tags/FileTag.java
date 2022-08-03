@@ -33,13 +33,15 @@ import codegenerator.generator.utils.*;
 
 
 /**
-	Parses the indicated template file and, on evaluation, writes the output from that template to a file with the given file name.
+	Parses the indicated template file and, on evaluation, writes the output from that template to a file with the given [filename] to the [destDir] directory.
 
 	<p>Here's an example of this tag:</p>
 
-	<pre><code>&lt;%file template = templates/cached_templates/marshalling/marshalling_interface.template	filename = "&lt;%className%&gt;Marshalling.java"	destDir = "&lt;%root.global.outputPath%&gt;/marshalling" optionalContextName = "parentTable"%&gt;</code></pre>
+	<pre><code>&lt;%file template = templates/cached_templates/marshalling/marshalling_interface.template filename = "&lt;%className%&gt;Marshalling.java" destDir = "&lt;%root.global.outputPath%&gt;/marshalling" optionalUseTempFile = "false" optionalContextName = "parentTable"%&gt;</code></pre>
 
 	<p>As the example shows, you can use tags that evaluate to strings in the values of the attributes.  The quotes are optional unless you have spaces in the file and/or path name.</p>
+
+	<p>optionalUseTempFile is an optional boolean attribute to indicate that generation should go to a temp file so that if an error occurs, then the original file and any custom code it contains will not be lost.  If the generation completes successfully, then the original file will be deleted and the temp file renamed with the specified filename.</p>
 
 	<p>Note that it is now possible to nest this file tag inside another file template.  To that ends, the optional
 	attribute <code>optionalContextName</code> is used if you need to have the	nested file tag execute inside an outer context
@@ -57,6 +59,7 @@ public class FileTag extends Tag_Base {
 	static private final String		ATTRIBUTE_TEMPLATE					= "template";
 	static private final String		ATTRIBUTE_FILENAME					= "filename";
 	static private final String		ATTRIBUTE_DEST_DIR					= "destDir";
+	static private final String		ATTRIBUTE_OPTIONAL_USE_TEMP_FILE	= "optionalUseTempFile";	// A boolean to indicate that generation should go to a temp file so that if an error occurs, then the original file and any custom code it contains will not be lost.
 	static private final String		ATTRIBUTE_OPTIONAL_CONTEXT_NAME		= "optionalContextName";
 
 
@@ -102,6 +105,7 @@ public class FileTag extends Tag_Base {
 
 	// Data members
 	private	String		m_templateFileName;
+	private boolean		m_useTempFile			= false;	// Optional flag indicating whether the output should go to a temp file or directly overwriting the original file.  We'll default to overwriting.
 	private	String		m_contextName			= null;		// The optional outer context in which to evaluate this variable.
 
 	// These values can themselves be composites of evaluation-time config variables and text, so we have to store them in their Text object form and evaluate them at runtime to get their final values.
@@ -167,6 +171,20 @@ public class FileTag extends Tag_Base {
 		}
 
 
+		// The "optionalUseTempFile" attribute is optional, so it's fine if it doesn't exist.
+		t_nodeAttribute = p_tagParser.GetNamedAttribute(ATTRIBUTE_OPTIONAL_USE_TEMP_FILE);
+		if (t_nodeAttribute != null) {
+			String t_value = t_nodeAttribute.GetAttributeValueAsString();
+			try {
+				if ((t_value != null) && !t_value.isBlank())
+					m_useTempFile = Boolean.parseBoolean(t_value);
+			}
+			catch (Throwable t_error) {
+				Logger.LogException("FileTag.Init() failed with error in file [" + m_templateFileName + "] because it did not receive an invalid boolean value [" + t_value + "]: ", t_error);
+				return false;
+			}
+		}
+
 		// The "optionalContextName" attribute is optional, so it's fine if it doesn't exist.
 		t_nodeAttribute = p_tagParser.GetNamedAttribute(ATTRIBUTE_OPTIONAL_CONTEXT_NAME);
 		if (t_nodeAttribute != null)
@@ -215,25 +233,28 @@ public class FileTag extends Tag_Base {
 				return false;
 			}
 
-			// Build the filename from the component destdir and filename parts.
-			StringWriter		t_fileName			= new StringWriter();
-			Cursor				t_fileNameCursor	= new Cursor(t_fileName);
+			// Build the filename from the component destdir and filename parts.  This has to be done in this confusing way because both the directory path and the filename will almost certainly contain config value tags in them that need to be evaluated to get the correct final value for both.
+			StringWriter		t_filePath			= new StringWriter();
+			Cursor				t_filePathCursor	= new Cursor(t_filePath);
 
-			p_evaluationContext.PushNewCursor(t_fileNameCursor);
+			p_evaluationContext.PushNewCursor(t_filePathCursor);
 
 			if (!m_destinationDirectory.Evaluate(p_evaluationContext)) {
-				Logger.LogError("FileTag.Evaluate() failed to evaluate the destination.");
+				Logger.LogError("FileTag.Evaluate() failed to evaluate the destination directory path.");
+				p_evaluationContext.PopCurrentCursor();	// We need to clean up the temp filename cursor before we return.
 				return false;
 			}
 
-			File t_destDirectory = new File(t_fileName.toString());
+			p_evaluationContext.PopCurrentCursor();	// We need to clean up the temp path name cursor before we go any further.
+
+			File t_destDirectory = new File(t_filePath.toString());
 
 			try {
+				// I put this lock in when I was trying to multi-thread things.  I didn't go far enough with that effort to completely get it to work, but I didn't remove this because I might try again and it's not causing any harm now that we're back to single-threading.
 				s_directoryCreateLock.lock();
 
 				if (!t_destDirectory.exists() && !t_destDirectory.mkdirs()) {
 					Logger.LogError("FileTag.Evaluate() failed to create the destination directory [" + t_destDirectory.getAbsolutePath() + "].");
-					p_evaluationContext.PopCurrentCursor();	// We need to clean up the temp cursor before we fail out of the function.
 					return false;
 				}
 			}
@@ -241,17 +262,25 @@ public class FileTag extends Tag_Base {
 				s_directoryCreateLock.unlock();
 			}
 
-			t_fileNameCursor.Write(File.separator);
+
+			StringWriter		t_fileName			= new StringWriter();
+			Cursor				t_fileNameCursor	= new Cursor(t_fileName);
+
+			p_evaluationContext.PushNewCursor(t_fileNameCursor);
+
 			if (!m_fileName.Evaluate(p_evaluationContext)) {
 				Logger.LogError("FileTag.Evaluate() failed to evaluate the filename.");
+				p_evaluationContext.PopCurrentCursor();	// We need to clean up the temp filename cursor before we return.
 				return false;
 			}
 
-			File t_targetFile = new File(t_fileName.toString());
-			if (t_targetFile.exists()) {
-				if (!p_evaluationContext.GetCustomCodeManager().ScanFile(t_targetFile)) {	// Check to see if the file has any custom code in it.  If it does, this will save it so that the CustomCode tags can re-insert it during the file generation.
-					Logger.LogError("FileTag.Evaluate() failed to scan the file [" + t_targetFile.getAbsolutePath() + "] for custom code blocks.");
-					p_evaluationContext.PopCurrentCursor();	// We need to clean up the temp cursor before we fail out of the function.
+			p_evaluationContext.PopCurrentCursor();	// We need to clean up the temp filename cursor before we go any further.
+
+			// Create the full filename path and see if it exists.
+			File t_originalFile = new File(t_filePath.toString() + File.separator + t_fileName.toString());
+			if (t_originalFile.exists()) {
+				if (!p_evaluationContext.GetCustomCodeManager().ScanFile(t_originalFile)) {	// Check to see if the file has any custom code in it.  If it does, this will save it so that the CustomCode tags can re-insert it during the file generation.
+					Logger.LogError("FileTag.Evaluate() failed to scan the file [" + t_originalFile.getAbsolutePath() + "] for custom code blocks.");
 					return false;
 				}
 			}
@@ -259,13 +288,21 @@ public class FileTag extends Tag_Base {
 				p_evaluationContext.GetCustomCodeManager().ClearCache();	// If a new file is being generated after an existing file was regenerated and the custom code blocks aren't unique, then the new file will inherit the previous file's custom code blocks.  !!!That's really BAD!!!  This will clear the custom code cache in those cases.
 			}
 
-			Logger.LogDebug("FileTag.Evaluate() is writing to file [" + t_fileName + "]");
 
-			BufferedWriter	t_fileWriter		= new BufferedWriter(new FileWriter(t_targetFile));
-			Cursor			t_fileWriterCursor	= new Cursor(t_fileWriter);
+			// Now we need to figure out if we are doing a temp file or not.
+			File t_targetFile = t_originalFile;	// We'll default the target file to the "original" file and only switch it to a temp file if needed.
+			if (m_useTempFile) {
+				t_targetFile = new File(t_originalFile.getAbsolutePath() + ".temp");
+				if (t_targetFile.exists()) {
+					if (!t_targetFile.delete()) {	// This should theoretically never happen if this code is properly cleaning up after itself, but just in case, we'll delete it here before we move on.
+						Logger.LogError("FileTag.Evaluate() failed to delete the unexpected temp file [" + t_targetFile.getAbsolutePath() + "].");
+						return false;
+					}
+				}
+			}
 
-			p_evaluationContext.PopCurrentCursor();	// We need to throw away the filename cursor before we add the new file cursor to the context.
-			p_evaluationContext.PushNewCursor(t_fileWriterCursor);
+			Logger.LogDebug("FileTag.Evaluate() is writing to file [" + t_targetFile.getPath() + "]");
+
 
 			// The addition of outer contexts means that if you use a file tag inside an inner context, you may need to point it to the outer context to get the correct values in the evaluation of the file.
 			ConfigNode t_currentNode = p_evaluationContext.GetCurrentNode();
@@ -281,11 +318,28 @@ public class FileTag extends Tag_Base {
 
 			int t_tagSettingsManagerStackDepth = p_evaluationContext.GetTabSettingsManagerStackDepth();	// This is kinda fugly, but it's the only way I could come up with to figure out if the file contains a TagSettings tag so that we can pop it below if it does.
 
+
+			BufferedWriter	t_fileWriter		= new BufferedWriter(new FileWriter(t_targetFile));
+			Cursor			t_fileWriterCursor	= new Cursor(t_fileWriter);
+
+			p_evaluationContext.PushNewCursor(t_fileWriterCursor);
+
 			for (Tag_Base t_nextTag: m_tagList) {
 				if (!t_nextTag.Evaluate(p_evaluationContext)) {
 					t_fileWriter.close();
 					Logger.LogError("FileTag.Evaluate() failed for file [" + t_targetFile.getAbsolutePath() + "].");
 					p_evaluationContext.PopCurrentCursor();	// We need to clean up the temp cursor before we fail out of the function.
+
+// NOTE!!! I put this in at first, but then I remembered that it can be useful sometimes to see where the generator failed in the file so I commented it out.  I'll leave this here just in case there's ever a reason to bring it back.
+					// If we were using a temp file, we need to delete it before we return.
+//					if (m_useTempFile) {
+//						Logger.LogError("FileTag.Evaluate() will delete the temp file [" + t_targetFile.getAbsolutePath() + "].");
+//						if (!t_targetFile.delete()) {
+//							Logger.LogError("FileTag.Evaluate() failed to delete the temp file [" + t_targetFile.getAbsolutePath() + "].");
+//							return false;
+//						}
+//					}
+
 					return false;
 				}
 			}
@@ -298,6 +352,22 @@ public class FileTag extends Tag_Base {
 
 			t_fileWriter.close();
 			p_evaluationContext.PopCurrentCursor();	// We need to throw away the file cursor now that we're done with it.
+
+
+			// Finally, if we were using a temp file, we need to delete the original file and replace it with the temp file.
+			if (m_useTempFile) {
+				if (!t_originalFile.delete()) {
+					Logger.LogError("FileTag.Evaluate() failed to delete the unexpected temp file [" + t_targetFile.getAbsolutePath() + "].");
+					return false;
+				}
+
+				if (!t_targetFile.renameTo(t_originalFile)) {
+					Logger.LogError("FileTag.Evaluate() failed to delete the unexpected temp file [" + t_targetFile.getAbsolutePath() + "].");
+					return false;
+				}
+
+				Logger.LogDebug("FileTag.Evaluate() replaced the original file [" + t_originalFile.getPath() + "] with the temp file [" + t_targetFile.getPath() + "]");
+			}
 		}
 		catch (Throwable t_error) {
 			Logger.LogException("FileTag.Evaluate() failed with error: ", t_error);

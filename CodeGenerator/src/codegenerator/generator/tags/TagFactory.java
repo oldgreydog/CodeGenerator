@@ -37,7 +37,7 @@ public class TagFactory {
 
 	// The tag name is converted to lower case so that we can universally force the names searched for in GetTag() below to lower case and thereby make it possible to handle whatever capitalization the user uses in their templates (i.e. camelcase, all lower, all cap, etc.).
 	static {
-		//m_tags.put(.TAG_NAME.toLowerCase(), new ConfigVariable());	// This class is a special case that has to be handled by the Text tag parsing.
+		//m_tags.put(.TAG_NAME.toLowerCase(),						new ConfigValue());	// This class is a special case that has to be handled by the Text tag parsing.
 		m_tags.put(CamelCase.TAG_NAME.toLowerCase(),				new CamelCase());
 		m_tags.put(Counter.TAG_NAME.toLowerCase(),					new Counter());
 		m_tags.put(CounterDecrement.TAG_NAME.toLowerCase(),			new CounterDecrement());

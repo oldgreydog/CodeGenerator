@@ -33,12 +33,12 @@ import coreutil.logging.*;
 
 	<p>There are three modes of use for this tag:</p>
 
-	<p>	- Simple variable: a single child variable name is looked for on the current parent context node</p>
+	<p>	- Simple value: a single child value name is looked for on the current parent context node</p>
 
-	<p>	- Parent references: the caret ( ^ ) is used one or more times before the variable name to
+	<p>	- Parent references: the caret ( ^ ) is used one or more times before the value name to
 	indicate that it should be found that number of parent nodes above the current parent</p>
 
-	<p>	- Global path name: A fully specified variable name that starts with "root." will be dereferenced from the root node</p>
+	<p>	- Global path name: A fully specified value name that starts with "root." will be dereferenced from the root node</p>
 
 	<h3>Examples</h3>
 
@@ -84,24 +84,24 @@ import coreutil.logging.*;
 	<p>Let's assume that we are at a point in the template such that the current context node pointer is at the
 	first "column" node under the "table" node (i.e. you are inside a <code>&lt;%foreach node=column %&gt;</code> tag).</p>
 
-	<p>	- A simple variable reference like <code>&lt;%sqlName%&gt;</code> will be evaluated to <b><code>USER_ID</code></b>.</p>
+	<p>	- A simple value reference like <code>&lt;%sqlName%&gt;</code> will be evaluated to <b><code>USER_ID</code></b>.</p>
 
-	<p>	- A variable reference with one parent reference caret like <code>&lt;%^sqlName%&gt;</code> will be evaluated to <b><code>USER</code></b>.</p>
+	<p>	- A value reference with one parent reference caret like <code>&lt;%^sqlName%&gt;</code> will be evaluated to <b><code>USER</code></b>.</p>
 
-	<p>	- A fully qualified variable reference like <code>&lt;%root.global.databaseName%&gt;</code> will be evaluated to <b><code>Operations</code></b>.</p>
+	<p>	- A fully qualified value reference like <code>&lt;%root.global.databaseName%&gt;</code> will be evaluated to <b><code>Operations</code></b>.</p>
  */
-public class ConfigVariable extends Tag_Base {
+public class ConfigValue extends Tag_Base {
 
-	static public final String		TAG_NAME		= "ConfigVariable";
+	static public final String		TAG_NAME		= "ConfigValue";
 
 
 	// Data members
-	private	String		m_variableName			= null;
-	private	int			m_parentReferenceCount	= 0;		// (i.e. "^varname") This count tells us how many levels up to go to reference the following variable name on a parent node (or a parent-of-a-parent node "^^varname", etc.)
+	private	String		m_valueName			= null;
+	private	int			m_parentReferenceCount	= 0;		// (i.e. "^varname") This count tells us how many levels up to go to reference the following value name on a parent node (or a parent-of-a-parent node "^^varname", etc.)
 
 
 	//*********************************
-	public ConfigVariable() {
+	public ConfigValue() {
 		super(TAG_NAME);
 		m_isSafeForText			= true;
 		m_isSafeForAttributes	= true;
@@ -119,42 +119,42 @@ public class ConfigVariable extends Tag_Base {
 	//*********************************
 	@Override
 	public Tag_Base GetInstance() {
-		return new ConfigVariable();
+		return new ConfigValue();
 	}
 
 
 	//*********************************
 	public boolean Init(TagParser p_tagParser, int p_lineNumber) {
 		if (!p_tagParser.GetTagAttributes().isEmpty()) {
-			Logger.LogError("ConfigVariable.Init() was handed a tag definition for [" + p_tagParser.GetTagName() + "] at line number [" + p_tagParser.GetLineNumber() + "] that has [" + p_tagParser.GetTagAttributes().size() + "] attribute(s) and is, therefore, not a config variable name.");
+			Logger.LogError("ConfigValue.Init() was handed a tag definition for [" + p_tagParser.GetTagName() + "] at line number [" + p_tagParser.GetLineNumber() + "] that has [" + p_tagParser.GetTagAttributes().size() + "] attribute(s) and is, therefore, not a config value name.");
 			return false;
 		}
 
 		if (!super.Init(p_tagParser)) {
-			Logger.LogError("ConfigVariable.Init() failed in the parent Init() at line number [" + p_tagParser.GetLineNumber() + "]");
+			Logger.LogError("ConfigValue.Init() failed in the parent Init() at line number [" + p_tagParser.GetLineNumber() + "]");
 			return false;
 		}
 
-		String t_variableName = p_tagParser.GetTagName();
-		if (t_variableName == null) {
-			Logger.LogError("ConfigVariable.Init() did not find the required variable name at line [" + p_lineNumber + "].");
+		String t_valueName = p_tagParser.GetTagName();
+		if (t_valueName == null) {
+			Logger.LogError("ConfigValue.Init() did not find the required value name at line [" + p_lineNumber + "].");
 			return false;
 		}
 
-		return Init(t_variableName, p_lineNumber);
+		return Init(t_valueName, p_lineNumber);
 	}
 
 
 	//*********************************
-	public boolean Init(String p_variableName, int p_lineNumber) {
+	public boolean Init(String p_valueName, int p_lineNumber) {
 		// Count (and remove) any parent references.
-		String t_variableName = p_variableName;
-		while (t_variableName.startsWith("^")) {
+		String t_valueName = p_valueName;
+		while (t_valueName.startsWith("^")) {
 			m_parentReferenceCount++;
-			t_variableName = t_variableName.substring(1);	// Chop off the leading ^.
+			t_valueName = t_valueName.substring(1);	// Chop off the leading ^.
 		}
 
-		m_variableName	= t_variableName;
+		m_valueName	= t_valueName;
 		m_lineNumber	= p_lineNumber;
 
 		return true;
@@ -177,16 +177,16 @@ public class ConfigVariable extends Tag_Base {
 	{
 		try {
 			ConfigNode	t_currentNode	= p_evaluationContext.GetCurrentNode();
-			String		t_variableName	= m_variableName;
-			if (t_variableName.startsWith("root.")) {
+			String		t_valueName	= m_valueName;
+			if (t_valueName.startsWith("root.")) {
 				t_currentNode = p_evaluationContext.GetRootNode();
-				t_variableName.replace("root.", "");	// Remove the "root." reference so that the variable name will work correctly below.
+				t_valueName.replace("root.", "");	// Remove the "root." reference so that the value name will work correctly below.
 			}
 			else if (m_parentReferenceCount > 0) {
 				// This will kick the node reference up the tree the specified number of times.
 				for (int i = 0; i < m_parentReferenceCount; i++) {
 					if (t_currentNode == null) {
-						Logger.LogError("ConfigVariable.Evaluate() appears to have too many parent references [" + m_parentReferenceCount + "] to the variable named [" + m_variableName + "] at line [" + m_lineNumber + "].  It ran off the top of the tree.");
+						Logger.LogError("ConfigValue.Evaluate() appears to have too many parent references [" + m_parentReferenceCount + "] to the value named [" + m_valueName + "] at line [" + m_lineNumber + "].  It ran off the top of the tree.");
 						return false;
 					}
 
@@ -195,20 +195,20 @@ public class ConfigVariable extends Tag_Base {
 			}
 
 			if (t_currentNode == null) {
-				Logger.LogError("ConfigVariable.Evaluate() appears to have too many parent references [" + m_parentReferenceCount + "] to the variable named [" + m_variableName + "] at line [" + m_lineNumber + "].  It ran off the top of the tree.");
+				Logger.LogError("ConfigValue.Evaluate() appears to have too many parent references [" + m_parentReferenceCount + "] to the value named [" + m_valueName + "] at line [" + m_lineNumber + "].  It ran off the top of the tree.");
 				return false;
 			}
 
-			String t_value = t_currentNode.GetNodeValue(m_variableName);
+			String t_value = t_currentNode.GetNodeValue(m_valueName);
 			if (t_value == null) {
-				Logger.LogError("ConfigVariable.Evaluate() could not find the variable named [" + m_variableName + "] defined in line [" + m_lineNumber + "] in either the current or root config nodes.");
+				Logger.LogError("ConfigValue.Evaluate() could not find the value named [" + m_valueName + "] defined in line [" + m_lineNumber + "] in either the current or root config nodes.");
 				return false;
 			}
 
 			p_evaluationContext.GetCursor().Write(t_value);
 		}
 		catch (Throwable t_error) {
-			Logger.LogException("ConfigVariable.Evaluate() failed with error at line [" + m_lineNumber + "]: ", t_error);
+			Logger.LogException("ConfigValue.Evaluate() failed with error at line [" + m_lineNumber + "]: ", t_error);
 			return false;
 		}
 
@@ -222,7 +222,7 @@ public class ConfigVariable extends Tag_Base {
 		StringBuilder t_dump = new StringBuilder();
 
 		t_dump.append(p_tabs + "Tag name         :  " + m_name 					+ "\n");
-		t_dump.append(p_tabs + "Variable name    :  " + m_variableName			+ "\n");
+		t_dump.append(p_tabs + "Value name       :  " + m_valueName				+ "\n");
 		t_dump.append(p_tabs + "Parent Ref Count :  " + m_parentReferenceCount	+ "\n");
 
 		return t_dump.toString();

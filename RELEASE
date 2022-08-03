@@ -3,6 +3,25 @@ This contains important info about each release.
 To run the code generator using the contents of the code_generator.zip file, extract the file into the folder of your choice.
 
 
+1.6.1
+
+	A relatively minor update.
+
+
+	Change summary:
+		a) I needed to update the main README.md and wiki.  I still need to work on the wiki some, but it is outside of the main repository so it isn't tied to doing a release.
+		b) I noticed that I should change the name and references for "ConfigVariable" to "ConfigValue".  Somehow I missed that when I was doing the "Block"->"Tag" changes for 1.6.
+		c) I added a new optional attribute to the File tag that allows you have the generation go to a temp file instead of directly overwriting the original file.
+
+
+	Detailed change notes:
+		c) The new optional File tag attribute "optionalUseTempFile" allows you to generate to temp files instead of directly overwriting the original file.  That
+			means that it's safer to generate into your "working" dev tree since if the generate fails, it won't cause you to lose the custom code that might be in the
+			existing original file.  HOWEVER!! - if you have made changes outside of the custom code blocks, you can't use this because, temp file or not, generating
+			over your original work files will still blow away those type of non-standard changes.
+
+
+
 1.6
 
 	Build Change (again)!!

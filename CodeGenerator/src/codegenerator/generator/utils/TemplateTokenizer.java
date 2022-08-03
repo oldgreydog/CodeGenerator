@@ -102,7 +102,7 @@ public class TemplateTokenizer {
 	protected	int							m_currentLineIndex	= -1;
 	protected	int							m_lineCount			= 0;
 
-	protected	Token						m_pushBackToken		= null;	// I'm trying this for the time being to kludge ConfigVariable parsing.  Normally, the TemplateParser eats the first string after the opening delimiter and uses that as the tag name to get the next tag from the TagFactory, but that screws us up in the ConfigVariable case because then there's nothing for it to parse but its closing delimiter.  Therefore, we'll use the PushBackToken() functionality to push the first string "back on the TemplateTokenizer" so that the ConfigVariable will get it when it calls GetNextToke(), etc.
+	protected	Token						m_pushBackToken		= null;	// I'm trying this for the time being to kludge ConfigValue parsing.  Normally, the TemplateParser eats the first string after the opening delimiter and uses that as the tag name to get the next tag from the TagFactory, but that screws us up in the ConfigValue case because then there's nothing for it to parse but its closing delimiter.  Therefore, we'll use the PushBackToken() functionality to push the first string "back on the TemplateTokenizer" so that the ConfigValue will get it when it calls GetNextToke(), etc.
 
 
 

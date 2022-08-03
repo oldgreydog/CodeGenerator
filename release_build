@@ -1,28 +1,8 @@
 
 # This script builds the project and then creates zip file that is the working release build put out on the GitHub page.
 
-# NOTE!! This used to be set up such that it required you to get the CoreUtils repository to complete this build.
-#        That is no longer the case, hense the commented-out lines below.  I added the coreutil.jar file back to
-#        this project to eliminate the need for the CoreUtils repository but I've just commented-out the lines
-#        instead of removing them incase you want to go back to the other way of building the project.
-
 # Remove any existing jars so that we get a clean build.
 rm lib/code_generator.jar
-#rm lib/coreutil.jar
-#
-#
-## Build CoreUtils
-#pushd ../CoreUtils
-#
-#source java_build clean
-#source java_build
-#
-#popd
-#
-#
-## Copy the coreutil jar into this project so it will build.
-#mkdir lib
-#cp -pL  ../CoreUtils/lib/*.* ./lib
 
 
 # Build the code generator java code.

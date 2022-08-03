@@ -35,7 +35,7 @@ import coreutil.logging.*;
 
 <p>Example use of this tag:</p>
 
-<p><pre><code>&lt;%outercontexteval contextname = outer1 targetvalue = tableName %&gt;</code></pre></p>
+<p><pre><code>&lt;%outerContextEval contextname = outer1 targetvalue = tableName %&gt;</code></pre></p>
 
 <p></p>
 
@@ -137,8 +137,8 @@ public class OuterContextEval extends Tag_Base {
 
 			p_evaluationContext.PushNewCurrentNode(t_contextNode);
 
-			// We'll us a ConfigVariable to do the dirty work of getting the value out of the config.
-			ConfigVariable t_targetValue = new ConfigVariable();
+			// We'll us a ConfigValue to do the dirty work of getting the value out of the config.
+			ConfigValue t_targetValue = new ConfigValue();
 			t_targetValue.Init(m_valuePath, m_lineNumber);
 
 			if (!t_targetValue.Evaluate(p_evaluationContext)) {

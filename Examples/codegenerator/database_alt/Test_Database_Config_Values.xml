@@ -5,6 +5,7 @@
 		<Value name="databaseName">TestDB</Value>
 		<Value name="packageName">test.output.db</Value>
 		<Value name="outputPath">output</Value>
+		<Value name="useTempFiles">true</Value>
 	</Node>
 
 	<Node name="table">
