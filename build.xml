@@ -18,7 +18,7 @@
 	<target name="code_generator_jar">
 		<mkdir dir="CodeGenerator/bin"/>
 
-		<javac source="1.8" target="1.8" includeantruntime="false" srcdir="CodeGenerator/src" destdir="CodeGenerator/bin" debug="true">
+		<javac source="11" target="11" includeantruntime="false" srcdir="CodeGenerator/src" destdir="CodeGenerator/bin" debug="true">
 			<classpath>
 				<pathelement path="${jar_dir}/coreutil.jar"/>
 			</classpath>

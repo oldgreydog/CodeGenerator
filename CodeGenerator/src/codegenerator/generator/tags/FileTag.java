@@ -356,13 +356,13 @@ public class FileTag extends Tag_Base {
 
 			// Finally, if we were using a temp file, we need to delete the original file and replace it with the temp file.
 			if (m_useTempFile) {
-				if (!t_originalFile.delete()) {
-					Logger.LogError("FileTag.Evaluate() failed to delete the unexpected temp file [" + t_targetFile.getAbsolutePath() + "].");
+				if (t_originalFile.exists() && !t_originalFile.delete()) {
+					Logger.LogError("FileTag.Evaluate() failed to delete the original file [" + t_targetFile.getAbsolutePath() + "].");
 					return false;
 				}
 
 				if (!t_targetFile.renameTo(t_originalFile)) {
-					Logger.LogError("FileTag.Evaluate() failed to delete the unexpected temp file [" + t_targetFile.getAbsolutePath() + "].");
+					Logger.LogError("FileTag.Evaluate() failed to rename the temp file [" + t_targetFile.getAbsolutePath() + "] to the original file name [" + t_originalFile.getAbsolutePath() + "].");
 					return false;
 				}
 
