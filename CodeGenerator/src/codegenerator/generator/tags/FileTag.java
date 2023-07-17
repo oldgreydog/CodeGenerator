@@ -105,7 +105,7 @@ public class FileTag extends Tag_Base {
 
 	// Data members
 	private	String		m_templateFileName;
-	private boolean		m_useTempFile			= false;	// Optional flag indicating whether the output should go to a temp file or directly overwriting the original file.  We'll default to overwriting.
+	private boolean		m_useTempFile			= true;		// Optional flag indicating whether the output should go to a temp file or directly overwriting the original file.  We'll default to using the temp file so that we err on the side of saving people from themselves.
 	private	String		m_contextName			= null;		// The optional outer context in which to evaluate this variable.
 
 	// These values can themselves be composites of evaluation-time config variables and text, so we have to store them in their Text object form and evaluate them at runtime to get their final values.

@@ -169,22 +169,23 @@ public class CustomCode extends Tag_Base {
 	public boolean Evaluate(EvaluationContext p_evaluationContext)
 	{
 		try {
-			// The vast majority of the time, the key will have one or more tags embedded in it, so we must evaluate it to get the correct final value.
+			// Get the key for this custom code block.  The vast majority of the time, the key will have one or more tags embedded in it, so we must evaluate it to get the correct final value.
 			StringWriter	t_keyWriter = new StringWriter();
 			Cursor			t_keyCursor	= new Cursor(t_keyWriter);
 
 			p_evaluationContext.PushNewCursor(t_keyCursor);
 
 			if (!m_key.Evaluate(p_evaluationContext)) {
-				Logger.LogError("CustomCode.Evaluate() failed to evaluate the key.");
+				Logger.LogError("CustomCode.Evaluate() failed to evaluate the custom code block key at line number [" + m_lineNumber + "].");
 				return false;
 			}
 
 			p_evaluationContext.PopCurrentCursor();
 
 
-			Cursor t_writer = p_evaluationContext.GetCursor();
-			String t_leadingWhiteSpace = t_writer.GetCurrentLineContents();		// Grab the current contents of the line because we want to use the same whitespace offset for the closing comment line below as is before this tag in the template so that the two comments line up at the same indention.
+			// Now begin with the opening comment line.
+			Cursor t_writer				= p_evaluationContext.GetCursor();
+			String t_leadingWhiteSpace	= t_writer.GetCurrentLineContents();		// Grab the current contents of the line because we want to use the same whitespace offset for the closing comment line below as is before this tag in the template so that the two comments line up at the same indention.
 
 			t_writer.Write(m_openingCommentCharacters + "	" + CustomCodeManager.START_CUSTOM_CODE + ":" + t_keyWriter.toString());
 
@@ -193,10 +194,19 @@ public class CustomCode extends Tag_Base {
 
 			t_writer.Write("\n");
 
-			String t_customCode = p_evaluationContext.GetCustomCodeManager().GetCodeSegment(t_keyWriter.toString());
+			// Insert any custom code that may have been found when the existing file was scanned.
+			String				t_key				= t_keyWriter.toString();
+			CustomCodeManager	t_customCodeManager = p_evaluationContext.GetCustomCodeManager();
+			if (t_customCodeManager.IsDuplicate(t_key)) {
+				Logger.LogError("CustomCode.Evaluate() found a duplicate custom code block key [" + t_key + "] at line number [" + m_lineNumber + "].");
+				return false;
+			}
+
+			String t_customCode = t_customCodeManager.GetCodeSegment(t_key);
 			if (t_customCode != null)
 				t_writer.Write(t_customCode);
 
+			// Finish by adding the closing comment line.
 			t_writer.Write(t_leadingWhiteSpace + m_openingCommentCharacters + "	" + CustomCodeManager.END_CUSTOM_CODE + ":" + t_keyWriter.toString());	// This doesn't have "\n" on the end because it's used in text tags and the text tag will keep the newline after the tag itself and add it here so we don't have to.
 
 			if (m_closingCommentCharacters != null)

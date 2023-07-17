@@ -3,6 +3,20 @@ This contains important info about each release.
 To run the code generator using the contents of the code_generator.zip file, extract the file into the folder of your choice.
 
 
+
+1.6.2
+
+	A really minor update.
+
+
+	Change summary:
+		a) I added a check for duplicate custom code tag keys when it's writing to the file.  Just a little extra validation that catches, for example, if you've copy/pasted a
+			custom code tag but forgot to change the key.
+		b) I changed the optionalUseTempFile option on the file tag to default to TRUE since that is the safer option if people are generating on top of their working directory
+			and something kills the generate.  See the detailed change note below in v1.6.1.
+
+
+
 1.6.1
 
 	A relatively minor update.

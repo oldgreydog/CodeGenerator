@@ -44,19 +44,23 @@ public class CustomCodeManager {
 
 
 	// Static members
-	private TreeMap<String, String>		m_keyCodeMap	= new TreeMap<String, String>();
+	private TreeMap<String, String>		m_createdKeyMap		= new TreeMap<String, String>();
+	private TreeMap<String, String>		m_keyCodeMap		= new TreeMap<String, String>();
 
 
 	//*********************************
 	public void ClearCache() {
-		m_keyCodeMap.clear();	// We have to clear the map when we start a new file.  We do not want to accidently cross-contaminate code into other files.
+		// We have to clear the maps when we start a new file.  We do not want to accidently cross-contaminate code into other files.
+		m_createdKeyMap.clear();
+		m_keyCodeMap.clear();
 	}
 
 	//*********************************
 	public boolean ScanFile(File p_targetFile) {
 		BufferedReader t_lineReader = null;
 		try {
-			m_keyCodeMap.clear();	// We have to clear the map when we start a new file.  We do not want to accidently cross-contaminate code into other files.
+			// We have to clear the maps when we start a new file.  We do not want to accidently cross-contaminate code into other files.
+			ClearCache();
 
 			String			t_line;
 			String			t_startKey;
@@ -122,6 +126,19 @@ public class CustomCodeManager {
 			if (t_lineReader != null)
 				try { t_lineReader.close(); } catch (Throwable t_dontCare) {}
 		}
+	}
+
+
+	//*********************************
+	public boolean IsDuplicate(String p_key) {
+		if (m_createdKeyMap.containsKey(p_key)) {
+			Logger.LogError("CustomeCodeManager.IsDuplicate() found the custom code block key [" + p_key + "] has already been created.");
+			return true;
+		}
+
+		// Since this is the first time we've seen this key, we need to add it to the map.
+		m_createdKeyMap.put(p_key, p_key);
+		return false;
 	}
 
 
