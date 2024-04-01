@@ -95,13 +95,10 @@ public class DataTypeManager {
 						}
 
 						t_targetLanguageMap = s_typeMap.get(t_targetLanguageName);
-						if (t_targetLanguageMap != null) {
-							Logger.LogError("DataTypeManager.LoadConfigFile() found a pre-existing instance of a source type map for the language [" + t_targetLanguageName + "].");
-							return false;
+						if (t_targetLanguageMap == null) {	// I changed this to allow more than one file to be loaded for the same language.  I don't know why I did it the other way the first time.
+							t_targetLanguageMap = new TreeMap<String, TreeMap<String, String>>();
+							s_typeMap.put(t_targetLanguageName, t_targetLanguageMap);
 						}
-
-						t_targetLanguageMap = new TreeMap<String, TreeMap<String, String>>();
-						s_typeMap.put(t_targetLanguageName, t_targetLanguageMap);
 
 						t_targetTypeFieldDelimiter = t_nextChildNode.GetNodeValue(CONFIG_VALUE_TARGET_TYPE_FIELD_DELIMITER);
 						if ((t_targetTypeFieldDelimiter == null) || t_targetTypeFieldDelimiter.isEmpty()) {
@@ -119,7 +116,8 @@ public class DataTypeManager {
 								continue;
 							}
 
-							t_sourceType = null;
+							t_sourceTypeMap	= null;
+							t_sourceType	= null;
 							for (ConfigNode t_nextTypeField: t_nextSourceTypeNode.GetChildNodeList()) {
 								if (t_nextTypeField.GetName().equalsIgnoreCase(CONFIG_VALUE_SOURCE_TYPE)) {
 									t_sourceType = ((ConfigValue)t_nextTypeField).GetValue();
@@ -129,7 +127,9 @@ public class DataTypeManager {
 										return false;
 									}
 
-									t_sourceTypeMap = new TreeMap<String, String>();
+									if (t_sourceTypeMap == null)	// Doing this this way allows us to have more than one sourcetype value in types that can use the same target values (i.e. in SQL, decimal and numeric).
+										t_sourceTypeMap = new TreeMap<String, String>();
+
 									t_targetLanguageMap.put(t_sourceType, t_sourceTypeMap);
 									continue;
 								}
@@ -146,7 +146,7 @@ public class DataTypeManager {
 									}
 
 									if (t_sourceTypeMap.containsKey(t_targetTypeParts[0])) {
-										Logger.LogError("DataTypeManager.LoadConfigFile() - the source type [" + t_sourceType + "] already contains groupID entry [" + t_targetTypeParts[0] + "].");
+										Logger.LogError("DataTypeManager.LoadConfigFile() - the source type [" + t_sourceType + "] already contains target type entry [" + t_targetTypeParts[0] + "].");
 										return false;
 									}
 
@@ -178,7 +178,7 @@ public class DataTypeManager {
 
 
 	//===========================================
-	static public String GetTypeConversion(String p_targetLanguage, String p_sourceType, String p_typeClass) {
+	static public String GetTypeConversion(String p_targetLanguage, String p_sourceType, String p_targetType) {
 		try {
 			TreeMap<String, TreeMap<String, String>> t_targetLanguage = s_typeMap.get(p_targetLanguage);
 			if (t_targetLanguage == null) {
@@ -188,11 +188,11 @@ public class DataTypeManager {
 
 			TreeMap<String, String> t_sourceType = t_targetLanguage.get(p_sourceType);
 			if (t_sourceType == null) {
-				Logger.LogError("DataTypeManager.GetTypeConversion() failed to find a groupID map for the source type [" + p_sourceType + "].");
+				Logger.LogError("DataTypeManager.GetTypeConversion() failed to find a type group map for the source type [" + p_sourceType + "].");
 				return null;
 			}
 
-			return t_sourceType.get(p_typeClass);	// It's fine if this returns NULL if there is no p_typeClass for this source type.
+			return t_sourceType.get(p_targetType);	// It's fine if this returns NULL if there is no p_targetType for this source type.
 		}
 		catch (Throwable t_error) {
 			Logger.LogException("DataTypeManager.GetTypeConversion() failed with error: ", t_error);
