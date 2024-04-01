@@ -29,7 +29,7 @@ import coreutil.logging.*;
 /**
 	This is a simple wrapper class that lets you easily run the code generator from the command line.
 
-	<p>Usage:</p> <pre><code>java -cp .,coreutil.jar CodeGenerator_Main &lt;configFilename&gt; &lt;templateFilename&gt; &lt;variablesFilename&gt;</code></pre>
+	<p>Usage:</p> <pre><code>java -cp .:coreutil.jar:code_generator.jar CodeGenerator_Main &lt;configFilename&gt; &lt;templateFilename&gt; &lt;variablesFilename&gt;</code></pre>
 */
 public class CodeGenerator_Main {
 
@@ -52,9 +52,9 @@ public class CodeGenerator_Main {
 			// The ConfigManager can be given, theoretically, any number of configuration info sources.  In practice, it will probably only be a couple of sources: the config file as default first source and either a database source or network source depending on whether the app is a client/server or a multi-tier architecture (respectively).
 			// Load the config file and add its "source" to the ConfigManager first.  This will make its values the "default" values for anything not in other config sources added later.
 			FileConfigValueSet	t_configValues		= new FileConfigValueSet();
-			String				p_configFileName	= p_args[0];
-			if (!t_configValues.Load(p_configFileName)) {
-				System.out.println("CodeGenerator_Main() failed to import the config file [" + p_configFileName + "].");
+			String				t_configFileName	= p_args[0];
+			if (!t_configValues.Load(t_configFileName)) {
+				System.out.println("CodeGenerator_Main() failed to import the config file [" + t_configFileName + "].");
 				System.exit(1);
 			}
 
@@ -95,7 +95,7 @@ public class CodeGenerator_Main {
 		}
 		catch (Throwable t_error)
 		{
-			Logger.LogException("CodeGenerator_Main.main() failed with error: ", t_error);
+			Logger.LogException("CodeGenerator_Main.Cleanup() failed with error: ", t_error);
 		}
 	}
 }

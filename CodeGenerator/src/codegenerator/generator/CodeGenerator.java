@@ -44,11 +44,11 @@ public class CodeGenerator {
 	 * the file loads/parses and then executes the generation.
 	 *
 	 * @param p_templateFilename	File contains the "root" template to be used for the generation run.
-	 * @param p_variablesFilename	File contains the values that will be substituted into the template(s).  It is in the same ConfigManager XML format as is used in p_configFileName.
+	 * @param p_configFilename	File contains the values that will be substituted into the template(s).  It is in the same ConfigManager XML format as is used in p_configFileName.
 	 * @return
 	 */
 	public synchronized boolean Execute(String p_templateFilename,
-										String p_variablesFilename)
+										String p_configFilename)
 	{
 		try
 		{
@@ -62,8 +62,8 @@ public class CodeGenerator {
 
 			long t_startTemplateParse = Calendar.getInstance().getTimeInMillis();
 
-			TemplateParser		t_parser	= new TemplateParser();
-			Tag_Base	t_template	= t_parser.ParseTemplate(t_templateFile);
+			TemplateParser	t_parser	= new TemplateParser();
+			Tag_Base		t_template	= t_parser.ParseTemplate(t_templateFile);
 			if (t_template == null) {
 				Logger.LogFatal("CodeGenerator.Execute() failed to parse the template file [" + p_templateFilename + "].");
 				return false;
@@ -75,13 +75,15 @@ public class CodeGenerator {
 
 
 			// Parse the config file that contains the information that will be merged into the template.
-			File t_templateConfigFile = new File(p_variablesFilename);
-			ConfigNode t_templateConfig = null;
-			XMLConfigParser t_configParser = new XMLConfigParser();
-			if ((t_templateConfig = t_configParser.ParseConfigFile(t_templateConfigFile)) == null) {
-				Logger.LogFatal("CodeGenerator.Execute() failed to parse the config variables file [" + p_variablesFilename + "].");
+			FileConfigValueSet t_configValues = new FileConfigValueSet();
+			if (!t_configValues.Load(p_configFilename)) {
+				Logger.LogFatal("CodeGenerator.Execute() failed to parse the config variables file [" + p_configFilename + "].");
 				return false;
 			}
+
+			ConfigManager.AddValueSetFirst(t_configValues);		// I used the config substitution in a template config file but it turned out that it can only work through the ConfigManager so I had to add the parsed config file set to the ConfigManager to get it to work.
+
+			ConfigNode t_templateConfig = t_configValues.GetRootNode();
 
 			long t_endConfigValuesParse = Calendar.getInstance().getTimeInMillis();
 
@@ -91,7 +93,7 @@ public class CodeGenerator {
 			// And finally, "evaluate" the template with the config to generate the all of the file outputs.
 			EvaluationContext t_context = new EvaluationContext(t_templateConfig, t_templateConfig, null, new LoopCounter());
 			if (!t_template.Evaluate(t_context)) {
-				Logger.LogFatal("CodeGenerator.Execute() to evaluate the template file [" + t_templateFile.getAbsolutePath() + "].");
+				Logger.LogFatal("CodeGenerator.Execute() failed to evaluate the template file [" + t_templateFile.getAbsolutePath() + "].");
 				return false;
 			}
 
