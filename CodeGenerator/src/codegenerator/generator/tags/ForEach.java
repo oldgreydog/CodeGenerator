@@ -36,6 +36,10 @@ import codegenerator.generator.utils.*;
 ...
 &lt;%endFor%&gt;</code></pre>
 
+	<pre><code>&lt;%forEach value = column  optionalCounterName = "loop1" %&gt;
+...
+&lt;%endFor%&gt;</code></pre>
+
 	<p>This tag is the main control in the templates.  The config values are defined in a tree structure
 	in the XML file and the <code>forEach</code> tag lets you build templates that can iterate down
 	through that tree structure.</p>
@@ -168,13 +172,17 @@ public class ForEach extends Tag_Base {
 	static public final String		TAG_END_NAME						= "endFor";
 
 	static private final String		ATTRIBUTE_NODE						= "node";
+	static private final String		ATTRIBUTE_VALUE						= "value";
 	static private final String		ATTRIBUTE_OPTIONAL_COUNTER_NAME		= "optionalCounterName";
 
 
+	enum CONFIG_TYPE { NODE, VALUE };
+
 	// Data members
-	private	String		m_nodeName;						// This is the name of the config node that will be the temporary "root" node for each iteration of the loop.  For example, if this is == "class", then when we enter Evaluate(), we will run through the loop once for each "class" child node we find on the passed-in p_currentNode.
-	private	int			m_parentReferenceCount	= 0;	// (i.e. "^nodename") This count tells us how many levels up to go to reference the following variable name on a parent node (or a parent-of-a-parent node "^^varname", etc.)
-	private	String		m_optionalCounterName	= null;	// Providing a name for the loop counter lets you access it inside inner loops to achieve finer control over <code>first</code> tags and other counter uses.
+	private	String		m_nodeName;										// This is the name of the config node that will be the temporary "root" node for each iteration of the loop.  For example, if this is == "class", then when we enter Evaluate(), we will run through the loop once for each "class" child node we find on the passed-in p_currentNode.
+	private CONFIG_TYPE	m_configType			= CONFIG_TYPE.NODE;		// This tells us whether we are evaluating NODEs or VALUEs.
+	private	int			m_parentReferenceCount	= 0;					// (i.e. "^nodename") This count tells us how many levels up to go to reference the following variable name on a parent node (or a parent-of-a-parent node "^^varname", etc.)
+	private	String		m_optionalCounterName	= null;					// Providing a name for the loop counter lets you access it inside inner loops to achieve finer control over <code>first</code> tags and other counter uses.
 
 
 	//*********************************
@@ -201,13 +209,20 @@ public class ForEach extends Tag_Base {
 
 			TagAttributeParser t_nodeAttribute = p_tagParser.GetNamedAttribute(ATTRIBUTE_NODE);
 			if (t_nodeAttribute == null) {
-				Logger.LogError("ForEach.Init() did not find the [" + ATTRIBUTE_NODE + "] attribute that is required for [" + TAG_NAME + "] tags.");
-				return false;
+				t_nodeAttribute = p_tagParser.GetNamedAttribute(ATTRIBUTE_VALUE);
+				if (t_nodeAttribute == null) {
+					Logger.LogError("ForEach.Init() did not find either the [" + ATTRIBUTE_NODE + "] or [" + ATTRIBUTE_VALUE + "] attribute that is required for [" + TAG_NAME + "] tags.");
+					return false;
+				}
+				else {
+					m_configType = CONFIG_TYPE.VALUE;
+				}
 			}
+			// m_configType defaults to CONFIG_TYPE.NODE, so we don't need to set it here.
 
 			m_nodeName = t_nodeAttribute.GetAttributeValueAsString();
 			if (m_nodeName == null) {
-				Logger.LogError("ForEach.Init() did not get the value from attribute [" + ATTRIBUTE_NODE + "] that is required for [" + TAG_NAME + "] tags.");
+				Logger.LogError("ForEach.Init() did not get the value from the attribute [" + ((m_configType == CONFIG_TYPE.NODE) ? ATTRIBUTE_NODE : ATTRIBUTE_VALUE) + "] that is required for [" + TAG_NAME + "] tags.");
 				return false;
 			}
 

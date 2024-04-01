@@ -177,10 +177,10 @@ public class ConfigValue extends Tag_Base {
 	{
 		try {
 			ConfigNode	t_currentNode	= p_evaluationContext.GetCurrentNode();
-			String		t_valueName	= m_valueName;
+			String		t_valueName		= m_valueName;
 			if (t_valueName.startsWith("root.")) {
-				t_currentNode = p_evaluationContext.GetRootNode();
-				t_valueName.replace("root.", "");	// Remove the "root." reference so that the value name will work correctly below.
+				t_currentNode	= p_evaluationContext.GetRootNode();
+				t_valueName		= t_valueName.replace("root.", "");	// Remove the "root." reference so that the value name will work correctly below.
 			}
 			else if (m_parentReferenceCount > 0) {
 				// This will kick the node reference up the tree the specified number of times.
@@ -199,7 +199,21 @@ public class ConfigValue extends Tag_Base {
 				return false;
 			}
 
-			String t_value = t_currentNode.GetNodeValue(m_valueName);
+			// While the error message gives some clue what's going on here, I think a little extra explanation is in order.  The only way that t_currentNode can ever point to a leaf "value" instead of a tree node is that we are inside of a ForEach(VALUE) loop so the only value we can find is the one that we're pointing at.
+			// The only thing that can alter that is parent reference(s) (i.e. ^valuename), but that is already handled above, so this if() still holds true.
+			String t_value;
+			if (t_currentNode.IsValue()) {
+				if (!t_valueName.equalsIgnoreCase(t_currentNode.GetName())) {
+					Logger.LogError("ConfigValue.Evaluate() is being used in a ForEach(VALUE) loop for the value named [" + m_valueName + "] defined in line [" + m_lineNumber + "] but found the value named [" + t_currentNode.GetName() + "] instead.");
+					return false;
+				}
+
+				t_value = t_currentNode.GetValue();
+			}
+			else {
+				t_value = t_currentNode.GetNodeValue(t_valueName);
+			}
+
 			if (t_value == null) {
 				Logger.LogError("ConfigValue.Evaluate() could not find the value named [" + m_valueName + "] defined in line [" + m_lineNumber + "] in either the current or root config nodes.");
 				return false;
