@@ -70,12 +70,11 @@ public class FirstElse extends Tag_Base {
 
 	static private final String		ATTRIBUTE_OPTIONAL_COUNTER_NAME		= "optionalCounterName";
 
+	private LoopCounter			m_currentCounter		= null;
+	private int					m_lastCounterValue		= 0;
 	private GeneralBlock		m_firstBlock			= null;
 	private GeneralBlock		m_elseBlock				= null;
 	private	String				m_optionalCounterName	= null;	// Providing a name for the loop counter lets you specify using a named loop counter from a forEach tag other than the one directly containing this first tag.
-
-//	private ArrayList<Integer>	m_parentIterationCountList	= null;
-	private final TreeMap<Integer, LoopCounter>		m_counterIDMap	= new TreeMap<>();
 
 
 	//*********************************
@@ -160,8 +159,7 @@ public class FirstElse extends Tag_Base {
 	public boolean Evaluate(EvaluationContext p_evaluationContext)
 	{
 		try {
-			LoopCounter t_iterationCounter		= p_evaluationContext.GetLoopCounter();
-			boolean		t_usingCounterVariable	= false;
+			LoopCounter t_iterationCounter = p_evaluationContext.GetLoopCounter();
 			if (m_optionalCounterName != null) {
 				t_iterationCounter = t_iterationCounter.GetNamedCounter(m_optionalCounterName);
 
@@ -173,14 +171,7 @@ public class FirstElse extends Tag_Base {
 						Logger.LogError("FirstElse.Evaluate() failed to find a counter with name [" + m_optionalCounterName + "] at line number [" + m_lineNumber + "].");
 						return false;
 					}
-
-					t_usingCounterVariable	= true;
 				}
-
-				// Since optionally "named" counters ID's don't change each iteration of an outer loop re-evaluates the forEach, we have to check to see if the named loop counter is a new instance reference and, if it is, count it as a new start of the loop.
-				LoopCounter t_existingLoopCounter = m_counterIDMap.get(t_iterationCounter.GetCounterID());
-				if ((t_existingLoopCounter != null) && (t_existingLoopCounter != t_iterationCounter))
-					m_counterIDMap.remove(t_iterationCounter.GetCounterID());
 			}
 
 			if (t_iterationCounter == null) {
@@ -188,17 +179,27 @@ public class FirstElse extends Tag_Base {
 				return false;
 			}
 
-
-			// I think (!hope!) that using a tree map to keep the internal counter for each counter ID that we see will let us use variable tags inside various levels of nested <forEach> loops and <if> tags without having to worry about looking up the stack of counters to figure out if a particular evaluation is the first one or not for that particular counter.
-			LoopCounter t_internalCounter	= m_counterIDMap.get(t_iterationCounter.GetCounterID());
-			boolean		t_firstTimeThrough	= false;
-			if (t_internalCounter == null)
-			{
-				m_counterIDMap.put(t_iterationCounter.GetCounterID(), t_iterationCounter);
-
-				if (!t_usingCounterVariable || (t_iterationCounter.GetCounter() == 1))	// Counter variables are different from loop counters in that the "first time through" for a counter variable should always be == 1, whereas a loop counter where the first tag is inside one or more nested if tags can have a "first time through" value > 1.
-					t_firstTimeThrough	= true;
+			// Since an instance of First will exist across any number of passes for different config nodes and even output files, each time we come into a particular instance of First we have to check to see if the counter we are working with has changed and, if it has, reset this instance as if it has never seen the counter.
+			if (m_currentCounter != null) {
+				if (m_currentCounter != t_iterationCounter) {
+					m_currentCounter	= t_iterationCounter;
+					m_lastCounterValue	= 0;
+				}
 			}
+			else
+				m_currentCounter = t_iterationCounter;
+
+
+			boolean	t_firstTimeThrough	= false;
+			int		t_nextCounterValue	= t_iterationCounter.GetCounter();
+			if (t_nextCounterValue == 0)
+				return true;					// Until the counter is > 0, we can't even do the "first" pass, much less the "else", so we'll short-circuit out here.
+			else if (m_lastCounterValue == 0)
+				t_firstTimeThrough	= true;
+			else if (m_lastCounterValue == t_nextCounterValue)
+				return true;					// I don't think this can happen, but just in case, if the value hasn't changed, then we need to exit this loop.
+
+			m_lastCounterValue	= t_nextCounterValue;
 
 			if (t_firstTimeThrough) {
 				LinkedList<Tag_Base> t_contents = m_firstBlock.GetChildTagList();

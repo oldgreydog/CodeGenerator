@@ -37,7 +37,7 @@ public class LoopCounter {
 	private LoopCounter		m_parentCounter			= null;			// This lets us find name counters by recursing up the parent pointers.
 	private int				m_counterID				= GetNextID();
 	private String			m_optionalCounterName	= null;
-	private int				m_counter				= 1;
+	private int				m_counter				= 0;			// This needs to be zero so that we can properly control First/Else tags by only incrementing the counter when it should be.  Otherwise, with a default of 1, it looks like the counter and, therefore, any First/Else is "ON" immediately, which is definitely the wrong behavior.
 
 
 	//*********************************
