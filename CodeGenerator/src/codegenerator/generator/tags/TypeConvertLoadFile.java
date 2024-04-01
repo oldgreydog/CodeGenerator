@@ -22,6 +22,8 @@ package codegenerator.generator.tags;
 
 
 
+import java.io.*;
+
 import codegenerator.generator.utils.*;
 import coreutil.logging.*;
 
@@ -44,7 +46,8 @@ public class TypeConvertLoadFile extends Tag_Base {
 
 
 	// Data members
-	private String m_filePath	= null;
+	private OptionalEvalValue	m_filePath		= null;
+	private boolean				m_fileLoaded	= false;
 
 
 	//*********************************
@@ -58,33 +61,29 @@ public class TypeConvertLoadFile extends Tag_Base {
 	public boolean Init(TagParser p_tagParser) {
 		try {
 			if (!super.Init(p_tagParser)) {
-				Logger.LogError("TypeConvertLoadFile.Init() failed in the parent Init() at line number [" + p_tagParser.GetLineNumber() + "].");
+				Logger.LogError("TypeConvertLoadFile.Init() failed in the parent Init() at line number [" + m_lineNumber + "].");
 				return false;
 			}
 
 			// The target language should be a string constant.
 			TagAttributeParser t_nodeAttribute = p_tagParser.GetNamedAttribute(ATTRIBUTE_FILE);
 			if (t_nodeAttribute == null) {
-				Logger.LogError("TypeConvertLoadFile.Init() did not find the [" + ATTRIBUTE_FILE + "] attribute that is required for TypeConvertLoadFile tags at line number [" + p_tagParser.GetLineNumber() + "].");
+				Logger.LogError("TypeConvertLoadFile.Init() did not find the [" + ATTRIBUTE_FILE + "] attribute that is required for TypeConvertLoadFile tags at line number [" + m_lineNumber + "].");
 				return false;
 			}
 
-			m_filePath = t_nodeAttribute.GetAttributeValueAsString();
-			if (m_filePath == null) {
-				Logger.LogError("TypeConvertLoadFile.Init() did not get the [" + ATTRIBUTE_FILE + "] value as a string from attribute at line number [" + p_tagParser.GetLineNumber() + "].");
+			GeneralBlock t_valueBlock = t_nodeAttribute.GetAttributeValue();
+			if ((t_valueBlock == null) || !t_valueBlock.HasContentTags()) {
+				Logger.LogError("TypeConvertLoadFile.Init() did not get the [" + ATTRIBUTE_FILE + "] value as a string from attribute at line number [" + m_lineNumber + "].");
 				return false;
 			}
 
-
-			if (!DataTypeManager.LoadConfigFile(m_filePath)) {
-				Logger.LogError("TypeConvertLoadFile.Init() failed to load the file [" + m_filePath +"] into the DataTypeManager at line number [" + p_tagParser.GetLineNumber() + "].");
-				return false;
-			}
+			m_filePath = new OptionalEvalValue(t_valueBlock);
 
 			return true;
 		}
 		catch (Throwable t_error) {
-			Logger.LogException("TypeConvertLoadFile.Init() failed with error at line number [" + p_tagParser.GetLineNumber() + "]: ", t_error);
+			Logger.LogException("TypeConvertLoadFile.Init() failed with error at line number [" + m_lineNumber + "]: ", t_error);
 			return false;
 		}
 	}
@@ -108,6 +107,21 @@ public class TypeConvertLoadFile extends Tag_Base {
 	@Override
 	public boolean Evaluate(EvaluationContext p_evaluationContext)
 	{
+		if (!m_fileLoaded) {
+			String t_filePath = m_filePath.Evaluate(p_evaluationContext);
+			if ((t_filePath == null) || t_filePath.isBlank()) {
+				Logger.LogError("TypeConvertLoadFile.Evaluate() failed to evaluate the destination directory path.");
+				return false;
+			}
+
+			if (!DataTypeManager.LoadConfigFile(t_filePath)) {
+				Logger.LogError("TypeConvertLoadFile.Evaluate() failed to load the file [" + m_filePath +"] into the DataTypeManager at line number [" + m_lineNumber + "].");
+				return false;
+			}
+
+			m_fileLoaded = true;
+		}
+
 		return true;
 	}
 

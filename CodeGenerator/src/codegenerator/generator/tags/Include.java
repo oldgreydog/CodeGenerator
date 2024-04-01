@@ -45,7 +45,7 @@ public class Include extends Tag_Base {
 
 
 	// Data members
-	private	String		m_templateFileName;
+	private	OptionalEvalValue		m_templateFileName		= null;		// I've changed this so that if the file name is constant (i.e. all text tags) at parsing time, then we only get the name once and we parse the target file in the parse phase.
 
 
 	//*********************************
@@ -75,31 +75,36 @@ public class Include extends Tag_Base {
 			return false;
 		}
 
-		m_templateFileName = t_nodeAttribute.GetAttributeValueAsString();
-		if (m_templateFileName == null) {
+		// If the value requires evaluation, then we need to save the value's GeneralBlock so that we can evaluate it later instead of getting it's string value now.
+		GeneralBlock t_valueBlock = t_nodeAttribute.GetAttributeValue();
+		if ((t_valueBlock == null) || (t_valueBlock.GetChildTagList() == null)) {
 			Logger.LogError("Include.Init() did not get the [" + ATTRIBUTE_TEMPLATE + "] string from attribute that is required for Include tags at line number [" + m_lineNumber + "].");
 			return false;
 		}
+
+		m_templateFileName = new OptionalEvalValue(t_valueBlock);
 
 		return true;
 	}
 
 
 	//*********************************
-	@Override
-	public boolean Parse(TemplateTokenizer p_tokenizer) {
+	public boolean ParseFile(String p_fileName) {
 		try {
-			File t_templateFile = new File(m_templateFileName);
+			File t_templateFile = new File(p_fileName);
 			if (!t_templateFile.exists()) {
-				Logger.LogFatal("Include.Parse() could not open the template file [" + m_templateFileName + "] at line number [" + m_lineNumber + "].");
+				Logger.LogFatal("Include.ParseFile() could not open the template file [" + m_templateFileName + "] at line number [" + m_lineNumber + "].");
 				return false;
 			}
+
+			if (m_tagList != null)
+				m_tagList.clear();	// We have to be sure to clear any existing contents that might exist from a previous evaluation.
 
 			// Parse the template file.  The passed in p_tokenizer is from a parent file's contents, but here we are going to parse the indicated template file for this tag and add its execution tree to this tag object so that when the parent's execution tree is being evaluated, this template file's tree can also be evaluated.
 			TemplateParser t_parser = new TemplateParser();
 			Tag_Base t_template = t_parser.ParseTemplate(t_templateFile);
 			if (t_template == null) {
-				Logger.LogError("Include.Parse() failed in file [" + t_templateFile.getAbsolutePath() + "] at line number [" + m_lineNumber + "].");
+				Logger.LogError("Include.ParseFile() failed in file [" + t_templateFile.getAbsolutePath() + "] at line number [" + m_lineNumber + "].");
 				return false;
 			}
 
@@ -108,9 +113,16 @@ public class Include extends Tag_Base {
 			return true;
 		}
 		catch (Throwable t_error) {
-			Logger.LogException("Include.Parse() failed with error at line number [" + m_lineNumber + "] in file [" + m_templateFileName + "]: ", t_error);
+			Logger.LogException("Include.ParseFile() failed with error at line number [" + m_lineNumber + "] in file [" + m_templateFileName + "]: ", t_error);
 			return false;
 		}
+	}
+
+
+	//*********************************
+	@Override
+	public boolean Parse(TemplateTokenizer p_tokenizer) {
+		return true;	// Now that this is set up to take an attribute value that may have child tags that need to be evaluated in Evaluate(), we can no longer parse that template file here.  It must be deferred.
 	}
 
 
@@ -119,8 +131,23 @@ public class Include extends Tag_Base {
 	public boolean Evaluate(EvaluationContext p_evaluationContext)
 	{
 		try {
-			if (m_tagList == null) {
-				Logger.LogError("Include.Evaluate() doesn't have any executable content at line [" + m_lineNumber + "].");
+			String t_templateFileName = m_templateFileName.Evaluate(p_evaluationContext);
+			if ((t_templateFileName == null) || t_templateFileName.isBlank()) {
+				Logger.LogError("Include.Evaluate() failed to evaluate the template file name at line [" + m_lineNumber + "].");
+				return false;
+			}
+
+			// We only need to parse the file if this is the first time through (no child tags exist i.e. file not loaded) or if the filename is not constant (i.e. the filename has to be evaluated and loaded every time we pass through).
+			if (!HasContentTags() || !m_templateFileName.IsConstant()) {
+				if (!ParseFile(t_templateFileName)) {
+					Logger.LogFatal("Include.Evaluate() failed to parse the template file [" + t_templateFileName + "] at line number [" + m_lineNumber + "].");
+					return false;
+				}
+			}
+
+			// I realize that I could mash this check into the nested if() above, but I feel more comfortable with it here since there isn't any way for SURE of getting past here if no tags were read from a file.
+			if (!HasContentTags()) {
+				Logger.LogError("Include.Evaluate() found no content for the template file [" + t_templateFileName + "] at line [" + m_lineNumber + "].");
 				return false;
 			}
 
@@ -130,7 +157,7 @@ public class Include extends Tag_Base {
 
 			for (Tag_Base t_nextTag: m_tagList) {
 				if (!t_nextTag.Evaluate(p_evaluationContext)) {
-					Logger.LogError("Include.Evaluate() failed.");
+					Logger.LogError("Include.Evaluate() failed in template file [" + t_templateFileName + "] at line number [" + m_lineNumber + "].");
 					return false;
 				}
 			}

@@ -77,6 +77,19 @@ public class TagAttributeParser {
 
 
 	//*********************************
+	public boolean DoesAttributeNameRequireEvaluation() {
+		// If there is anything other than TEXT tags in the contents of the name, then it will require evaluation to get the final value.
+		LinkedList<Tag_Base> t_nameContents = m_attributeName.GetChildTagList();
+		for (Tag_Base t_nextContent: t_nameContents) {
+			if (!t_nextContent.GetName().equalsIgnoreCase(Text.TAG_NAME))
+				return true;
+		}
+
+		return false;
+	}
+
+
+	//*********************************
 	public GeneralBlock GetAttributeName() {
 		return m_attributeName;
 	}
@@ -114,6 +127,19 @@ public class TagAttributeParser {
 
 
 	//*********************************
+	public boolean DoesAttributeValueRequireEvaluation() {
+		// If there is anything other than TEXT tags in the contents of the name, then it will require evaluation to get the final value.
+		LinkedList<Tag_Base> t_valueContents = m_value.GetChildTagList();
+		for (Tag_Base t_nextContent: t_valueContents) {
+			if (!t_nextContent.GetName().equalsIgnoreCase(Text.TAG_NAME))
+				return true;
+		}
+
+		return false;
+	}
+
+
+	//*********************************
 	public GeneralBlock GetAttributeValue() {
 		return m_value;
 	}
@@ -134,14 +160,18 @@ public class TagAttributeParser {
 				return null;
 
 			LinkedList<Tag_Base> t_attributeTags = m_value.GetChildTagList();
-			if ((t_attributeTags == null) || (t_attributeTags.isEmpty() || (t_attributeTags.size() > 1)))
+			if ((t_attributeTags == null) || t_attributeTags.isEmpty())
 				return null;
 
-			Tag_Base t_onlyTag = t_attributeTags.getFirst();
-			if (t_onlyTag.GetName() == Text.TAG_NAME)
-				return  ((Text)t_onlyTag).GetText();
+			if (DoesAttributeValueRequireEvaluation())
+				return null;
 
-			return null;
+			StringBuilder t_tagValue = new StringBuilder();
+			for (Tag_Base t_onlyTag: t_attributeTags) {
+				t_tagValue.append(((Text)t_onlyTag).GetText());
+			}
+
+			return  t_tagValue.toString();
 		}
 		catch (Throwable t_error) {
 			Logger.LogException("TagAttributeParser.GetAttributeValueAsString() failed with error: ", t_error);

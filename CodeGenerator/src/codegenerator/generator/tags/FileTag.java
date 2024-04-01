@@ -26,6 +26,8 @@ import coreutil.config.*;
 import coreutil.logging.*;
 
 import java.io.*;
+import java.nio.file.*;
+import java.nio.file.attribute.*;
 import java.util.concurrent.locks.*;
 
 import codegenerator.generator.utils.*;
@@ -33,15 +35,32 @@ import codegenerator.generator.utils.*;
 
 
 /**
-	Parses the indicated template file and, on evaluation, writes the output from that template to a file with the given [filename] to the [destDir] directory.
+	This tag has two modes for getting its "contents":  use the attribute [template] or, if that attribute is not present, parse the contents following the
+	<code>file</code> tag until it finds the matching <code>endfile</code> tag.  As I worked on the ArchTemplates project, it became obvious that there were
+	cases where I needed to generate only one or two files but I didn't want to have to create a "top" template files to contain the <code>file</code> tags
+	just for, say, one file.  Making the [template] attribute optional and adding the optional <code>endfile</code> tag let me make those single-file generation
+	scenarios without needing the superfluous "top" file to "wrap" it.
 
-	<p>Here's an example of this tag:</p>
+	If you use the [template] attribute, this parses the indicated template file and, on evaluation, writes the output from that template to a file with the
+	given [filename] to the [destDir] directory.
 
-	<pre><code>&lt;%file template = templates/cached_templates/marshalling/marshalling_interface.template filename = "&lt;%className%&gt;Marshalling.java" destDir = "&lt;%root.global.outputPath%&gt;/marshalling" optionalUseTempFile = "false" optionalContextName = "parentTable"%&gt;</code></pre>
+	<p>Here's an example of this version of the tag:</p>
+
+	<p><pre><code>&lt;%file template = templates/cached_templates/marshalling/marshalling_interface.template filename = "&lt;%className%&gt;Marshalling.java" destDir = "&lt;%root.global.outputPath%&gt;/marshalling" optionalUseTempFile = "false" optionalContextName = "parentTable"  optionalMakeFileExecutable = true %&gt;</code></pre></p>
 
 	<p>As the example shows, you can use tags that evaluate to strings in the values of the attributes.  The quotes are optional unless you have spaces in the file and/or path name.</p>
 
 	<p>optionalUseTempFile is an optional boolean attribute to indicate that generation should go to a temp file so that if an error occurs, then the original file and any custom code it contains will not be lost.  If the generation completes successfully, then the original file will be deleted and the temp file renamed with the specified filename.</p>
+
+	<p>optionalMakeFileExecutable is an optional boolean attribute to indicate that once the file has been copied then it needs to be marked as executable.  This will probably be used mostly with batch files, for example.</p>
+
+	<p>This is the same example but without the [template] attribute and with single content tag and the matching <code>endfile</code> at the end of the contents</p>
+
+	<p><pre><code>&lt;%file filename = "&lt;%className%&gt;Marshalling.java" destDir = "&lt;%root.global.outputPath%&gt;/marshalling" optionalUseTempFile = "false" optionalContextName = "parentTable"%&gt;
+		&lt;%text%&gt;
+			Hello, world!
+		&lt;%endtext%&gt;
+	&lt;%endfile%&gt;</code></pre></p>
 
 	<p>Note that it is now possible to nest this file tag inside another file template.  To that ends, the optional
 	attribute <code>optionalContextName</code> is used if you need to have the	nested file tag execute inside an outer context
@@ -55,12 +74,14 @@ import codegenerator.generator.utils.*;
 public class FileTag extends Tag_Base {
 
 	static public final String		TAG_NAME							= "file";
+	static public final String		TAG_END_NAME						= "endfile";
 
 	static private final String		ATTRIBUTE_TEMPLATE					= "template";
 	static private final String		ATTRIBUTE_FILENAME					= "filename";
 	static private final String		ATTRIBUTE_DEST_DIR					= "destDir";
 	static private final String		ATTRIBUTE_OPTIONAL_USE_TEMP_FILE	= "optionalUseTempFile";	// A boolean to indicate that generation should go to a temp file so that if an error occurs, then the original file and any custom code it contains will not be lost.
 	static private final String		ATTRIBUTE_OPTIONAL_CONTEXT_NAME		= "optionalContextName";
+	static private final String		ATTRIBUTE_OPTIONAL_MAKE_EXECUTABLE	= "optionalMakeFileExecutable";
 
 
 	// Static members
@@ -104,13 +125,14 @@ public class FileTag extends Tag_Base {
 
 
 	// Data members
-	private	String		m_templateFileName;
-	private boolean		m_useTempFile			= true;		// Optional flag indicating whether the output should go to a temp file or directly overwriting the original file.  We'll default to using the temp file so that we err on the side of saving people from themselves.
-	private	String		m_contextName			= null;		// The optional outer context in which to evaluate this variable.
+	private	OptionalEvalValue	m_templateFileName		= null;		// This attribute is now optional if you are going to include the "contents" inside the tag and a matching <endFile> tag.
+	private boolean				m_useTempFile			= true;		// Optional flag indicating whether the output should go to a temp file or directly overwriting the original file.  We'll default to using the temp file so that we err on the side of saving people from themselves.
+	private	String				m_contextName			= null;		// The optional outer context in which to evaluate this variable.
+	private boolean				m_makeFileExecutable	= false;
 
 	// These values can themselves be composites of evaluation-time config variables and text, so we have to store them in their Text object form and evaluate them at runtime to get their final values.
-	private	Tag_Base	m_fileName				= null;
-	private	Tag_Base	m_destinationDirectory	= null;
+	private	OptionalEvalValue	m_fileName				= null;
+	private	OptionalEvalValue	m_destinationDirectory	= null;
 
 
 	//*********************************
@@ -134,17 +156,20 @@ public class FileTag extends Tag_Base {
 			return false;
 		}
 
+		// Now that the [template] attribute is optional, we need to treat it differently from how we treat the required attributes below.
 		TagAttributeParser t_nodeAttribute = p_tagParser.GetNamedAttribute(ATTRIBUTE_TEMPLATE);
-		if (t_nodeAttribute == null) {
-			Logger.LogError("FileTag.Init() did not find the [" + ATTRIBUTE_TEMPLATE + "] attribute that is required for FileTag tags at line number [" + m_lineNumber + "].");
-			return false;
+		if (t_nodeAttribute != null) {
+			GeneralBlock t_valueBlock = t_nodeAttribute.GetAttributeValue();
+			if ((t_valueBlock == null) || !t_valueBlock.HasContentTags()) {
+				Logger.LogError("FileTag.Init() did not get the [" + ATTRIBUTE_TEMPLATE + "] string from attribute that is required for FileTag tags at line number [" + m_lineNumber + "].");
+				return false;
+			}
+
+			m_templateFileName = new OptionalEvalValue(t_valueBlock);
 		}
 
-		m_templateFileName = t_nodeAttribute.GetAttributeValueAsString();
-		if (m_templateFileName == null) {
-			Logger.LogError("FileTag.Init() did not get the [" + ATTRIBUTE_TEMPLATE + "] string from attribute that is required for FileTag tags at line number [" + m_lineNumber + "].");
-			return false;
-		}
+
+
 
 		t_nodeAttribute = p_tagParser.GetNamedAttribute(ATTRIBUTE_FILENAME);
 		if (t_nodeAttribute == null) {
@@ -152,11 +177,14 @@ public class FileTag extends Tag_Base {
 			return false;
 		}
 
-		m_fileName = t_nodeAttribute.GetAttributeValue();
-		if (m_fileName == null) {
+		GeneralBlock t_valueBlock = t_nodeAttribute.GetAttributeValue();
+		if ((t_valueBlock == null) || !t_valueBlock.HasContentTags()) {
 			Logger.LogError("FileTag.Init() did not get the [" + ATTRIBUTE_FILENAME + "] value from attribute that is required for FileTag tags at line number [" + m_lineNumber + "].");
 			return false;
 		}
+
+		m_fileName = new OptionalEvalValue(t_valueBlock);
+
 
 		t_nodeAttribute = p_tagParser.GetNamedAttribute(ATTRIBUTE_DEST_DIR);
 		if (t_nodeAttribute == null) {
@@ -164,11 +192,13 @@ public class FileTag extends Tag_Base {
 			return false;
 		}
 
-		m_destinationDirectory = t_nodeAttribute.GetAttributeValue();
-		if (m_destinationDirectory == null) {
+		t_valueBlock = t_nodeAttribute.GetAttributeValue();
+		if ((t_valueBlock == null) || !t_valueBlock.HasContentTags()) {
 			Logger.LogError("FileTag.Init() did not get the [" + ATTRIBUTE_DEST_DIR + "] value from attribute that is required for FileTag tags at line number [" + m_lineNumber + "].");
 			return false;
 		}
+
+		m_destinationDirectory = new OptionalEvalValue(t_valueBlock);
 
 
 		// The "optionalUseTempFile" attribute is optional, so it's fine if it doesn't exist.
@@ -180,7 +210,7 @@ public class FileTag extends Tag_Base {
 					m_useTempFile = Boolean.parseBoolean(t_value);
 			}
 			catch (Throwable t_error) {
-				Logger.LogException("FileTag.Init() failed with error in file [" + m_templateFileName + "] because it did not receive an invalid boolean value [" + t_value + "]: ", t_error);
+				Logger.LogException("FileTag.Init() failed with error in file [" + m_templateFileName + "] because it received an invalid boolean value [" + t_value + "]: ", t_error);
 				return false;
 			}
 		}
@@ -190,25 +220,42 @@ public class FileTag extends Tag_Base {
 		if (t_nodeAttribute != null)
 			m_contextName = t_nodeAttribute.GetAttributeValueAsString();
 
+
+		// The "optionalMakeFileExecutable" attribute is optional, so it's fine if it doesn't exist.
+		t_nodeAttribute = p_tagParser.GetNamedAttribute(ATTRIBUTE_OPTIONAL_MAKE_EXECUTABLE);
+		if (t_nodeAttribute != null) {
+			String t_value = t_nodeAttribute.GetAttributeValueAsString();
+			try {
+				if ((t_value != null) && !t_value.isBlank())
+					m_makeFileExecutable = Boolean.parseBoolean(t_value);
+			}
+			catch (Throwable t_error) {
+				Logger.LogException("FileTag.Init() failed because it received an invalid boolean value [" + t_value + "] for attribute [" + ATTRIBUTE_OPTIONAL_MAKE_EXECUTABLE + "]: ", t_error);
+				return false;
+			}
+		}
+
 		return true;
 	}
 
 
 	//*********************************
-	@Override
-	public boolean Parse(TemplateTokenizer p_tokenizer) {
+	public boolean ParseFile(String p_fileName) {
 		try {
-			File t_templateFile = new File(m_templateFileName);
+			File t_templateFile = new File(p_fileName);
 			if (!t_templateFile.exists()) {
-				Logger.LogFatal("FileTag.Parse() could not open the template file [" + m_templateFileName + "] at line number [" + m_lineNumber + "].");
-				System.exit(1);
+				Logger.LogFatal("FileTag.ParseFile() could not open the template file [" + p_fileName + "] at line number [" + m_lineNumber + "].");
+				return false;
 			}
+
+			if (m_tagList != null)
+				m_tagList.clear();	// We have to be sure to clear any existing contents that might exist from a previous evaluation.
 
 			// Parse the template file.  The passed in p_tokenizer is from a parent file's contents, but here we are going to parse the indicated template file for this tag and add its execution tree to this tag object so that when the parent's execution tree is being evaluated, this template file's tree can also be evaluated.
 			TemplateParser t_parser = new TemplateParser();
 			Tag_Base t_template = t_parser.ParseTemplate(t_templateFile);
 			if (t_template == null) {
-				Logger.LogError("FileTag.Parse() failed in file [" + t_templateFile.getAbsolutePath() + "] at line number [" + m_lineNumber + "].");
+				Logger.LogError("FileTag.ParseFile() failed in file [" + t_templateFile.getAbsolutePath() + "] at line number [" + m_lineNumber + "].");
 				return false;
 			}
 
@@ -217,9 +264,52 @@ public class FileTag extends Tag_Base {
 			return true;
 		}
 		catch (Throwable t_error) {
-			Logger.LogException("FileTag.Parse() failed with error at line number [" + m_lineNumber + "] in file [" + m_templateFileName + "]: ", t_error);
+			Logger.LogException("FileTag.ParseFile() failed with error at line number [" + m_lineNumber + "] in file [" + p_fileName + "]: ", t_error);
 			return false;
 		}
+	}
+
+
+	//*********************************
+	/**
+	 * This is used if the tag is missing the [template] attribute and we need to parse the contents "inside" the tag here.
+	 */
+	public boolean ParseContents(TemplateTokenizer p_tokenizer) {
+		try {
+			// Get the general block of tags for the <if> tag.
+			GeneralBlock t_generalBlock	= new GeneralBlock();
+			if (!t_generalBlock.Parse(p_tokenizer)) {
+				Logger.LogError("File.ParseContents() general block parser failed in the [" + TAG_NAME + "] tag in the tag starting at [" + t_generalBlock.m_lineNumber + "].");
+				return false;
+			}
+
+			String t_endingTagName = t_generalBlock.GetUnknownTag().GetTagName();
+			if (!t_endingTagName.equalsIgnoreCase(TAG_END_NAME)) {
+				Logger.LogError("File.ParseContents() general block ended on a tag named [" + t_endingTagName + "] at line [" + p_tokenizer.GetLineCount() + "] in the tag starting at [" + t_generalBlock.m_lineNumber + "].  The closing tag [" + TAG_END_NAME + "] was expected.");
+				return false;
+			}
+
+			AddChildTag(t_generalBlock);	// Finally, add the contents of the tag to the m_tagList where Evaluate() will look for it.
+		}
+		catch (Throwable t_error) {
+			Logger.LogException("File.ParseContents() failed with error in the tag starting at [" + m_lineNumber + "]: ", t_error);
+			return false;
+		}
+
+		return true;
+	}
+
+
+	//*********************************
+	@Override
+	public boolean Parse(TemplateTokenizer p_tokenizer) {
+		// If this is NOT using a template file but is instead a tag that wraps the contents locally, then we do need to parse those contents here.
+		if ((m_templateFileName == null) && !ParseContents(p_tokenizer)) {
+			return false;
+		}
+
+		// Otherwise, we have a template name and we need to handle that in the Evaluate() below.
+		return true;
 	}
 
 
@@ -228,27 +318,34 @@ public class FileTag extends Tag_Base {
 	public boolean Evaluate(EvaluationContext p_evaluationContext)
 	{
 		try {
-			if (m_tagList == null) {
-				Logger.LogError("FileTag.Evaluate() doesn't have any executable content at line [" + m_lineNumber + "].");
+			String t_templateFileName = "wrapped contents";		// We'll default this for the case where tag is using wrapped contents instead of a template file.
+			if ((m_templateFileName != null)) {
+				 t_templateFileName = m_templateFileName.Evaluate(p_evaluationContext);
+				if ((t_templateFileName == null) || t_templateFileName.isBlank()) {
+					Logger.LogError("FileTag.Evaluate() failed to evaluate the template file name at line [" + m_lineNumber + "].");
+					return false;
+				}
+				else if (!HasContentTags() || !m_templateFileName.IsConstant()) {	// We only need to parse the file if this is the first time through (no child tags exist i.e. file not loaded) or if the filename is not constant (i.e. the filename has to be evaluated and loaded every time we pass through).
+					if (!ParseFile(t_templateFileName)) {
+						Logger.LogFatal("FileTag.Evaluate() failed parsing the template file [" + t_templateFileName + "] at line number [" + m_lineNumber + "].");
+						return false;
+					}
+				}
+			}
+
+			if (!HasContentTags()) {
+				Logger.LogError("FileTag.Evaluate() failed to load the file [" + t_templateFileName + "] at line [" + m_lineNumber + "].");
 				return false;
 			}
 
-			// Build the filename from the component destdir and filename parts.  This has to be done in this confusing way because both the directory path and the filename will almost certainly contain config value tags in them that need to be evaluated to get the correct final value for both.
-			StringWriter		t_filePath			= new StringWriter();
-			Cursor				t_filePathCursor	= new Cursor(t_filePath);
 
-			p_evaluationContext.PushNewCursor(t_filePathCursor);
-
-			if (!m_destinationDirectory.Evaluate(p_evaluationContext)) {
+			String t_filePath = m_destinationDirectory.Evaluate(p_evaluationContext);
+			if ((t_filePath == null) || t_filePath.isBlank()) {
 				Logger.LogError("FileTag.Evaluate() failed to evaluate the destination directory path.");
-				p_evaluationContext.PopCurrentCursor();	// We need to clean up the temp filename cursor before we return.
 				return false;
 			}
-
-			p_evaluationContext.PopCurrentCursor();	// We need to clean up the temp path name cursor before we go any further.
 
 			File t_destDirectory = new File(t_filePath.toString());
-
 			try {
 				// I put this lock in when I was trying to multi-thread things.  I didn't go far enough with that effort to completely get it to work, but I didn't remove this because I might try again and it's not causing any harm now that we're back to single-threading.
 				s_directoryCreateLock.lock();
@@ -263,18 +360,12 @@ public class FileTag extends Tag_Base {
 			}
 
 
-			StringWriter		t_fileName			= new StringWriter();
-			Cursor				t_fileNameCursor	= new Cursor(t_fileName);
-
-			p_evaluationContext.PushNewCursor(t_fileNameCursor);
-
-			if (!m_fileName.Evaluate(p_evaluationContext)) {
+			String t_fileName = m_fileName.Evaluate(p_evaluationContext);
+			if ((t_fileName == null) || t_fileName.isBlank()) {
 				Logger.LogError("FileTag.Evaluate() failed to evaluate the filename.");
-				p_evaluationContext.PopCurrentCursor();	// We need to clean up the temp filename cursor before we return.
 				return false;
 			}
 
-			p_evaluationContext.PopCurrentCursor();	// We need to clean up the temp filename cursor before we go any further.
 
 			// Create the full filename path and see if it exists.
 			File t_originalFile = new File(t_filePath.toString() + File.separator + t_fileName.toString());
@@ -327,7 +418,7 @@ public class FileTag extends Tag_Base {
 			for (Tag_Base t_nextTag: m_tagList) {
 				if (!t_nextTag.Evaluate(p_evaluationContext)) {
 					t_fileWriter.close();
-					Logger.LogError("FileTag.Evaluate() failed for file [" + t_targetFile.getAbsolutePath() + "].");
+					Logger.LogError("FileTag.Evaluate() failed for template file [" + t_templateFileName + "] writing to output file [" + t_targetFile.getAbsolutePath() + "].");
 					p_evaluationContext.PopCurrentCursor();	// We need to clean up the temp cursor before we fail out of the function.
 
 // NOTE!!! I put this in at first, but then I remembered that it can be useful sometimes to see where the generator failed in the file so I commented it out.  I'll leave this here just in case there's ever a reason to bring it back.
@@ -368,6 +459,13 @@ public class FileTag extends Tag_Base {
 
 				Logger.LogDebug("FileTag.Evaluate() replaced the original file [" + t_originalFile.getPath() + "] with the temp file [" + t_targetFile.getPath() + "]");
 			}
+
+			if (m_makeFileExecutable) {
+				if (Files.setPosixFilePermissions(Paths.get(t_originalFile.getAbsolutePath()), PosixFilePermissions.fromString("rwxr--r--")) == null) {
+					Logger.LogError("FileTag.Evaluate() failed to set the permissions for the destination file [" + t_originalFile.getAbsolutePath() + "].");
+					return false;
+				}
+			}
 		}
 		catch (Throwable t_error) {
 			Logger.LogException("FileTag.Evaluate() failed with error: ", t_error);
@@ -384,10 +482,12 @@ public class FileTag extends Tag_Base {
 	public String Dump(String p_tabs) {
 		StringBuilder t_dump = new StringBuilder();
 
-		t_dump.append(p_tabs + "Tag name           :  " + m_name 											+ "\n");
-		t_dump.append(p_tabs + "Template file name :  " + m_templateFileName								+ "\n");
-		t_dump.append(p_tabs + "Output file name   :  " + m_fileName.Dump(p_tabs + "\t")				+ "\n");
-		t_dump.append(p_tabs + "Destination Dir    :  " + m_destinationDirectory.Dump(p_tabs + "\t")	+ "\n");
+		t_dump.append(p_tabs + "Tag name           :  " + m_name 										+ "\n");
+
+// Disabled these two since they now require evaluation to get their values and I don't care about setting that up right now.
+//		t_dump.append(p_tabs + "Template file name :  " + m_templateFileName							+ "\n");
+//		t_dump.append(p_tabs + "Output file name   :  " + m_fileName.Dump(p_tabs + "\t")				+ "\n");
+//		t_dump.append(p_tabs + "Destination Dir    :  " + m_destinationDirectory.Dump(p_tabs + "\t")	+ "\n");
 
 		if (m_tagList == null)
 			return t_dump.toString();

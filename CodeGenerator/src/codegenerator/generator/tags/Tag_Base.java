@@ -117,6 +117,12 @@ public abstract class Tag_Base {
 
 
 	//*********************************
+	public boolean HasContentTags() {
+		return ((m_tagList != null) && !m_tagList.isEmpty());
+	}
+
+
+	//*********************************
 	/**
 	 * There may be cases where a tag like GeneralBlock will be used for things like parsing attribute
 	 * names and that code may need to check to see if, for example, whether the attribute name is a
