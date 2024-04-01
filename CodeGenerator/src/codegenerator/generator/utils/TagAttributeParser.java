@@ -96,7 +96,7 @@ public class TagAttributeParser {
 			if (m_attributeName == null)
 				return null;
 
-			LinkedList<Tag_Base> t_attributeTags = m_attributeName.GetChildNodeList();
+			LinkedList<Tag_Base> t_attributeTags = m_attributeName.GetChildTagList();
 			if ((t_attributeTags == null) || (t_attributeTags.isEmpty() || (t_attributeTags.size() > 1)))
 				return null;
 
@@ -133,7 +133,7 @@ public class TagAttributeParser {
 			if (m_value == null)
 				return null;
 
-			LinkedList<Tag_Base> t_attributeTags = m_value.GetChildNodeList();
+			LinkedList<Tag_Base> t_attributeTags = m_value.GetChildTagList();
 			if ((t_attributeTags == null) || (t_attributeTags.isEmpty() || (t_attributeTags.size() > 1)))
 				return null;
 
@@ -200,7 +200,7 @@ public class TagAttributeParser {
 									if (m_attributeName == null)
 										m_attributeName = new GeneralBlock();
 
-									m_attributeName.AddChildNode(t_configValue);
+									m_attributeName.AddChildTag(t_configValue);
 									break;
 
 								case EXPECT_EQUALS:
@@ -214,7 +214,7 @@ public class TagAttributeParser {
 									if (m_value == null)
 										m_value = new GeneralBlock();
 
-									m_value.AddChildNode(t_configValue);
+									m_value.AddChildTag(t_configValue);
 									break;
 							}
 
@@ -243,7 +243,7 @@ public class TagAttributeParser {
 										if (m_attributeName == null)
 											m_attributeName = new GeneralBlock();
 
-										m_attributeName.AddChildNode(t_newTag);
+										m_attributeName.AddChildTag(t_newTag);
 										break;
 
 									case EXPECT_EQUALS:
@@ -257,7 +257,7 @@ public class TagAttributeParser {
 										if (m_value == null)
 											m_value = new GeneralBlock();
 
-										m_value.AddChildNode(t_newTag);
+										m_value.AddChildTag(t_newTag);
 										break;
 								}
 							}
@@ -315,7 +315,7 @@ public class TagAttributeParser {
 									if (m_attributeName == null)
 										m_attributeName = new GeneralBlock();
 
-									m_attributeName.AddChildNode(t_text);
+									m_attributeName.AddChildTag(t_text);
 								}
 								else {	// Otherwise, we're done with the attribute name and we need to look for the equals.
 									t_parseState = ParseState.EXPECT_EQUALS;
@@ -337,7 +337,7 @@ public class TagAttributeParser {
 									if (m_value == null)
 										m_value = new GeneralBlock();
 
-									m_value.AddChildNode(t_text);
+									m_value.AddChildTag(t_text);
 								}
 								else {	// Otherwise, we're done with the attribute name and we need to look for the equals.
 									return true;	// We're done with the attribute value and, therefore, the attribute, so it's time to return.
@@ -358,7 +358,7 @@ public class TagAttributeParser {
 								if (m_attributeName == null)
 									m_attributeName = new GeneralBlock();
 
-								m_attributeName.AddChildNode(t_text);
+								m_attributeName.AddChildTag(t_text);
 
 								// We can't change the state to EXPECT_EQUALS here because this may be a mixed value (i.e. text + tags).
 								break;
@@ -372,7 +372,7 @@ public class TagAttributeParser {
 								if (m_value == null)
 									m_value = new GeneralBlock();
 
-								m_value.AddChildNode(t_text);
+								m_value.AddChildTag(t_text);
 
 								// We can't return here because this may be a mixed value (i.e. text + tags).
 								break;

@@ -404,7 +404,7 @@ public class IfElse extends Tag_Base {
 				return false;
 			}
 
-			AddChildNode(t_ifCondition);
+			AddChildTag(t_ifCondition);
 
 			return true;
 		}
@@ -440,7 +440,7 @@ public class IfElse extends Tag_Base {
 				return false;
 			}
 
-			t_nextCondition.AddChildNode(t_generalBlock);
+			t_nextCondition.AddChildTag(t_generalBlock);
 
 			// If the first tag is followed by any elseIf tags, then consume them.
 			String t_endingTagName = t_generalBlock.GetUnknownTag().GetTagName();
@@ -451,7 +451,7 @@ public class IfElse extends Tag_Base {
 					return false;
 				}
 
-				AddChildNode(t_nextCondition);
+				AddChildTag(t_nextCondition);
 
 				t_generalBlock	= new GeneralBlock();
 				if (!t_generalBlock.Parse(p_tokenizer)) {
@@ -459,7 +459,7 @@ public class IfElse extends Tag_Base {
 					return false;
 				}
 
-				t_nextCondition.AddChildNode(t_generalBlock);
+				t_nextCondition.AddChildTag(t_generalBlock);
 
 				t_endingTagName = t_generalBlock.GetUnknownTag().GetTagName();
 			}
@@ -467,7 +467,7 @@ public class IfElse extends Tag_Base {
 			// If there is an else tag, then consume it.
 			if (t_endingTagName.equalsIgnoreCase(BLOCK_ELSE_NAME)) {
 				t_nextCondition = new IfCondition();	// Else tags don't have attributes so we can not call Init() here.  All we need is to create the object and add it to m_tagList.
-				AddChildNode(t_nextCondition);
+				AddChildTag(t_nextCondition);
 
 				t_generalBlock	= new GeneralBlock();
 				if (!t_generalBlock.Parse(p_tokenizer)) {
@@ -475,7 +475,7 @@ public class IfElse extends Tag_Base {
 					return false;
 				}
 
-				t_nextCondition.AddChildNode(t_generalBlock);
+				t_nextCondition.AddChildTag(t_generalBlock);
 
 				t_endingTagName = t_generalBlock.GetUnknownTag().GetTagName();
 			}
@@ -516,7 +516,7 @@ public class IfElse extends Tag_Base {
 				if (t_result == null)
 					return false;
 				else if (t_result) {
-					LinkedList<Tag_Base> t_contents = t_nextCondition.GetChildNodeList();
+					LinkedList<Tag_Base> t_contents = t_nextCondition.GetChildTagList();
 					if ((t_contents != null) && !t_contents.isEmpty()) {
 						if (!t_nextCondition.Evaluate(p_evaluationContext)) {
 							Logger.LogError("IfElse.Evaluate() failed to evaluate an IF condition's contents at line [" + m_lineNumber + "].");

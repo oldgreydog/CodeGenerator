@@ -176,7 +176,7 @@ public class Text extends Tag_Base {
 							}
 
 							SaveCollectedTextBeforeNewTag(t_collectedText);
-							AddChildNode(t_configValue);
+							AddChildTag(t_configValue);
 						}
 						else {
 							// Other than ConfigValues, these are the only tag types that can appear inside of a Text.  This forces you to keep text tags simpler which will keep templates simpler (hopefully).
@@ -193,7 +193,7 @@ public class Text extends Tag_Base {
 								}
 
 								SaveCollectedTextBeforeNewTag(t_collectedText);
-								AddChildNode(t_newTag);
+								AddChildTag(t_newTag);
 							}
 							else {
 								Logger.LogError("Text.Parse() found the tag [" + t_newTag.GetName() + "] at line [" + p_tokenizer.GetLineCount() + "] which is not allowed inside a text tag that started at [" + m_lineNumber + "].");
@@ -303,7 +303,7 @@ public class Text extends Tag_Base {
 		if (p_collectedText.length() != 0) {
 			Text t_newText = new Text();
 			t_newText.SetText(p_collectedText.toString());
-			AddChildNode(t_newText);
+			AddChildTag(t_newText);
 
 			p_collectedText.setLength(0);	// Now that we've saved the local text, we need to reset it for any future text.
 		}
@@ -317,7 +317,7 @@ public class Text extends Tag_Base {
 			if ((m_tagList != null) && !m_tagList.isEmpty()) {	// If this block contained tags, then there will be objects in the m_tagList.  In that case, we need to create a new Text, put the local text into it and add it to the tag list.
 				Text t_newText = new Text();
 				t_newText.SetText(p_collectedText.toString());
-				AddChildNode(t_newText);
+				AddChildTag(t_newText);
 			}
 			else
 				m_text = p_collectedText.toString();	// Otherwise, if what we just parsed is a strictly text-only string (there were no embedded tags), then we need to set the m_text member of this object with the parsed text.

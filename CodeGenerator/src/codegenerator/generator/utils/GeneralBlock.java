@@ -103,7 +103,7 @@ public class GeneralBlock extends Tag_Base {
 						return false;
 					}
 
-					AddChildNode(t_newBlock);
+					AddChildTag(t_newBlock);
 				}
 //				else {
 //					Logger.LogError("GeneralBlock.Parse() found a token of type [" + t_nextToken.GetTokenTypeName() + "] when it was expecting a WORD for the attribute name at line [" + p_tokenizer.GetLineCount() + "].");

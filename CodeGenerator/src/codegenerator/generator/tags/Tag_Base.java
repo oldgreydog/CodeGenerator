@@ -108,7 +108,7 @@ public abstract class Tag_Base {
 	 *
 	 * @param p_childTag The newly parsed child tag handler.
 	 */
-	public void AddChildNode(Tag_Base p_childTag) {
+	public void AddChildTag(Tag_Base p_childTag) {
 		if (m_tagList == null)
 			m_tagList = new LinkedList<Tag_Base>();
 
@@ -123,7 +123,7 @@ public abstract class Tag_Base {
 	 * simple text tag or a mixed value of text and tags.
 	 *
 	 */
-	public LinkedList<Tag_Base> GetChildNodeList() {
+	public LinkedList<Tag_Base> GetChildTagList() {
 		return m_tagList;
 	}
 

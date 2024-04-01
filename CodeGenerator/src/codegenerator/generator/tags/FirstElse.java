@@ -201,7 +201,7 @@ public class FirstElse extends Tag_Base {
 			}
 
 			if (t_firstTimeThrough) {
-				LinkedList<Tag_Base> t_contents = m_firstBlock.GetChildNodeList();
+				LinkedList<Tag_Base> t_contents = m_firstBlock.GetChildTagList();
 				if ((t_contents != null) && !t_contents.isEmpty()) {
 					if (!m_firstBlock.Evaluate(p_evaluationContext)) {
 						Logger.LogError("FirstElse.Evaluate() failed to evaluate the [first] tag at line number [" + m_lineNumber + "].");
@@ -210,7 +210,7 @@ public class FirstElse extends Tag_Base {
 				}
 			}
 			else if (m_elseBlock != null) {
-				LinkedList<Tag_Base> t_contents = m_elseBlock.GetChildNodeList();
+				LinkedList<Tag_Base> t_contents = m_elseBlock.GetChildTagList();
 				if ((t_contents != null) && !t_contents.isEmpty()) {
 					if (!m_elseBlock.Evaluate(p_evaluationContext)) {
 						Logger.LogError("FirstElse.Evaluate() failed to evaluate the [else] tag for [first] tag at line number [" + m_lineNumber + "].");

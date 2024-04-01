@@ -103,7 +103,7 @@ public class Include extends Tag_Base {
 				return false;
 			}
 
-			AddChildNode(t_template);
+			AddChildTag(t_template);
 
 			return true;
 		}

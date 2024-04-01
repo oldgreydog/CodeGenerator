@@ -258,7 +258,7 @@ public abstract class If_Boolean extends Tag_Base {
 					return false;
 				}
 
-				AddChildNode(t_ifCondition);
+				AddChildTag(t_ifCondition);
 			}
 
 			return true;

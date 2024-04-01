@@ -253,7 +253,7 @@ public class ForEach extends Tag_Base {
 				return false;
 			}
 
-			AddChildNode(t_generalBlock);
+			AddChildTag(t_generalBlock);
 
 			return true;
 		}
