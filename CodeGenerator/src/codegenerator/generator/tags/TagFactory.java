@@ -39,6 +39,7 @@ public class TagFactory {
 	static {
 		//m_tags.put(.TAG_NAME.toLowerCase(),						new ConfigValue());	// This class is a special case that has to be handled by the Text tag parsing.
 		m_tags.put(CamelCase.TAG_NAME.toLowerCase(),				new CamelCase());
+		m_tags.put(CopyFile.TAG_NAME.toLowerCase(),					new CopyFile());
 		m_tags.put(Counter.TAG_NAME.toLowerCase(),					new Counter());
 		m_tags.put(CounterDecrement.TAG_NAME.toLowerCase(),			new CounterDecrement());
 		m_tags.put(CounterIncrement.TAG_NAME.toLowerCase(),			new CounterIncrement());
