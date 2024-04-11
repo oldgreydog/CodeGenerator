@@ -208,7 +208,7 @@ public class ConfigValue extends Tag_Base {
 					return false;
 				}
 
-				t_value = t_currentNode.GetValue();
+				t_value = ((coreutil.config.ConfigValue)t_currentNode).GetValue();
 			}
 			else {
 				t_value = t_currentNode.GetNodeValue(t_valueName);
