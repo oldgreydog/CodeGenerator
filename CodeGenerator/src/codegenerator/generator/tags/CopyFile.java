@@ -169,7 +169,7 @@ public class CopyFile extends Tag_Base {
 			}
 
 			Path t_destinationPath = Paths.get(t_destinationDirectory);
-			if (Files.notExists(t_destinationPath) && (Files.createDirectory(t_sourcePath) == null)) {
+			if (Files.notExists(t_destinationPath) && (Files.createDirectory(t_destinationPath) == null)) {
 				Logger.LogError("CopyFile.Evaluate() failed to create the destination directory [" + t_destinationPath.toString() + "].");
 				return false;
 			}
