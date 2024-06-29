@@ -161,16 +161,10 @@ public class FirstElse extends Tag_Base {
 		try {
 			LoopCounter t_iterationCounter = p_evaluationContext.GetLoopCounter();
 			if (m_optionalCounterName != null) {
-				t_iterationCounter = t_iterationCounter.GetNamedCounter(m_optionalCounterName);
-
+				t_iterationCounter = p_evaluationContext.GetNamedCounter(m_optionalCounterName);
 				if (t_iterationCounter == null) {
-					// If we don't find a loop counter by that name, then we need to check to see if there is a counter variable by that name.
-					t_iterationCounter = p_evaluationContext.GetCounterVariable(m_optionalCounterName);
-
-					if (t_iterationCounter == null) {
-						Logger.LogError("FirstElse.Evaluate() failed to find a counter with name [" + m_optionalCounterName + "] at line number [" + m_lineNumber + "].");
-						return false;
-					}
+					Logger.LogError("FirstElse.Evaluate() failed to find a counter with name [" + m_optionalCounterName + "] at line number [" + m_lineNumber + "].");
+					return false;
 				}
 			}
 

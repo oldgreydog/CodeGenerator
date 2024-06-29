@@ -310,7 +310,6 @@ public class ForEach extends Tag_Base {
 			}
 
 			LoopCounter t_iterationCount = new LoopCounter();
-			t_iterationCount.SetParentCounter(p_evaluationContext.GetLoopCounter());
 
 			if (m_optionalCounterName != null)
 				t_iterationCount.SetOptionalCounterName(m_optionalCounterName);

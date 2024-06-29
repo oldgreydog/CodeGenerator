@@ -211,6 +211,25 @@ public class EvaluationContext {
 
 
 	//*********************************
+	public LoopCounter GetNamedCounter(String p_optionalCounterName) {
+		String t_optionalCounterName;
+		for (LoopCounter t_nextCounter: m_iterationCounterStack) {
+			t_optionalCounterName = t_nextCounter.GetOptionalCounterName();
+			if ((t_optionalCounterName != null) && t_optionalCounterName.equalsIgnoreCase(p_optionalCounterName))
+				return t_nextCounter;
+		}
+
+		for (LoopCounter t_nextCounter: m_counterVariableMap.values()) {
+			t_optionalCounterName = t_nextCounter.GetOptionalCounterName();
+			if ((t_optionalCounterName != null) && t_optionalCounterName.equalsIgnoreCase(p_optionalCounterName))
+				return t_nextCounter;
+		}
+
+		return null;	// No counter with that name was found.
+	}
+
+
+	//*********************************
 	public void RemoveCounterVariable(String p_counterName) {
 		m_counterVariableMap.remove(p_counterName);
 	}

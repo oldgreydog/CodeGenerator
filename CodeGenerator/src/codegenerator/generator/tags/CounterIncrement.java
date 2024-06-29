@@ -92,17 +92,13 @@ public class CounterIncrement extends Tag_Base {
 	public boolean Evaluate(EvaluationContext p_evaluationContext)
 	{
 		try {
-			LoopCounter t_iterationCounter = p_evaluationContext.GetLoopCounter();
+			LoopCounter t_iterationCounter = p_evaluationContext.GetLoopCounter();	// Get the default counter which is the most immediately enclosing ForEach tag.
 			if (m_optionalCounterName != null) {
-				t_iterationCounter = t_iterationCounter.GetNamedCounter(m_optionalCounterName);
-
+				// If the optional counter name is set, then get the referenced counter instead of the default.
+				t_iterationCounter = p_evaluationContext.GetNamedCounter(m_optionalCounterName);
 				if (t_iterationCounter == null) {
-					// If we don't find a loop counter by that name, then we need to check to see if there is a counter variable by that name.
-					t_iterationCounter = p_evaluationContext.GetCounterVariable(m_optionalCounterName);
-					if (t_iterationCounter == null) {
-						Logger.LogError("CounterIncrement.Evaluate() failed to find a loop counter with name [" + m_optionalCounterName + "] at line number [" + m_lineNumber + "].");
-						return false;
-					}
+					Logger.LogError("CounterIncrement.Evaluate() failed to find a loop counter with name [" + m_optionalCounterName + "] at line number [" + m_lineNumber + "].");
+					return false;
 				}
 			}
 
