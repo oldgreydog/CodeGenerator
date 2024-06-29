@@ -207,21 +207,25 @@ public class ForEach extends Tag_Base {
 				return false;
 			}
 
-			TagAttributeParser t_nodeAttribute = p_tagParser.GetNamedAttribute(ATTRIBUTE_NODE);
+			TagAttributeParser t_nodeAttribute	= p_tagParser.GetNamedAttribute(ATTRIBUTE_NODE);
+			TagAttributeParser t_valueAttribute = p_tagParser.GetNamedAttribute(ATTRIBUTE_VALUE);
+			if ((t_nodeAttribute == null) && (t_valueAttribute == null)) {
+				Logger.LogError("ForEach.Init() did not find either the [" + ATTRIBUTE_NODE + "] or [" + ATTRIBUTE_VALUE + "] attributes, one of which is required for [" + TAG_NAME + "] tags.");
+				return false;
+			}
+			else if ((t_nodeAttribute != null) && (t_valueAttribute != null)) {
+				Logger.LogError("ForEach.Init() found both the [" + ATTRIBUTE_NODE + "] or [" + ATTRIBUTE_VALUE + "] attributes.  Only one or the other can be used per [" + TAG_NAME + "] tag.");
+				return false;
+			}
+
 			if (t_nodeAttribute == null) {
-				t_nodeAttribute = p_tagParser.GetNamedAttribute(ATTRIBUTE_VALUE);
-				if (t_nodeAttribute == null) {
-					Logger.LogError("ForEach.Init() did not find either the [" + ATTRIBUTE_NODE + "] or [" + ATTRIBUTE_VALUE + "] attribute that is required for [" + TAG_NAME + "] tags.");
-					return false;
-				}
-				else {
-					m_configType = CONFIG_TYPE.VALUE;
-				}
+				t_nodeAttribute = t_valueAttribute;
+				m_configType = CONFIG_TYPE.VALUE;
 			}
 			// m_configType defaults to CONFIG_TYPE.NODE, so we don't need to set it here.
 
 			m_nodeName = t_nodeAttribute.GetAttributeValueAsString();
-			if (m_nodeName == null) {
+			if ((m_nodeName == null) || m_nodeName.isBlank()) {
 				Logger.LogError("ForEach.Init() did not get the value from the attribute [" + ((m_configType == CONFIG_TYPE.NODE) ? ATTRIBUTE_NODE : ATTRIBUTE_VALUE) + "] that is required for [" + TAG_NAME + "] tags.");
 				return false;
 			}

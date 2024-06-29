@@ -96,7 +96,7 @@ public class TabStop extends Tag_Base {
 			}
 
 			String t_stopType = t_nodeAttribute.GetAttributeValueAsString();
-			if (t_stopType == null) {
+			if ((t_stopType == null) || t_stopType.isBlank()) {
 				Logger.LogError("TabStop.Evaluate() failed to get the [" + ATTRIBUTE_STOP_TYPE + "] value at line number [" + m_lineNumber + "].");
 				return false;
 			}

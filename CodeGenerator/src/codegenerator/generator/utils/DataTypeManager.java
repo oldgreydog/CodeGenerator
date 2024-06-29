@@ -122,6 +122,11 @@ public class DataTypeManager {
 								if (t_nextTypeField.GetName().equalsIgnoreCase(CONFIG_VALUE_SOURCE_TYPE)) {
 									t_sourceType = ((ConfigValue)t_nextTypeField).GetValue();
 
+									if ((t_sourceType == null) || t_sourceType.isBlank()) {
+										Logger.LogError("DataTypeManager.LoadConfigFile() found a [" + CONFIG_VALUE_SOURCE_TYPE + "] entry that doesn't have a value.");
+										return false;
+									}
+
 									if (t_targetLanguageMap.containsKey(t_sourceType)) {
 										Logger.LogError("DataTypeManager.LoadConfigFile() - the type map for target language [" + t_targetLanguageMap + "] already contains source type [" + t_sourceType + "].");
 										return false;

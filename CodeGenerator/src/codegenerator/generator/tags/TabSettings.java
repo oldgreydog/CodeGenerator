@@ -51,6 +51,9 @@ public class TabSettings extends Tag_Base {
 	static private final String		ATTRIBUTE_TAB_LENGTH	= "tabLength";
 	static private final String		ATTRIBUTE_OUTPUT_TYPE	= "outputType";
 
+	static private final String		OUTPUT_TYPE_TABS		= "tabs";
+	static private final String		OUTPUT_TYPE_SPACES		= "spaces";
+
 
 	// Data members
 	private int		m_tabLength		= -1;
@@ -95,15 +98,19 @@ public class TabSettings extends Tag_Base {
 			}
 
 			String t_outputType = t_nodeAttribute.GetAttributeValueAsString();
-			if (t_outputType == null) {
+			if ((t_outputType == null) || t_outputType.isBlank()) {
 				Logger.LogError("TabSettings.Evaluate() failed to get the [" + ATTRIBUTE_OUTPUT_TYPE + "] value at line number [" + m_lineNumber + "].");
 				return false;
 			}
 
-			if (t_outputType.equalsIgnoreCase("tabs"))
+			if (t_outputType.equalsIgnoreCase(OUTPUT_TYPE_TABS))
 				m_outputType = TabSettingsManager.OUTPUT_TYPE_TABS;
-			else
+			else if (t_outputType.equalsIgnoreCase(OUTPUT_TYPE_SPACES))
 				m_outputType = TabSettingsManager.OUTPUT_TYPE_SPACES;
+			else  {
+				Logger.LogError("TabSettings.Evaluate() received an unknown [" + ATTRIBUTE_OUTPUT_TYPE + "] value [" + t_outputType + "] at line number [" + m_lineNumber + "].");
+				return false;
+			}
 
 			return true;
 		}
