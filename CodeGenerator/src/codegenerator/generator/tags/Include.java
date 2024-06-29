@@ -31,12 +31,16 @@ import codegenerator.generator.utils.*;
 
 
 /**
-	Parses the indicated template file and, on evaluation, executes that files contents as if they were part of the parent template file.
+<p>Parses the indicated template file and evaluates that file's contents as if they were part of the parent template file.</p>
 
-	<p>Here's an example of this tag:</p>
+<h3>Usage example</h3>
 
-	<pre>	<code>&lt;%include template = templates/marshalling/marshalling_interface_variables.template %&gt;</code></pre>
- */
+<pre>	<code><b>&lt;%include template = templates/marshalling/marshalling_interface_variables.template %&gt;</b></code></pre>
+
+<h3>Attribute descriptions</h3>
+
+<p><code><b>template</b></code>:  the file path of the template file that will be parsed into the parent file in place of the <code><b>include</b></code> tag.</p>
+*/
 public class Include extends Tag_Base {
 
 	static public final String		TAG_NAME				= "include";

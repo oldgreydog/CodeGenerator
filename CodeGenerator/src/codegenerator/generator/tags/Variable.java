@@ -35,21 +35,28 @@ import codegenerator.generator.utils.*;
 <p>Allows you to create reusable template blocks so that duplicate template sections can be cleaned
 up and simplified.</p>
 
-<p>When used with a variable name and the evalmode set to "set", it will parse the contents to the
-<code>&lt;%endVariable%&gt;</code> tag and save them for the variable name.</p>
+<h3>Usage example</h3>
 
-<pre><code>&lt;%variable name = "primeNames" evalmode = "set" %&gt;
+<pre><code><b>&lt;%variable name = "primeNames" evalmode = "set" %&gt;
 ...
-&lt;%endVariable%&gt;</code></pre>
+&lt;%endVariable%&gt;</b></code></pre>
 
-<p>When used with a variable name and the evalmode set to "evaluate", it will evaluate the template
-block set for that variable name at that location.  Obviously, all of the config value references must
-also be valid for that location.</p>
+<p>When used with <code><b>evalmode</b></code> set to "set", it will parse the contents to the <code><b>&lt;%endVariable%&gt;</b></code>
+tag and save them for the variable name.</p>
 
-<pre><code>&lt;%variable name = "primeNames" evalmode = "evaluate" optionalContextName = "outer1" %&gt;</code></pre>
+<pre><code><b>&lt;%variable name = "primeNames" evalmode = "evaluate" optionalContextName = "outer1" %&gt;</b></code></pre>
 
-<p> !!NOTE!! The attribute "optionalContextName" is optional!  Now that outer contexts exist, I had to add this so that
-variables could be made to work even inside inner contexts.
+<p>When used with <code><b>evalmode</b></code> set to <code><b>evaluate</b></code>, it will evaluate the template block set for that variable name at that location.
+Obviously, all of the config value references inside the  must also be valid for that location.</p>
+
+<h3>Attribute descriptions</h3>
+
+<p><code><b>name</b></code>:  the name that identifies a particular <code><b>variable</b></code> instance.</p>
+
+<p><code><b>evalmode</b></code>: [values: <code><b>set</b></code>|<code><b>evaluate</b></code>, no default: a value must be set]  </p>
+
+<p><code><b>optionalContextName</b></code>:  this is an optional attribute.  Now that outer contexts exist, I had to add this so that
+variables could be made to work even inside inner contexts when the variable's definition uses values from the outer context.
 
 */
 public class Variable extends Tag_Base {

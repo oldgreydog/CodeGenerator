@@ -29,18 +29,20 @@ import codegenerator.generator.utils.*;
 
 
 /**
- * 	<p>Creates a counter that is independent of the counters built into the <code>forEach</code> tags.</p>
- *
-	<p>For example, if you need to have a counter that guarantees that you only generate a piece of code only once inside
-	a complicated set of nested contexts and/or <code>forEach</code> loops, then you can set up a CounterVariable
-	tag that wraps those contexts/loops and use the new <code>++counter</code> ({@link CounterIncrement}) tag inside the
-	if/else tag where the desired code is generated with the same name you put on the counterVariable tag.
-	This will ensure that regardless of how the <code>forEach</code> loops traverse the config tree, that code will only get
-	generated once.</p>
+<p>Creates a counter that is independent of the <code><b>forEach</b></code> tag's internal counter.</p>
 
-	<p>Here's a long but (I think) illuminating real usage example from one of my templates:</p>
+<p>For example, if you need to have a counter that guarantees that you only generate a piece of code only once inside
+a complicated set of nested contexts and/or <code><b>forEach</b></code> loops, then you can set up a CounterVariable
+tag that wraps those contexts/loops and use the new <code>++counter</code> ({@link CounterIncrement}) tag inside the
+if/else tag where the desired code is generated with the same name you put on the counterVariable tag.
+This will ensure that regardless of how the <code><b>forEach</b></code> loops traverse the config tree, that code will only get
+generated once.</p>
 
-	<pre><code>&lt;%counterVariable counterName = tableCounter %&gt;
+<h3>Usage example</h3>
+
+<p>Here's a long but (I think) illuminating real usage example from one of my templates:</p>
+
+<pre><code><b>&lt;%counterVariable counterName = tableCounter %&gt;
 
 	&lt;&lt;&lt; This section finds all foreign key references to this table and add the child parent nodes for each of them. &gt;&gt;&gt;
 	&lt;%outerContext contextname = "parentTable" %&gt;
@@ -54,6 +56,8 @@ import codegenerator.generator.utils.*;
 
 					&lt;%if &lt;%parentTableName%&gt; = &lt;%outerContextEval contextname = "parentTable" targetvalue = sqlName %&gt; %&gt;
 
+						&lt;%++counter optionalCounterName = tableCounter %&gt;
+
 						&lt;%first optionalCounterName = tableCounter%&gt;
 
 							&lt;&lt;&lt; We can use the "first" to add the opening authentication code only if there is at least one child found. &gt;&gt;&gt;
@@ -66,8 +70,6 @@ import codegenerator.generator.utils.*;
 							&lt;%text%&gt;,&lt;%endtext%&gt;
 
 						&lt;%endfirst%&gt;
-
-						&lt;%++counter optionalCounterName = tableCounter %&gt;
 
 						&lt;%text%&gt;database.&lt;%^^sqlName%&gt;.view&lt;%endtext%&gt;
 
@@ -85,8 +87,6 @@ import codegenerator.generator.utils.*;
 	&lt;&lt;&lt; We'll use the tableCounter to only add this block of code if at least one child table was found. &gt;&gt;&gt;
 	&lt;%first optionalCounterName = tableCounter%&gt;
 
-	&lt;%else%&gt;
-
 		&lt;%text%&gt;");
 	if (t_permissionResults === null) {
 		alert("Failed to get the permissions required to create the &lt;%className%&gt; display.");
@@ -99,13 +99,17 @@ import codegenerator.generator.utils.*;
 
 	&lt;%endfirst%&gt;
 
+&lt;%endCounter%&gt;</b></code>
+</pre>
 
-&lt;%endCounter%&gt;
-</code></pre>
-	<br>
-	<p>If you look at the example closely, you'll see that where I used <code>++counter</code>, I only get one pass through that
-	<code>first</code> tag.  But I also use the same counter at the bottom of the example in the <code>first</code> tag to only
-	generate a matching block of code in the <code>else</code> if the first <code>first</code> tag was executed at least once.</p>
+<p>If you look at the example closely, you'll see that where I used <code>++counter</code>, I only get one pass through that
+<code><b>first</b></code> tag.  But I also use the same counter at the bottom of the example in the <code><b>first</b></code> tag to only
+generate a matching block of code in the <code>else</code> if the first <code><b>first</b></code> tag was executed at least once.</p>
+
+<h3>Attribute descriptions</h3>
+
+<p><code>counterName</code>:  the counter has to have a unique name because it is never eligible as a "default" value like a <code><b>forEach</b></code> counter value is.
+To use a <code><b>counterVariable</b></code>'s value, any tag that references if <i>must</i> use its <code>counterName</code>.</p>
 */
 public class CounterVariable extends Tag_Base {
 

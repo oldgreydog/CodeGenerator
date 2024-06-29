@@ -20,28 +20,30 @@
 
 package codegenerator.generator.tags;
 
-import java.util.*;
-import java.io.*;
 import java.nio.file.*;
 import java.nio.file.attribute.*;
-import java.util.concurrent.locks.*;
 
 import codegenerator.generator.utils.*;
-import coreutil.config.*;
 import coreutil.logging.*;
 
 
 
 /**
-	<code>file</code> does exactly what you think it does: it copies a file to a new location.  I needed this for certain files, such as batch files, in
-	ArchTemplates that did have any generated content but needed to be moved into the output project tree.  I could have technically just used <code>file</code>
-	with a template whose content was completely wrapped in a <code>text</code> tag, but that seemed a little unnecessarily indirect.
+<p>Copies a file to the destination directory without evaluating it as a template.  It was needed for certain files, such as batch files, in
+the ArchTemplates project that did have any generated content but needed to be moved into the output project tree.  Technically, <code>file</code>
+could have been used with a template whose content was completely wrapped in a <code>text</code> tag, but that seemed a little unnecessarily indirect.</p>
 
-	<p>Here's an example of this version of the tag:</p>
+<h3>Usage example</h3>
 
-	<p><pre><code>&lt;%copyfile sourceFilePath = &lt;%root.global.rootTemplatesPath%&gt;/project/generate_all filename = "&lt;%className%&gt;Marshalling.java" destDir = "&lt;%root.global.outputPath%&gt;/coredb"  optionalMakeFileExecutable = true %&gt;</code></pre></p>
+<p><pre><code><b>&lt;%copyfile  sourceFilePath = &lt;%root.global.rootTemplatesPath%&gt;/project/generate_all  targetDirectory = "&lt;%root.global.outputPath%&gt;/coredb"  optionalMakeFileExecutable = true %&gt;</b></code></pre></p>
 
-	<p>optionalMakeFileExecutable is an optional boolean attribute to indicate that once the file has been copied then it needs to be marked as executable.  This will probably be used mostly with batch files, for example.</p>
+<h3>Attribute descriptions</h3>
+
+<p><code>sourceFilePath</code>: the file path, including the filename, of the file that will be copied from</p>
+
+<p><code><b>targetDirectory</b></code>: the directory path where the file will be copied to</p>
+
+<p><code><b>optionalMakeFileExecutable</b></code>: an optional boolean attribute to indicate that once the file has been copied then it needs to be marked as executable.  This will probably be used mostly with batch files, for example.</p>
  */
 public class CopyFile extends Tag_Base {
 

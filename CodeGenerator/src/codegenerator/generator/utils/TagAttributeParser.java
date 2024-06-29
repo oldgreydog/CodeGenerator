@@ -38,7 +38,7 @@ import codegenerator.generator.utils.TemplateTokenizer.*;
 	<pre>	<code>name=value
 	name = value
 	name = "value with white spaces bound by double quotes"
-	nameWith&lt;%embeddedTags%&gt; = valueWith&lt;%embeddedTags%&gt;</code></pre>
+	nameWith&lt;%embeddedTags%&gt; = valueWith&lt;%embeddedTags%&gt;</b></code></pre>
 
 	<p>This list is "compressed" in that it tries to show examples of all of the rules below without showing every possible combination.
 	Here are the general rules for what the parser accepts for valid attributes:</p>
@@ -51,14 +51,14 @@ import codegenerator.generator.utils.TemplateTokenizer.*;
 
 	<p>Here is the current list of allowed embedded tags:</p>
 
-	<pre>	<code><B>camelCase
-	&lt;%DataType%&gt; </B>(i.e. config values)<B>
+	<pre>	<code><b>camelCase
+	&lt;%DataType%&gt; </b>(i.e. config values)<b>
 	counter
 	firstLetterToLowerCase
-	and/or/not	</B>(i.e. for if statements)<B>
+	and/or/not	</b>(i.e. for if statements)<b>
 	outerContextEval
 	typeConvert
-	variable</B></code></pre>
+	variable</b></code></pre>
  */
 public class TagAttributeParser {
 

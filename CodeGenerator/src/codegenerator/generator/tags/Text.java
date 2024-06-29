@@ -32,32 +32,34 @@ import coreutil.logging.*;
 
 
 /**
-	<p>This is the only tag that can contain text that will be written to the output.</p>
+<p>This is the only tag that can contain text that will be written to the output.</p>
 
-	<pre>	<code>&lt;%text%&gt;
+<h3>Usage example</h3>
+
+<pre>	<code><b>&lt;%text%&gt;
 	...
-	&lt;%endText%&gt;</code></pre>
+	&lt;%endText%&gt;</b></code></pre>
 
-	<p>Note that all text and white space from the end of the closing delimiter for the <code><B>text</B></code>
-	tag and the beginning of the opening delimiter of the <code><B>endText</B></code> tag is significant.
-	The only exception is any embedded tags.  They will be replaced by their evaluated text during file
-	generation.  This means that you can indent the opening <code><B>text</B></code> tag as much as you like
-	to make the template more readable, but text inside the tag will have to be indented in relation to
-	the left edge because it will be output with the formatting as written, not in relation to where
-	the <code><B>text</B></code> tag was placed.</p>
+<p>Note that all text and white space from the end of the closing delimiter for the <code><b>text</b></code>
+tag to the beginning of the opening delimiter of the <code><b>endText</b></code> tag is significant.
+The only exception is any embedded tags.  They will be replaced by their evaluated text during file
+generation.  This means that you can indent the opening <code><b>text</b></code> tag as much as you like
+to make the template more readable, but text inside the tag will have to be indented in relation to
+the left edge because it will be output with the formatting as written, not in relation to where
+the <code><b>text</b></code> tag was placed.</p>
 
-	<p>Text that is not in a <code><B>text</B></code> tag will be ignored by the parser.  This is an easy
-	mistake to make because you will see your text is in the template but it may not be immediately
-	obvious that it isn't inside a <code><B>text</B></code> tag and that's why it isn't getting written
-	out to your files.  Of course, that also means that it is possible to comment your templates
-	with any text that is outside of a text tag.  I've been using "<code>&lt;&lt;&lt;</code>" and
-	"<code>&gt;&gt;&gt;</code>" as opening and closing delimiters for my template comments because they
-	help the comments stand out, but you can do your comments any way you like.</p>
+<p>Text that is not in a <code><b>text</b></code> tag will be ignored by the parser.  This is an easy
+mistake to make because you will see your text is in the template but it may not be immediately
+obvious that it isn't inside a <code><b>text</b></code> tag and that's why it isn't getting written
+out to your files.  Of course, that also means that it is possible to comment your templates
+with any text that is outside of a text tag.  I've been using <code><b>&lt;&lt;&lt;</b></code> and
+<code><b>&gt;&gt;&gt;</b></code> as opening and closing delimiters for my template comments because they
+help the comments stand out, but you can do your comments any way you like.</p>
 
-	<p>The <code><B>text</B></code> tag is not allowed to have any other tags inside it except for:</p>
+<p>The <code><b>text</b></code> tag is only allowed to have "single" tags inside it such as (this may not be a complete list):</p>
 
-	<pre>	a config value (such as <code><B>&lt;%className%&gt;</B></code>)
-	<code><B>camelCase
+<pre>	a config value (such as <code><b>&lt;%className%&gt;</b></code>)
+	<code><b>camelCase
 	counter
 	customCode
 	firstLetterToLowerCase
@@ -65,12 +67,16 @@ import coreutil.logging.*;
 	tabMarker
 	tabStop
 	typeConvert
-	variable</B></code></pre>
+	variable</b></code></pre>
 
-	<p>Note that one of the defining characteristics of all of these tags is that they are single, free-standing tags.
-	In other words, they don't have any intermediate or ending tags and, therefore, do not have child tags as content.
-	Any other tag type will cause the parse to fail.  This is enforced by the code because every tag class marks itself
-	as being safe for use in text or not.</p>
+<p>Note that the defining common characteristic of all of these tags is that they are single, free-standing tags.
+In other words, they don't have any intermediate or ending tags and, therefore, do not have child tags as content.
+Any other tag type will cause the parse to fail.  This is enforced by the code because every tag class marks itself
+as being safe for use in text or not.</p>
+
+<p><i>However</i>, <code><b>variable</b></code> is a loophole to this rule since a <code><b>variable</b></code>'s
+definition can include an arbitrary number of single and multi-part tags.  But since <code><b>variable</b></code>
+is a single tag where it is evaluated, it is still safe to be used inside a <code><b>text</b></code> tag block.</p>
  */
 public class Text extends Tag_Base {
 

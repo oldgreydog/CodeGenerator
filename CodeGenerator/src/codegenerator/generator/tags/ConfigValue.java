@@ -28,23 +28,23 @@ import coreutil.logging.*;
 
 
 /**
-	Accesses values in the config tree so that they can be inserted into the template output.  (For
-	an explanation of the config tree and how it is traversed, please see {@link ForEach}.)
+This accesses values in the config tree so that they can be inserted into the template output or passed to
+other tags as their input.  (For an explanation of the config tree and how it is traversed, please see {@link ForEach}.)
 
-	<p>There are three modes of use for this tag:</p>
+<p>There are three modes of use for this tag:</p>
 
-	<p>	- Simple value: a single child value name is looked for on the current parent context node</p>
+<p>	- Simple value: a single child value name is looked for on the current parent context node</p>
 
-	<p>	- Parent references: the caret ( ^ ) is used one or more times before the value name to
-	indicate that it should be found that number of parent nodes above the current parent</p>
+<p>	- Parent references: the caret ( ^ ) is used one or more times before the value name to
+indicate that it should be found that number of parent nodes above the current parent</p>
 
-	<p>	- Global path name: A fully specified value name that starts with "root." will be dereferenced from the root node</p>
+<p>	- Global path name: A fully specified value name that starts with "root." will be dereferenced from the root node</p>
 
-	<h3>Examples</h3>
+<h3>Usage example</h3>
 
-	<p>We'll use this example config as the reference point:</p>
+<p>We'll use this example config as the reference point:</p>
 
-	<pre><code>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+<pre><code><b>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
 &lt;Node name="root"&gt;
 	&lt;Node name="global"&gt;
 		&lt;Value name="databaseName"&gt;Operations&lt;/Value&gt;
@@ -78,17 +78,16 @@ import coreutil.logging.*;
 
 	...
 
-&lt;/Node&gt;
-</code></pre>
+&lt;/Node&gt;</b></code></pre>
 
-	<p>Let's assume that we are at a point in the template such that the current context node pointer is at the
-	first "column" node under the "table" node (i.e. you are inside a <code>&lt;%foreach node=column %&gt;</code> tag).</p>
+<p>Let's assume that we are at a point in the template such that the current context node pointer is at the
+first "column" node under the "table" node (i.e. you are inside a <code><b>&lt;%foreach node=column %&gt;</b></code> tag).</p>
 
-	<p>	- A simple value reference like <code>&lt;%sqlName%&gt;</code> will be evaluated to <b><code>USER_ID</code></b>.</p>
+<p>	- A simple value reference like <code><b>&lt;%sqlName%&gt;</b></code> will be evaluated to <b><code>USER_ID</code></b>.</p>
 
-	<p>	- A value reference with one parent reference caret like <code>&lt;%^sqlName%&gt;</code> will be evaluated to <b><code>USER</code></b>.</p>
+<p>	- A value reference with one parent reference caret like <code><b>&lt;%^sqlName%&gt;</b></code> will be evaluated to <b><code>USER</code></b>.</p>
 
-	<p>	- A fully qualified value reference like <code>&lt;%root.global.databaseName%&gt;</code> will be evaluated to <b><code>Operations</code></b>.</p>
+<p>	- A fully qualified value reference like <code><b>&lt;%root.global.databaseName%&gt;</b></code> will be evaluated to <b><code>Operations</code></b>.</p>
  */
 public class ConfigValue extends Tag_Base {
 
@@ -96,7 +95,7 @@ public class ConfigValue extends Tag_Base {
 
 
 	// Data members
-	private	String		m_valueName			= null;
+	private	String		m_valueName				= null;
 	private	int			m_parentReferenceCount	= 0;		// (i.e. "^varname") This count tells us how many levels up to go to reference the following value name on a parent node (or a parent-of-a-parent node "^^varname", etc.)
 
 
@@ -154,7 +153,7 @@ public class ConfigValue extends Tag_Base {
 			t_valueName = t_valueName.substring(1);	// Chop off the leading ^.
 		}
 
-		m_valueName	= t_valueName;
+		m_valueName		= t_valueName;
 		m_lineNumber	= p_lineNumber;
 
 		return true;

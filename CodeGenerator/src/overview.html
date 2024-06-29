@@ -31,7 +31,7 @@
 
 	<p>The config values file holds the values that are substituted into the template when the template
 	is evaluated.  It is an XML file with a very simple tree structure that lets you create as complex a
-	definition of your functional domain as you need.  Here is an example taken from the {@link codegenerator.generator.tags.ConfigVariable}
+	definition of your functional domain as you need.  Here is an example taken from the {@link codegenerator.generator.tags.ConfigValue}
 	documentation:</p>
 
 	<pre><code>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
@@ -164,9 +164,9 @@
 	There are also certain special tags that can appear inside a <code>text</code> tag.  Here's the
 	<code>text</code> tag:</p>
 
-	<pre><code><%text%>
+	<pre><code>&lt;%text%&gt;
 ...
-<%endtext%></code></pre>
+&lt;%endtext%&gt;</code></pre>
 
 	<p>It is also possible to put certain tags inside a <code>text</code> block with or without text.  Note that the
 	one common aspect of all of these tags is that none of them have closing tags like the flow control tags.</p>

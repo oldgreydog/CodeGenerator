@@ -29,16 +29,24 @@ import coreutil.logging.*;
 
 
 /**
+<p>Provides access to values under the specified <code><b>outerContext</b></code> for use in nested tags whose context has
+been changed in such a way that they no longer have direct parent access to that <code><b>outerContext</b></code>.</p>
+
 <p>Please see the documentation for {@link OuterContext} for more information about outer contexts and their usage.</p>
 
-<p>This tag lets you pull in a value from the outer context to be used in the inner context.</p>
+<p>This tag lets you pull in a value from the outer context to be used in the inner context, usually in <code><b>if</b></code> tags or
+to output directly to the generated file.</p>
 
-<p>Example use of this tag:</p>
+<h3>Usage example</h3>
 
-<p><pre><code>&lt;%outerContextEval contextname = outer1 targetvalue = tableName %&gt;</code></pre></p>
+<p><pre><code><b>&lt;%outerContextEval contextname = outer1 targetvalue = tableName %&gt;</b></code></pre></p>
 
-<p></p>
+<h3>Attribute descriptions</h3>
 
+<p><code><b>contextname</b></code>:  the name of the <code><b>outerContext</b></code> tag that this tag will find to get its context node.</p>
+
+<p><code><b>targetvalue</b></code>:  once the target <code><b>outerContext</b></code> tag context is obtained, then this is the value under that
+context that is to be retrieved and output as the "result" of this tag.</p>
 */
 public class OuterContextEval extends Tag_Base {
 

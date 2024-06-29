@@ -32,7 +32,7 @@ import codegenerator.generator.utils.*;
 
 
 /**
-	The base class API definition for all tag subclasses.  Most tags can contain child
+	The base class definition for all tag subclasses.  Most tags can contain child
 	tags so this also provides the common functionality to add and evaluate child tags.
 */
 public abstract class Tag_Base {

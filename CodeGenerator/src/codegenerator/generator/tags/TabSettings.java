@@ -28,21 +28,23 @@ import coreutil.logging.*;
 
 
 /**
-	Sets the tab parameters for the template until the next <code><B>tabSettings</B></code> changes them.
+<p>Sets the tab parameters for the template until the next <code><b>tabSettings</b></code> changes them.</p>
 
-	<p>Example use of this tag:</p>
+<h3>Usage example</h3>
 
-	<pre>	<code>&lt;%tabSettings tabLength = "4" outputType = "tabs" %&gt;</code></pre>
+<pre>	<code><b>&lt;%tabSettings tabLength = "4" outputType = "tabs" %&gt;</b></code></pre>
 
-	<pre>	<code>&lt;%tabSettings tabLength = "4" outputType = "spaces" %&gt;</code></pre>
+<pre>	<code><b>&lt;%tabSettings tabLength = "4" outputType = "spaces" %&gt;</b></code></pre>
 
-	<p>The <code><B>tabLength</B></code> attribute defines how many spaces will be represented by a tab.  This
-	is used by the code when it is asked to do an offset of N spaces and the output type is "tabs".  It divides
-	the offset by the tabLength to get how many tabs to write and then it adds any spaces needed to reach the final
-	offset if it doesn't fall on a tab boundary.</p>
+<h3>Attribute descriptions</h3>
 
-	<p>The <code><B>outputType</B></code> attribute defines whether a tab character or spaces will be written
-	to the output to represent a tab's worth of spacing.</p>
+<p><code><b>tabLength</b></code>:  defines how many spaces will be represented by a tab.  This
+is used by the code when it is asked to do an offset of N spaces and the output type is "tabs".  It divides
+the offset by the tabLength to get how many tabs to write and then it adds any spaces needed to reach the final
+offset if it doesn't fall on a tab boundary.</p>
+
+<p><code><b>outputType</b></code>: [values: <code><b>tabs</b></code>|<code><b>spaces</b></code>, no default: a value must be set]  defines whether a tab character or spaces will be written
+to the output to represent a tab's worth of spacing.</p>
  */
 public class TabSettings extends Tag_Base {
 

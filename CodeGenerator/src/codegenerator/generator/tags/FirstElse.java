@@ -31,14 +31,15 @@ import codegenerator.generator.utils.*;
 
 
 /**
-	Allows a template to do something different on the first pass through a loop than what is done
-	on every subsequent pass.
+<p>Allows a template to do something different on the first pass through a loop than what is done on every subsequent pass.</p>
 
-	<p>There are numerous places in code where you will want to generate things like parameter lists
-	so you need to control when, in that example, you insert commas.  The <code>first</code>-<code>else</code>
-	tags let you do that.  For example:</p>
+<p>There are numerous places in code where you will want to generate things like parameter lists
+so you need to control when, in that example, you insert commas.  The <code><b>first</b></code>-<code>else</code>
+tags let you do that.</p>
 
-	<pre><code>&lt;%forEach node = member  optionalCounterName = "loop1" %&gt;
+<h3>Usage example</h3>
+
+	<pre><code><b>&lt;%forEach node = member  optionalCounterName = "loop1" %&gt;
 
 	&lt;%first%&gt;
 
@@ -53,14 +54,17 @@ import codegenerator.generator.utils.*;
 
 	&lt;%text%&gt;       &lt;%typeConvert targetLanguage = "java" sourceType = &lt;%type%&gt; class = "object" %&gt; p_&lt;%firstLetterToLowerCase member = &lt;%name%&gt;%&gt;&lt;%endtext%&gt;
 
-&lt;%endFor%&gt;</code></pre>
+&lt;%endFor%&gt;</b></code></pre>
 
-	<p>On the first pass through this loop, the <code>first</code> tag will do nothing.  But
-	for every iteration after that, the <code>else</code> tag will add a comma and a new-line in front of the
-	parameter definition.</p>
+<p>On the first pass through this loop, the <code><b>first</b></code> tag will do nothing.  But
+for every iteration after that, the <code>else</code> tag will add a comma and a new-line in front of the
+parameter definition.</p>
 
-	<p>The optionalCounterName attribute lets you specify using a named loop counter from a {@link ForEach} tag or {@link CounterVariable} other than the
-	 {@link ForEach} directly containing this <code>first</code> tag.</p>
+<h3>Attribute descriptions</h3>
+
+<p>The optionalCounterName attribute lets you specify using a named loop counter from a {@link ForEach} tag or {@link CounterVariable} other than the
+{@link ForEach} directly containing this <code><b>first</b></code> tag.  See {@link CounterVariable} for an example of this usage.  Since a <code><b>first</b></code>
+can contain any other tags such as <code><b>forEach</b></code> or <code>if</code>, this can let you create rather complex logic.</p>
  */
 public class FirstElse extends Tag_Base {
 

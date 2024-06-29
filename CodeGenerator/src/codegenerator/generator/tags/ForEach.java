@@ -30,141 +30,152 @@ import codegenerator.generator.utils.*;
 
 
 /**
-	<p>Provides the looping mechanism that iterates over child nodes of the specified name.</p>
+<p>Provides the looping mechanism that iterates over config child nodes of the specified name.</p>
 
-	<pre><code>&lt;%forEach node = column  optionalCounterName = "loop1" %&gt;
+	<pre><code><b>&lt;%forEach value = column %&gt;
 ...
-&lt;%endFor%&gt;</code></pre>
+&lt;%endFor%&gt;</b></code></pre>
 
-	<pre><code>&lt;%forEach value = column  optionalCounterName = "loop1" %&gt;
-...
-&lt;%endFor%&gt;</code></pre>
+<p>This tag is the main flow control in the templates.  The config values are defined in a tree structure
+in the XML file and the <code><b>forEach</b></code> tag lets you build templates that can iterate down
+through that tree structure.  That XML structure is made up of <code><b>node</b></code>(s) and <code><b>value</b></code>(s).  Think of the nodes
+as file folders and the values as files.  Like a folder tree, each node can hold any number of child nodes
+and values.  In the vast majority of cases, the values are like a class's attributes and are, therefore,
+uniquely named in each node.  But occasionally you need a list of values that have the same name and, in
+that case, you can use the <code><b>value</b></code> attribute instead of the <code><b>node</b></code> attribute to tell the <code><b>forEach</b></code>
+tag that you want it to iterate over the child values of the specified name instead of child nodes.</p>
 
-	<p>This tag is the main control in the templates.  The config values are defined in a tree structure
-	in the XML file and the <code>forEach</code> tag lets you build templates that can iterate down
-	through that tree structure.</p>
+<p>When you start the code generator, the current node pointer is pointed at the
+root node of the config value tree.  The evaluation of each template file is started with whatever
+the current node pointer is pointed at at the start of the <code>file</code> tag.  For the <code><b>root</b></code> template
+file that is passed into the generator, it's the <code><b>root</b></code> node in the config file.</p>
 
-	<p>When you start the code generator, the "current" node pointer is, conceptually, pointed at the
-	root node of the config value tree.  The evaluation of each template file is started with whatever
-	the current node pointer is pointed at at the start of the <code>file</code> tag.  For the "root" template
-	file that is passed into the generator, it's the "root" node in the config file.</p>
+<p>Each node in the config value tree can have both values and child nodes.  That means that at any
+point in a template, you can access the values under the current node or you can use the <code><b>forEach</b></code>
+tag to start a loop over that node's child nodes.  Inside the <code><b>forEach</b></code> tag, the current
+pointer is changed every iteration to point to the next available child of the specified name.
+If there are child nodes with different names, only the ones with the name specified in the tag will
+be iterated over in that particular <code><b>forEach</b></code> tag.  Therefore, if you have multiple
+child node groups, you can use multiple <code><b>forEach</b></code> tags to iterate over them.</p>
 
-	<p>Each node in the config value tree can have both values and child nodes.  That means that at any
-	point in a template, you can access the values under the "current" node or you can use the <code>forEach</code>
-	tag to start a loop over that node's child nodes.  Inside the <code>forEach</code> tag, the current
-	pointer is changed every iteration to point to the next available child of the specified name.
-	If there are child nodes with different names, only the ones with the name specified in the tag will
-	be iterated over in that particular <code>forEach</code> tag.  Therefore, if you have multiple
-	child node groups, you can use multiple <code>forEach</code> tags to iterate over them.</p>
+<p>A critical feature of the <code><b>forEach</b></code> tag is that it maintains an internal counter of how
+many child nodes it has iterated over.  This is the primary counter used by {@link FirstElse} tags so that they
+can figure out which iteration they are seeing and can choose to execute either the <code><b>first</b></code> block or the <code><b>else</b></code>
+block.  These iterator values can also be output in the generated text for various reasons (i.e. creating primary
+key values for default data that will be inserted into a database).  You can use the optional <code><b>optionalCounterName</b></code>
+attribute to add a name for a particular <code><b>forEach</b></code> tag's counter so that you can access it where there
+are nested <code><b>forEach</b></code> tags and the one you want to use is not the inner most <code><b>forEach</b></code> tag enclosing
+the point where you are accessing the couter.</p>
 
-	<p>The optionalCounterName attribute is just that: optional.  It lets you give the <code>forEach</code> tag's counter
-	a user-controlled name so that it can be accessed by name inside nested <code>forEach</code> tags to achieve more
-	controlled behavior.  For example, if you have two nested <code>forEach</code> loops and you want a <code>first</code> tag in the
-	inner loop to only run the first time that the inner <code>first</code> runs regardless of how many times the outer loop
-	has stepped through, then you use the optionalCounterName on the outer <code>forEach</code> as the optionalCounterName on the inner <code>first</code> tag.</p>
+<h3>Usage example</h3>
 
-	<p>Let's start with an example of a config value XML tree (truncated in places for brevity):</p>
+<p>Let's start with an example of a config value XML tree (truncated in places for brevity):</p>
 
-	<pre><code>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+	<pre><code><b>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
 &lt;Node name="root"&gt;
 	&lt;Node name="global"&gt;
 		&lt;Value name="databaseName"&gt;OpsDB&lt;/Value&gt;
 		&lt;Value name="packageName"&gt;coreutil.model.opsdb&lt;/Value&gt;
+		&lt;Value name="outputPath"&gt;~/temp/code_generator/ArchDev&lt;/Value&gt;
 		...
 	&lt;/Node&gt;
-	&lt;Node name="table"&gt;
-		&lt;Value name="tableName"&gt;User&lt;/Value&gt;
-		&lt;Value name="sqlName"&gt;USER&lt;/Value&gt;
-		&lt;Node name="column"&gt;
-			&lt;Value name="name"&gt;UserId&lt;/Value&gt;
-			&lt;Value name="sqlName"&gt;USER_ID&lt;/Value&gt;
-			&lt;Value name="memberName"&gt;userId&lt;/Value&gt;
-			&lt;Value name="type"&gt;int&lt;/Value&gt;
-			&lt;Value name="isNullable"&gt;false&lt;/Value&gt;
-			&lt;Value name="isPrimaryKey"&gt;true&lt;/Value&gt;
-		&lt;/Node&gt;
-		&lt;Node name="column"&gt;
-			...
-		&lt;/Node&gt;
-		...
 
-		&lt;Node name="foreignKey"&gt;
-			&lt;Value name="name"&gt;CustomerId&lt;/Value&gt;
-			&lt;Value name="childKeyColumnName"&gt;CUSTOMER_ID&lt;/Value&gt;
-			&lt;Value name="type"&gt;int&lt;/Value&gt;
+	&lt;Node name="table">
+		&lt;Value name="sqlName">DEVICE_PROPERTY&lt;/Value&gt;
+		&lt;Value name="className">DeviceProperty&lt;/Value&gt;
+		&lt;Value name="parameterName">deviceProperty&lt;/Value&gt;
+
+		&lt;Node name="column">
+			&lt;Value name="sqlName">DEVICE_PROPERTY_ID&lt;/Value&gt;
+			&lt;Value name="name">DevicePropertyId&lt;/Value&gt;
+			&lt;Value name="parameterName">devicePropertyId&lt;/Value&gt;
+			&lt;Value name="type">int&lt;/Value&gt;
+			&lt;Value name="valueMaxSize">&lt;/Value&gt;
+			&lt;Value name="isNullable">false&lt;/Value&gt;
+			&lt;Value name="isPrimaryKey">true&lt;/Value&gt;
+			&lt;Value name="isKeyGenerated">true&lt;/Value&gt;
+
+			<!--	StartCustomCode:DeviceProperty_DevicePropertyId_Misc	-->
+			<!--	EndCustomCode:DeviceProperty_DevicePropertyId_Misc	-->
 		&lt;/Node&gt;
-		&lt;Node name="foreignKey"&gt;
+		&lt;Node name="column">
+			&lt;Value name="sqlName">DEVICE_ID&lt;/Value&gt;
+			&lt;Value name="name">DeviceId&lt;/Value&gt;
+			&lt;Value name="parameterName">deviceId&lt;/Value&gt;
+			&lt;Value name="type">int&lt;/Value&gt;
+			&lt;Value name="valueMaxSize">&lt;/Value&gt;
+			&lt;Value name="isNullable">false&lt;/Value&gt;
+			&lt;Value name="isPrimaryKey">false&lt;/Value&gt;
+			&lt;Node name="foreignKey">
+				&lt;Value name="parentTableName">DEVICE&lt;/Value&gt;
+				&lt;Value name="parentColumnName">DEVICE_ID&lt;/Value&gt;
+			&lt;/Node&gt;
+		&lt;/Node&gt;
+		&lt;Node name="column"&gt;
 			...
 		&lt;/Node&gt;
 		...
 	&lt;/Node&gt;
-	&lt;Node name="table"&gt;
-		&lt;Node name="column"&gt;
-			...
-		&lt;/Node&gt;
-		...
+&lt;/Node&gt;</b></code></pre>
 
-		&lt;Node name="foreignKey"&gt;
-			...
-		&lt;/Node&gt;
-		...
-	&lt;/Node&gt;
-&lt;/Node&gt;</code></pre>
+<p>Heres an example "top" template that might be passed to the generator on startup (a simplified version of one
+from the Examples folders):</p>
 
-	<p>This may not be a perfect example since you might not normally represent the foreign keys
-	separately from the columns, but this worked for the way the templates shown in the Examples
-	were set up.  And it serves my purposes here.  Anyway, on to an example "root" template that
-	might be passed to the generator on startup (a slightly tweaked version of one from the Examples
-	folders):</p>
-
-	<pre><code>
+<pre><code><b>
 %%HEADER%% openingDelimiter=&lt;% closingDelimiter=%&gt;
 
 &lt;%forEach node=table%&gt;
-	&lt;%file template=database_class.template                      filename="&lt;%tableName%&gt;.java"                       destDir="&lt;%root.global.outputPath%&gt;"%&gt;
-
-	&lt;%file template=marshalling/marshalling_interface.template   filename="&lt;%tableName%&gt;Marshalling.java"            destDir="&lt;%root.global.outputPath%&gt;/marshalling"%&gt;
-	&lt;%file template=marshalling/marshalling_gson.template        filename="Gson&lt;%tableName%&gt;Marshalling.java"        destDir="&lt;%root.global.outputPath%&gt;/marshalling/gson"%&gt;
-	&lt;%file template=marshalling/marshalling_dmapi.template       filename="DMAPIJson&lt;%tableName%&gt;Marshalling.java"   destDir="&lt;%root.global.outputPath%&gt;/marshalling/dmapijson"%&gt;
-
-	&lt;%file template=dao/dao_interface.template                   filename="&lt;%tableName%&gt;DAO.java"                    destDir="&lt;%root.global.outputPath%&gt;/dao"%&gt;
-	&lt;%file template=dao/dao_db.template                          filename="&lt;%tableName%&gt;DAO_DB.java"                 destDir="&lt;%root.global.outputPath%&gt;/dao/db"%&gt;
-	&lt;%file template=dao/dao_cache.template                       filename="&lt;%tableName%&gt;DAO_Cache.java"              destDir="&lt;%root.global.outputPath%&gt;/dao/cache"%&gt;
-
-	&lt;%file template=dao/dao_net_client.template                  filename="&lt;%tableName%&gt;DAO_NET.java"                destDir="&lt;%root.global.outputPath%&gt;/dao/net"%&gt;
-	&lt;%file template=dao/dao_net_server.template                  filename="&lt;%tableName%&gt;DAO_NET_Server.java"         destDir="&lt;%root.global.outputPath%&gt;/dao/net/server"%&gt;
+	&lt;%file template=database_class.template                      filename="&lt;%name%&gt;.java"                       destDir="&lt;%root.global.outputPath%&gt;"%&gt;
 &lt;%endFor%&gt;
 
-&lt;%file template=marshalling/marshalling_factory.template         filename="&lt;%root.global.databaseName%&gt;MarshallingFactory.java"  destDir="&lt;%root.global.outputPath%&gt;/marshalling"%&gt;
-&lt;%file template=dao/dao_factory_interface.template               filename="&lt;%root.global.databaseName%&gt;DAOFactory.java"          destDir="&lt;%root.global.outputPath%&gt;/dao/factory"%&gt;
-&lt;%file template=dao/dao_server_factory.template                  filename="&lt;%root.global.databaseName%&gt;ClientDAOFactory.java"    destDir="&lt;%root.global.outputPath%&gt;/dao/factory"%&gt;
-&lt;%file template=dao/dao_server_factory.template                  filename="&lt;%root.global.databaseName%&gt;ServerDAOFactory.java"    destDir="&lt;%root.global.outputPath%&gt;/dao/factory"%&gt;
-</code></pre>
+&lt;%file template=marshalling/marshalling_factory.template         filename="&lt;%root.global.databaseName%&gt;MarshallingFactory.java"  destDir="&lt;%root.global.outputPath%&gt;/marshalling"%&gt;</b></code>
 
-	<p>When the generator starts up with these two files, the "current" node pointer points to "root".
-	That means that when the template evaluation starts, and at any point outside a <code>forEach</code>
-	tag, the current pointer for this template is "root".  However, inside this template's <code>forEach</code>
-	the current node pointer will iterate over each root child node that has the name "table".  The
-	target child node name is specified as the "node" attribute value in the <code>forEach</code> tag.
-	In this example, that looks like:</p>
+</pre>
 
-	<p><code>&lt;%forEach node=table%&gt;</code></p>
+<p>When the generator starts up with these two files, the current node pointer points to <code><b>root</b></code>.
+That means that when the template evaluation starts, and at any point outside the <code><b>forEach</b></code>
+tag, the current pointer for this template is <code><b>root</b></code>.  However, inside this template's <code><b>forEach</b></code>
+the current node pointer will iterate over each root child node that has the name <code><b>table</b></code>.  The
+target child node name is specified as the <code><b>node</b></code> attribute value in the <code><b>forEach</b></code> tag.
+In this example, that looks like:</p>
 
-	<p>After <code>forEach</code> has iterated over all of the "table" child nodes that it can find,
-	it exits its block at the <code>endFor</code> tag and from there the current node is again "root".
-	That's why the <code>file</code> tags after the <code>forEach</code> tag use fully-qualified
-	value names like <code>root.global.outputPath</code> to access the "global" values.</p>
+<p><code><b>&lt;%forEach node=table%&gt;</b></code></p>
 
-	<p>However, all of the <code>file</code> tags inside the <code>forEach</code> tag start their
-	evaluation with a current pointer pointing to a "table" node, not "root".  So when you are looking
-	at any of those child template files, you have to always keep that in mind.</p>
+<p>After <code><b>forEach</b></code> has iterated over all of the <code><b>table</b></code> child nodes that it can find,
+it exits its block at the <code><b>endFor</b></code> tag and from there the current node is again <code><b>root</b></code>.</p>
 
-	<p>Inside those child templates, more <code>forEach</code> tags can be used to iterate over the
-	<code>column</code> and <code>foreignKey</code> child nodes.  Thus <code>forEach</code> tags are
-	nested either directly inside a template or indirectly in a template's <code>file</code> tags to
-	traverse the config value tree and generate the desired output.</p>
+<p>However, all of the <code>file</code> tags inside the <code><b>forEach</b></code> tag start their
+evaluation with a current pointer pointing to a <code><b>table</b></code> node, not <code><b>root</b></code>.  So when you are looking
+at any of those child template files, you have to always keep that in mind.  All of the config references
+in those inner template files start with a <code><b>table</b></code> node as their current node,
+not whatever outer current node is seen by the parent (which itself may be a child of some other parent node).  Looking at the
+examples in the <code><b>Examples/codegenerator</b></code> folders is the best way to understand this.</p>
 
-	<p>Multiple examples can be found in the Examples/codegenerator folders</p>
+<h3>Attribute descriptions</h3>
+
+<p>NOTE!!!  Only one of either the <code><b>node</b></code> or <code><b>value</b></code> attributes can be used!  If both attributes are used at the same
+time, the generator will exit with an error.</p>
+
+<p><code><b>node</b></code>:  specifies that the <code><b>forEach</b></code> will iterate over child nodes of the given name.</p>
+
+<p><code><b>value</b></code>:  specifies that the <code><b>forEach</b></code> will iterate over child values of the given name.</p>
+
+<p><code><b>optionalCounterName</b></code>:  It lets you give the <code><b>forEach</b></code> tag's counter
+a user-controlled name so that it can be accessed by name inside nested <code><b>forEach</b></code> tags.  For example, if you have
+two nested <code><b>forEach</b></code> loops and you want a <code><b>first</b></code> tag in the inner loop to only run the first time that
+the outer <code><b>forEach</b></code> runs regardless of how many times the inner loop has stepped through, then you use the
+<code><b>optionalCounterName</b></code> on the outer <code><b>forEach</b></code> as the <code><b>optionalCounterName</b></code> on the
+inner <code><b>first</b></code> tag.</p>
+
+	<pre><code><b>&lt;%forEach node = table  optionalCounterName = "tableCounter" %&gt;
+	&lt;%forEach value = column %&gt;
+		&lt;%first optionalCounterName = tableCounter %&gt;
+		...
+		&lt;%else%&gt;
+		...
+		&lt;%endFirst%&gt;
+	&lt;%endFor%&gt;
+&lt;%endFor%&gt;</b></code></pre>
  */
 public class ForEach extends Tag_Base {
 
@@ -182,7 +193,7 @@ public class ForEach extends Tag_Base {
 	private	String		m_nodeName;										// This is the name of the config node that will be the temporary "root" node for each iteration of the loop.  For example, if this is == "class", then when we enter Evaluate(), we will run through the loop once for each "class" child node we find on the passed-in p_currentNode.
 	private CONFIG_TYPE	m_configType			= CONFIG_TYPE.NODE;		// This tells us whether we are evaluating NODEs or VALUEs.
 	private	int			m_parentReferenceCount	= 0;					// (i.e. "^nodename") This count tells us how many levels up to go to reference the following variable name on a parent node (or a parent-of-a-parent node "^^varname", etc.)
-	private	String		m_optionalCounterName	= null;					// Providing a name for the loop counter lets you access it inside inner loops to achieve finer control over <code>first</code> tags and other counter uses.
+	private	String		m_optionalCounterName	= null;					// Providing a name for the loop counter lets you access it inside inner loops to achieve finer control over first tags and other counter uses.
 
 
 	//*********************************

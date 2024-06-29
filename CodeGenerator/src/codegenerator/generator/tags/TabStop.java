@@ -28,30 +28,37 @@ import coreutil.logging.*;
 
 
 /**
-	<p>Enables better alignment of code elements.</p>
+<p>Gives you the ability to control alignment of text output.</p>
 
-	<p>Example use of this tag:</p>
+<h3>Usage example</h3>
 
-	<pre>	<code>&lt;%tabStop stopType = "stop" offset = "40" %&gt;</code></pre>
+<pre>	<code><b>&lt;%tabStop stopType = "stop" offset = "40" %&gt;</b></code></pre>
 
-	<pre>	<code>&lt;%tabStop stopType = "marker" offset = "20" %&gt;</code></pre>
+<pre>	<code><b>&lt;%tabStop stopType = "marker" offset = "20" %&gt;</b></code></pre>
 
-	<pre>	<code>&lt;%tabStop stopType = "marker" %&gt;</code></pre>
+<pre>	<code><b>&lt;%tabStop stopType = "marker" %&gt;</b></code></pre>
 
-	<p>A <code><B>stopType</B></code> of "stop" requires the <code><B>offset</B></code> attribute be set because
-	this type will use the offset as a hard stop from the beginning of the line.</p>
+<h3>Attribute descriptions</h3>
 
-	<p>A <code><B>stopType</B></code> of "marker" requires that a <code><B>tabMarker</B></code> tag be set somewhere
-	before this tag and whatever the offset of the beginning of that marker's tag is becomes the
-	base offset for this <code><B>tabStop</B></code>.  The <code><B>offset</B></code> attribute can optionally be
-	used to add an extra offset to the arbitrary marker value to create multiple columns of alignment.</p>
+<p><code><b>stopType</b></code>: [values: <code><b>stop</b></code>|<code><b>marker</b></code>, no default: a value must be set]</p>
 
-	<p>!!!NOTE!!!  If the text already written to the current line passes where the tab stop is calculated to be,
-	then this code will not add ANY whitespace at all!  Because of that, I highly recommend that you always precede
-	the use of this tag with a tab or space so that if the current line of generated text has already passed the
-	desired tab stop, then there will be at least one white space between the last text and whatever is after this tag.
-	If you don't, then you will risk running two pieces of text together with no white space between them and thereby causing
-	the generation of invalid code.</p>
+<p>A <code><b>stopType</b></code> of "stop" requires the <code><b>offset</b></code> attribute be set because
+this type will use the offset as a hard stop from the beginning of the line.</p>
+
+<p>A <code><b>stopType</b></code> of "marker" requires that a <code><b>tabMarker</b></code> tag be set somewhere
+before this tag and whatever the offset of the beginning of that marker's tag is becomes the
+base offset for this <code><b>tabStop</b></code>.  The <code><b>offset</b></code> attribute can optionally be
+used to add an extra offset to the arbitrary marker value to create multiple columns of alignment.</p>
+
+<p><code><b>offset</b></code>: an integer value defining either the offset from the beginning of the line (required for <code><b>stopType = "stop"</b></code>)
+or the offset to be added the last <code><b>tabMarker</b></code> position (optional for <code><b>stopType = "marker"</b></code>).</p>
+
+<p><code><b>!!!NOTE!!!</b></code>  If the text already written to the current line passes where the tab stop is calculated to be,
+then this code will not add ANY whitespace at all!  Because of that, I highly recommend that you always precede
+the use of this tag with a tab or space so that if the current line of generated text has already passed the
+desired tab stop, then there will be at least one white space between the last text and whatever is after this tag.
+If you don't, then you will risk running two pieces of text together with no white space between them and thereby causing
+the generation of invalid code.</p>
  */
 public class TabStop extends Tag_Base {
 

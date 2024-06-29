@@ -30,21 +30,26 @@ import coreutil.logging.*;
 
 
 /**
-	Takes any config value and outputs it with the first character re-cast in lowercase.  This was
-	created so that I could define a camel case class name config value with the first letter capitalized
-	and re-use it for a variable name with a lowercase first letter.
+<p>Takes a value from either config or another tag and outputs it with the first character re-cast in lowercase.
+This was created so that I could define a camel case class name config value with the first letter capitalized
+and re-use it for a variable name with a lowercase first letter.</p>
 
-	<p>Example use of this tag:</p>
+<h3>Usage example</h3>
 
-	<pre><code>&lt;%firstLetterToLowerCase value = &lt;%className%&gt; %&gt;</code></pre>
+<pre><code><b>&lt;%firstLetterToLowerCase value = &lt;%className%&gt; %&gt;</b></code></pre>
 
-	<p>So a class name like <code>FooBar</code> could also be used to generate a local variable called
-	<code>t_fooBar</code>.</p>
+<p>So a class name like <code>FooBar</code> could also be used to generate a local variable called
+<code>t_fooBar</code>.</p>
 
-	<pre><code>&lt;%firstLetterToLowerCase value = &lt;%camelCase value = &lt;%className%&gt; %&gt; %&gt;</code></pre>
+<p>Or you can take the output of another tag such as {@link CamelCase} as the input to this one and thereby convert
+a config value like "FOO_BAR" into "fooBar" like this:
 
-	<p>Or you can take the output of another tag such as {@link CamelCase} as the input to this one and thereby convert
-	a config value like "FOO_BAR" into "fooBar".
+<pre><code><b>&lt;%firstLetterToLowerCase value = &lt;%camelCase value = &lt;%className%&gt; %&gt; %&gt;</b></code></pre>
+
+<h3>Attribute descriptions</h3>
+
+<p><code><b>value</b></code>:  specifies what value will be altered to get the output.  This can be a config value or the output of another
+tag that generates a string.</p>
 */
 public class FirstLetterToLowerCase extends Tag_Base {
 

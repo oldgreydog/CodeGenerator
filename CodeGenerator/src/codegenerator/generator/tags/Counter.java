@@ -28,27 +28,27 @@ import codegenerator.generator.utils.*;
 
 
 /**
-	<p>This lets you use a counter value in the text output.  By default, the value comes from the {@link ForEach ForEach} tag that
-	immediately encloses this tag.  Or if you use the optional <code>optionalCounterName</code> attribute, you can name a different enclosing
-	<code>foreach</code> tag or a <code>counterVariable</code> tag to get the value from.</p>
+<p>Provides access to a counter value for output in the text.  By default, the value comes from the {@link ForEach} tag that
+immediately encloses this tag.  Or if you use the optional <code><b>optionalCounterName</b></code> attribute, you can name a different enclosing
+<code><b>foreach</b></code> tag or a <code><b>counterVariable</b></code> tag to get the value from.</p>
 
-	<h3>Examples</h3>
+<h3>Usage example</h3>
 
-	<p>We'll use the following template code for the examples:</p>
+<p>We'll use the following template code for the examples:</p>
 
 
-	<p><pre><code>&lt;%foreach node = table  optionalCounterName = tableCounter %&gt;
+<p><pre><code><b>&lt;%foreach node = table  optionalCounterName = tableCounter %&gt;
 	&lt;%foreach node = column %&gt;
 
 		&lt;%text%&gt;	Table &lt;%counter  optionalCounterName = tableCounter %&gt;		Column &lt;%counter%&gt;
 &lt;%endtext%&gt;
 
 	&lt;%endfor%&gt;
-&lt;%endfor%&gt;</code></pre></p>
+&lt;%endfor%&gt;</b></code></pre></p>
 
-	<p>This would give you an output that looks like this for however many tables/columns you have in the config.</p>
+<p>This would give you an output that looks like this for however many tables/columns you have in the config.</p>
 
-	<pre><code>
+<pre><code>
 	Table 1		Column 1
 	Table 1		Column 2
 	Table 1		Column 3
@@ -58,7 +58,10 @@ import codegenerator.generator.utils.*;
 	Table 2		Column 3
 	...</code></pre>
 
-	<p><B>However</B>, if you had ten tables and one of them was named USER, then you would only get <B>nine</B> table counts output!</p>
+<h3>Attribute descriptions</h3>
+
+<p><code><b>optionalCounterName</b></code>:  Optionally specify a named enclosing {@link ForEach} or {@link CounterVariable} to use a counter value other than the closest
+enclosing {@link ForEach}.</p>
 */
 public class Counter extends Tag_Base {
 

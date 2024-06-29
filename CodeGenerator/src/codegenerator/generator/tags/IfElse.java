@@ -32,94 +32,96 @@ import codegenerator.generator.utils.*;
 
 
 /**
-	Provides <code>if-elseIf-else</code> conditional evaluation.
+<p>Provides <code><b>if-elseIf-else</b></code> conditional evaluation.</p>
 
-	<p>Here is an example of the complete <code>if-elseIf-else</code> tag structure:</p>
+<h3>Usage example</h3>
 
-	<pre>	<code>&lt;%if [one top-level boolean attribute] %&gt;
+<p>Here is an example of the complete <code><b>if-elseIf-else</b></code> tag structure:</p>
+
+<pre>	<code><b>&lt;%if [one top-level boolean attribute] %&gt;
 		...
 	&lt;%elseIf [one top-level boolean attribute] %&gt;
 		...
 	&lt;%else%&gt;
 		...
-	&lt;%endIf%&gt;</code></pre>
+	&lt;%endIf%&gt;</b></code></pre>
 
-	<p>The <code><B>if</B></code> and <code><B>elseIf</B></code> tags only accept one test condition attribute.</p>
+<p>The <code><b>if</b></code> and <code><b>elseIf</b></code> tags only accept one test condition attribute.</p>
 
-	<p>As with typical programming language if-statements, you can use any combination of these tags that you need.
-	The test condition for the <code><B>if</B></code> and <code><B>elseIf</B></code> tags is more generically
-	defined like this:</p>
+<p>As with typical programming language if-statements, you can use any combination of these tags that you need.
+The test condition for the <code><b>if</b></code> and <code><b>elseIf</b></code> tags is more generically
+defined like this:</p>
 
-	<p><code>&lt;%if [something that evaluates to a string] = [something that evaluates to a string] %&gt;</code></p>
+<p><code><b>&lt;%if [something that evaluates to a string] = [something that evaluates to a string] %&gt;</b></code></p>
 
-	<p>Where other tags have specific named attributes, whether required or optional, the <code><B>if</B></code> tag
-	and all of the other boolean tags treat their attributes as string comparisons.  So the attribute "name" and "value"
-	can be anything that evaluates to a string, be it a tag or a string constant.</p>
+<p>Where other tags have specific named attributes, whether required or optional, the <code><b>if</b></code> tag
+and all of the other boolean tags treat their attributes as string comparisons.  So the attribute "name" and "value"
+can be anything that evaluates to a string, be it a tag or a string constant.</p>
 
-	<p>The condition uses "=" instead of "==" because this relies on the default tag parsing done by
-	{@link TagParser} which uses {@link TagAttributeParser}	to parse the attributes.  Using the tag
-	attribute format meant no extra effort to make this work whereas going to "==" would have required
-	custom parse code.  And using the standard attribute format means that the code can, with no special code,
-	correctly recurse down through whatever complex, nested boolean conditions you construct.</p>
+<p>The condition uses "=" instead of "==" because this relies on the default tag parsing done by
+{@link TagParser} which uses {@link TagAttributeParser}	to parse the attributes.  Using the tag
+attribute format meant no extra effort to make this work whereas going to "==" would have required
+custom parse code.  And using the standard attribute format means that the code can, with no special code,
+correctly recurse down through whatever complex, nested boolean conditions you construct.</p>
 
-	<p>All of that means that you have a pretty wide range of options when it comes to boolean operations you can use.
-	First, there are three traditional boolean tags:</p>
+<p>All of that means that you have a pretty wide range of options when it comes to boolean operations you can use.
+First, there are three traditional boolean tags:</p>
 
-	<pre>	<code><B>and</B>
-	<B>or</B>
-	<B>not</B></code></pre>
+<pre>	<code><b>and
+	or
+	not</b></code></pre>
 
-	<p>There is also a special-case attribute that you can use to test for the existence of a config node or value:</p>
+<p>There is also a special-case attribute that you can use to test for the existence of a config node or value:</p>
 
-	<pre>	<code><B>exists</B></code></pre>
+<pre>	<code><b>exists</b></code></pre>
 
-	<p>You can use many of the simple tags (tags that only have one tag and don't, therefore, contain
-	child tags).  Since the tag must evaluate to a string, that includes tags like <code><B>camelcase</B></code>
-	but excludes tags like <code><B>++counter</B></code></p>
+<p>You can use many of the simple tags (tags that only have one tag and don't, therefore, contain
+child tags).  Since the tag must evaluate to a string, that includes tags like <code><b>camelcase</b></code>
+but excludes tags like <code><b>++counter</b></code></p>
 
-	<pre>	<code><B>camelcase</B>
-	<B>counter</B>
-	<B>firstLetterToLowerCase</B>
-	<B>typeConvert</B>
-	<B>&lt;%DataType%&gt;</B> (config values)</code></pre>
+<pre>	<code><b>camelcase</b>
+	<b>counter</b>
+	<b>firstLetterToLowerCase</b>
+	<b>typeConvert</b>
+	<b>&lt;%DataType%&gt;</b> (config values)</code></pre>
 
-	<p>And finally, you can use string constants.</p>
+<p>And finally, you can use string constants.</p>
 
 
-	<h4>Boolean tags</h4>
+<h4>Boolean tags</h4>
 
-	<p>The boolean tags let you construct complex boolean tests with any number and combination of child boolean tags and/or
-	simple tags and string constants.</p>
+<p>The boolean tags let you construct complex boolean tests with any number and combination of child boolean tags and/or
+simple tags and string constants.</p>
 
-	<p>The <code><B>and</B></code> and <code><B>or</B></code> take any number attributes that can be a combination of child
-	boolean tags and/or simple tags and string constants:</p>
+<p>The <code><b>and</b></code> and <code><b>or</b></code> take any number attributes that can be a combination of child
+boolean tags and/or simple tags and string constants:</p>
 
-	<pre>	<code>&lt;%[and/or]  [[something that evaluates to a string] = [something that evaluates to a string]] <B>[...]</B> %&gt;</code></pre>
+<pre>	<code><b>&lt;%[and/or]  [[something that evaluates to a string] = [something that evaluates to a string]] <b>[...]</b> %&gt;</b></code></pre>
 
-	<p>The <code><B>not</B></code> only allows one attribute which can be a child boolean tag or a simple tag and string constant:</p>
+<p>The <code><b>not</b></code> only allows one attribute which can be a child boolean tag or a simple tag and string constant:</p>
 
-	<pre>	<code>&lt;%not  [[something that evaluates to a string] = [something that evaluates to a string]] %&gt;</code></pre>
+<pre>	<code><b>&lt;%not  [[something that evaluates to a string] = [something that evaluates to a string]] %&gt;</b></code></pre>
 
-	<p><code><B>and</B></code>, <code><B>or</B></code> and <code><B>not</B></code> evaluate to only one of the string values
-	<code><B>true</B></code> or <code><B>false</B></code>, so they must be used as an attribute in the following form:</p>
+<p><code><b>and</b></code>, <code><b>or</b></code> and <code><b>not</b></code> evaluate to only one of the string values
+<code><b>true</b></code> or <code><b>false</b></code>, so they must be used as an attribute in the following form:</p>
 
-	<pre>	<code>&lt;%[and/or]  [something that evaluates to a string] = [something that evaluates to a string] <B>[...]</B> %&gt; = [true/false]</code>
-	<code>&lt;%not  [[something that evaluates to a string] = [something that evaluates to a string]] %&gt; = [true/false]</code></pre>
+<pre>	<code><b>&lt;%[and/or]  [something that evaluates to a string] = [something that evaluates to a string] [...] %&gt; = [true/false]
+	&lt;%not  [[something that evaluates to a string] = [something that evaluates to a string]] %&gt; = [true/false]</b></code></pre>
 
-	<p>It's critical to notice that there is an <code><B>= [true/false]</B></code> after the <code><B>and/or/not</B></code> tags.
-	That is required to make the <code><B>and/or/not</B></code> a complete attribute, but it also lets you
-	do a crude !and or !or by setting it <code><B>= false</B></code> instead of <code><B>= true</B></code>.  But for a <code><B>not</B></code>
-	tag, you are as likely to use <code><B>= false</B></code> as much as you use <code><B>= true</B></code> because you are testing
-	for the "not" of the enclosed boolean.  Given that the <code><B>not</B></code> only takes one attribute, you will likely only
-	really need it when the one attribute is a simple-tag-and-string-const test.</p>
+<p>It's critical to notice that there is an <code><b>= [true/false]</b></code> after the <code><b>and/or/not</b></code> tags.
+That is required to make the <code><b>and/or/not</b></code> a complete attribute, but it also lets you
+do a crude !and or !or by setting it <code><b>= false</b></code> instead of <code><b>= true</b></code>.  But for a <code><b>not</b></code>
+tag, you are as likely to use <code><b>= false</b></code> as much as you use <code><b>= true</b></code> because you are testing
+for the "not" of the enclosed boolean.  Given that the <code><b>not</b></code> only takes one attribute, you will likely only
+really need it when the one attribute is a simple-tag-and-string-const test.</p>
 
-	<p>The <code><B>and/or</B></code> tags do in-order short-circuit evaluation such that <code><B>and</B></code> returns <code><B>false</B></code>
-	on the first test condition attribute that is <code><B>false</B></code> and <code><B>or</B></code> returns <code><B>true</B></code> on the
-	first test condition attribute that is <code><B>true</B></code>.</p>
+<p>The <code><b>and/or</b></code> tags do in-order short-circuit evaluation such that <code><b>and</b></code> returns <code><b>false</b></code>
+on the first test condition attribute that is <code><b>false</b></code> and <code><b>or</b></code> returns <code><b>true</b></code> on the
+first test condition attribute that is <code><b>true</b></code>.</p>
 
-	<p>Here is a simple example of an <code><B>if</B></code>/<code><B>elseIf</B></code> tag using and <code><B>or</B></code> and <code><B>and</B></code> tags:</p>
+<p>Here is a simple example of an <code><b>if</b></code>/<code><b>elseIf</b></code> tag using and <code><b>or</b></code> and <code><b>and</b></code> tags:</p>
 
-	<pre>	<code>&lt;%if  &lt;%or  &lt;%typeConvert targetLanguage = "java" sourceType = &lt;%type%&gt; groupID = "object" %&gt; = String
+<pre>	<code><b>&lt;%if  &lt;%or  &lt;%typeConvert targetLanguage = "java" sourceType = &lt;%type%&gt; groupID = "object" %&gt; = String
 				&lt;%typeConvert targetLanguage = "java" sourceType = &lt;%type%&gt; groupID = "object" %&gt; = Calendar
 				&lt;%typeConvert targetLanguage = "java" sourceType = &lt;%type%&gt; groupID = "object" %&gt; = byte[]	%&gt; = "true" %&gt;
 		...
@@ -128,42 +130,44 @@ import codegenerator.generator.utils.*;
 		...
 	&lt;%else%&gt;
 		...
-	&lt;%endIf%&gt;</code></pre>
+	&lt;%endIf%&gt;</b></code></pre>
 
-	<p><code><B>and</B></code>, <code><B>or</B></code> and <code><B>not</B></code> can be nested inside each other so that you can make
-	fairly complicated conditionals if you need them.</p>
+<p><code><b>and</b></code>, <code><b>or</b></code> and <code><b>not</b></code> can be nested inside each other so that you can make
+fairly complicated conditionals if you need them.</p>
 
 
-	<h4>Exists</h4>
+<h4>Exists</h4>
 
-	<p>The <code><B>exists</B></code> attribute tests for the existence of a child
-	node type.  For example:</p>
+<p>The <code><b>exists</b></code> attribute tests for the existence of a child
+node type.  For example:</p>
 
-	<pre>	<code>&lt;%if  exists = parameter %&gt;
+<pre>	<code><b>&lt;%if  exists = parameter %&gt;
 		...[Use the parameter node]...
 	&lt;%elseIf  exists = returnType %&gt;
 		...[Use the returnType value]...
 	&lt;%else%&gt;
 		...
-	&lt;%endIf%&gt;</code></pre>
+	&lt;%endIf%&gt;</b></code></pre>
 
 
-	<h4>Simple Tags</h4>
+<h4>Simple Tags</h4>
 
-	<p>In the end, the boolean tags are only for grouping comparisons of simple tags and string constants like this example:</p>
+<p>In the end, the boolean tags are mostly going to be used for grouping comparisons of simple tags and string constants like this example:</p>
 
-	<p><code>&lt;%if  &lt;%typeConvert targetLanguage = "java" sourceType = &lt;%type%&gt; class = "object" %&gt; = Integer %&gt;</code></p>
+<p><code><b>&lt;%if  &lt;%typeConvert targetLanguage = "java" sourceType = &lt;%type%&gt; class = "object" %&gt; = Integer %&gt;</b></code></p>
 
-	<p>Where &lt;%type%&gt; is a {@link ConfigValue} tag that inputs a config value of the name "type" into the {@link TypeConvert} tag
-	which, in this case, maps it to an equivalent Java object type as the tag output.  Therefore the example is checking to see if the type is <code><B>Integer</B></code>.</p>
+<p>Where &lt;%type%&gt; is a {@link ConfigValue} tag that inputs a config value of the name "type" into the {@link TypeConvert} tag
+which, in this case, maps it to an equivalent Java object type as the tag output.  Therefore the example is checking to see if the type is <code><b>Integer</b></code>.</p>
 
 
 
 */
 public class IfElse extends Tag_Base {
 
-	/*
-	 * This is a simple helper class.
+	/**
+	 This is the helper class that the <code><b>if</b></code> tag uses to hold the boolean operands for each <code><b>if</b></code>,
+	 <code><b>elseif</b></code> or <code><b>else</b></code> that may be present and the matching tag content for each so that the
+	 contents of the first to be found to evaluate to TRUE can be evaluated to the output.
 	 */
 	static protected class IfCondition extends Tag_Base {
 
@@ -511,7 +515,7 @@ public class IfElse extends Tag_Base {
 			while (t_tagIterator.hasNext()) {
 				t_nextCondition = (IfCondition)t_tagIterator.next();
 
-				// We only evaluate the first condition that returns TRUE.
+				// We only evaluate the first condition that returns TRUE since we are evaluating the if-elseif-else blocks in the order they were added and we can only evaluate one.
 				t_result = t_nextCondition.Test(p_evaluationContext);
 				if (t_result == null)
 					return false;

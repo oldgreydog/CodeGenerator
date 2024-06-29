@@ -30,36 +30,40 @@ import codegenerator.generator.utils.*;
 
 
 /**
-	<p>The outer context tags are such special-case tags that you may never find a use for them.  I have a certain type of
-	relationship between database tables that I define in my config value files and I wanted to use that relationship info
-	to generate deletions in my cached DAO's.  But to do that, I needed to be able to jump a <code><B>forEach</B></code> tag to a node ABOVE the current
-	one the template was pointing at in the config values tree.  And I needed to be able to reference values from both contexts in the
-	template code inside the <code><B>forEach</B></code> that was pointed outside the parent <code><B>forEach</B></code>.  That's where the outer context tags come in.</p>
+<p>Captures the current config context node at that point in the template so that nested tags can access it no matter how their context is changed.</p>
 
-	<p>There are two tags.  The first is <code><B>outerContext</B></code>.  This one is used to basically set a virtual maker in the loops to grab the
-	node context wherever it is placed in the template.</p>
+<p>The outer context tags are such special-case tags that you may never find a use for them.  I have a foreign-key
+relationship between database tables that I define in my config value files and I wanted to use that relationship info
+to generate deletions in my cached DAO's.  But to do that, I needed to be able to jump a <code><b>forEach</b></code> tag to a node ABOVE the current
+one the template was pointing at in the config values tree.  And I needed to be able to reference values from both contexts in the
+template code inside the <code><b>forEach</b></code> that was pointed outside the parent <code><b>forEach</b></code>.  That's where the outer context tags come in.</p>
 
-	<pre><code>&lt;%outerContext contextname = parentTable  optionalJumpToParentContext = "^^" %&gt;</code></pre>
+<p>There are two tags.  The first is <code><b>outerContext</b></code>.  This one is used to basically set a virtual maker in the loops to grab the
+node context wherever it is placed in the template.</p>
 
-	<p>The second tag is <code><B>outerContextEval</B></code>.  This one is used inside the inner <code><B>forEach</B></code> loop(s) so that you can access a value that's
-	in the outer node context held by the <code><B>outerContext</B></code> tag.</p>
+<pre><code><b>&lt;%outerContext contextName = parentTable  optionalJumpToParentContext = "^^" %&gt;</b></code></pre>
 
-	<pre><code>&lt;%outerContextEval contextname = parentTable targetvalue = sqlName %&gt;</code></pre>
+<p>The second tag is {@link OuterContextEval}.  This one is used inside the inner <code><b>forEach</b></code> loop(s) so that you can access a value that's
+in the outer node context held by the <code><b>outerContext</b></code> tag.</p>
 
-	<p>There are two ways to take advantage of this new functionality.  The <code><B>forEach</B></code> tag's <code><B>node</B></code> attribute can now take the parent reference characters ("^")
-	in its value.  That will jump the context up one parent node per carret and then execute the <code><B>forEach</B></code> loop from that context.  The other way is to use
-	the optionalJumpToParentContext attribute on the <code><B>outerContext</B></code> tag to jump the context up.  That option is discussed below.</p>
+<pre><code><b>&lt;%outerContextEval contextName = parentTable targetValue = sqlName %&gt;</b></code></pre>
 
-	<p>Here's an abbreviated example of the usage of these tags (the 1., 2., 3. and 4. are for reference in the explanation below):</p>
+<p>There are two ways to take advantage of this functionality.  The <code><b>forEach</b></code> tag's <code><b>node</b></code> attribute can now take the parent reference characters ("^")
+in its value.  That will jump the context up one parent node per carret and then execute the <code><b>forEach</b></code> loop from that context.  The other way is to use
+the optionalJumpToParentContext attribute on the <code><b>outerContext</b></code> tag to jump the context up.  That option is discussed below.</p>
 
-	<code>&lt;!-- At this point in the template, we are inside a <code>&lt;%forEach node = "table" %&gt;</code> tag, so the current
-		node context is pointing to a particular "table" node --&gt;</code>
+<h3>Usage example</h3>
 
-<br><br><pre><code>		&lt;%outerContext contextname = parentTable %&gt;
+<p>Here's an abbreviated example of the usage of these tags (the 1., 2., 3. and 4. are for reference in the explanation below):</p>
+
+<p>At this point in the template, we are inside a <code><b>&lt;%forEach node = "table" %&gt;</b></code> tag, so the current
+	node context is pointing to a particular "table" node.</p>
+
+<pre>		<code><b>&lt;%outerContext contextName = parentTable %&gt;
 	1.		&lt;%forEach node = ^table  optionalCounterName = innerTable %&gt;
 	2.			&lt;%forEach node = column %&gt;
 					&lt;%forEach node = foreignKey %&gt;
-	3.					&lt;%if &lt;%and &lt;%parentTableName%&gt; = &lt;%outerContextEval contextname = parentTable targetvalue = sqlName %&gt;
+	3.					&lt;%if &lt;%and &lt;%parentTableName%&gt; = &lt;%outerContextEval contextName = parentTable targetValue = sqlName %&gt;
 									&lt;%not &lt;%parentTableName%&gt; = &lt;%^^sqlName%&gt; %&gt; == true %&gt; == true %&gt;
 							&lt;%text%&gt;...&lt;%endtext%&gt;
 						&lt;%endIf%&gt;
@@ -67,7 +71,7 @@ import codegenerator.generator.utils.*;
 				&lt;%endFor%&gt;
 
 				&lt;%forEach node = tableRelationship %&gt;
-					&lt;%if &lt;%and &lt;%parentTableName%&gt; = &lt;%outerContextEval contextname = parentTable targetvalue = sqlName %&gt;
+					&lt;%if &lt;%and &lt;%parentTableName%&gt; = &lt;%outerContextEval contextName = parentTable targetValue = sqlName %&gt;
 								&lt;%not &lt;%parentTableName%&gt; = &lt;%^sqlName%&gt; %&gt; == true %&gt; == true %&gt;
 						&lt;%first  optionalCounterName = innerTable %&gt;
 							&lt;%text%&gt;...&lt;%endtext%&gt;
@@ -76,28 +80,28 @@ import codegenerator.generator.utils.*;
 					&lt;%endIf%&gt;
 				&lt;%endFor%&gt;
 			&lt;%endFor%&gt;
-	4.	&lt;%endcontext%&gt;</code></pre>
+	4.	&lt;%endcontext%&gt;</b></code></pre>
 
-	<p>Once the  <code><B>outerContext</B></code>  tag is hit, you can then jump the node pointer to a different context with a <code><B>forEach</B></code> as shown at 1.
-	Since that forEach's node attribute value is "^table", that tells the <code><B>forEach</B></code> to jump up ("^") one parent (which is the "root"
-	node in my database config values file) and start iterating over the "table" nodes under that parent.</p>
+<p>Once the  <code><b>outerContext</b></code>  tag is hit, you can then jump the node pointer to a different context with a <code><b>forEach</b></code> as shown at 1.
+Since that forEach's node attribute value is "^table", that tells the <code><b>forEach</b></code> to jump up ("^") one parent (which is the "root"
+node in my database config values file) and start iterating over the "table" nodes under that parent.</p>
 
-	<p>!!It is super important to note that now that we are inside the new parent context at 1., all node and value references inside
-	that <code><B>forEach</B></code> (i.e. 2.) are in that context, so you don't have to use the "^" with them!!</p>
+<p>!!It is super important to note that now that we are inside the new parent context at 1., all node and value references inside
+that <code><b>forEach</b></code> (i.e. 2.) are in that context, so you don't have to use the "^" with them!!</p>
 
-	<p>3. shows how to use <code><B>outerContextEval</B></code> to access a value in the outer context from inside the new inner context.</p>
+<p>3. shows how to use <code><b>outerContextEval</b></code> to access a value in the outer context from inside the new inner context.</p>
 
-	<p>At 4., the <code><B>endcontext</B></code> end tag closes the designated outer context and that context no longer exists from there on.</p>
+<p>At 4., the <code><b>endcontext</b></code> end tag closes the designated outer context and that context no longer exists from there on.</p>
 
-	<br><p>Now let's go back to the <code><B>optionalJumpToParentContext</B></code> attribute on the <code><B>outerContext</B></code> tag.  The driver
-	for adding this attribute was that I had one or more files that I only wanted to generate once based on a flag value used on my
-	API config.  To do that, I needed to be able to jump the parent context up some number of levels without being forced to use a
-	<code><B>forEach</B></code> loop.  An inner <code><B>forEach</B></code> would make it impossible to generate the file since the file template needs
-	to do the <code><B>forEach</B></code> internally to generate its content but you would be in the wrong context to do that.</p>
+<br><p>Now let's go back to the <code><b>optionalJumpToParentContext</b></code> attribute on the <code><b>outerContext</b></code> tag.  The driver
+for adding this attribute was that I had one or more files that I only wanted to generate once based on a flag value used on my
+API config.  To do that, I needed to be able to jump the parent context up some number of levels without being forced to use a
+<code><b>forEach</b></code> loop.  An inner <code><b>forEach</b></code> would make it impossible to generate the file since the file template needs
+to do the <code><b>forEach</b></code> internally to generate its content but you would be in the wrong context to do that.</p>
 
-	<p>Here's an example of this usage:</p>
+<p>Here's an example of this usage:</p>
 
-<pre><code>	&lt;%forEach node=manager%&gt;
+<pre>	<code><b>&lt;%forEach node=manager%&gt;
 		&lt;%file template=manager.template						filename="&lt;%className%&gt;Manager.java"				destDir="&lt;%root.global.outputPath%&gt;/&lt;%firstLetterToLowerCase value = &lt;%className%&gt; %&gt;" %&gt;
 
 		&lt;%forEach node=api%&gt;
@@ -109,13 +113,13 @@ import codegenerator.generator.utils.*;
 			&lt;%file template=manager_interface.template		filename = "&lt;%className%&gt;Manager_Interface.java"		destDir = "&lt;%root.global.outputPath%&gt;/&lt;%firstLetterToLowerCase value = &lt;%className%&gt; %&gt;" %&gt;
 
 			&lt;%first%&gt;
-				&lt;%outerContext contextname = root  optionalJumpToParentContext = "^" %&gt;
+				&lt;%outerContext contextName = root  optionalJumpToParentContext = "^" %&gt;
 					&lt;%file template=manager_factory.template				filename = "&lt;%root.global.serviceGroupName%&gt;ManagerFactory.java"		destDir = "&lt;%root.global.outputPath%&gt;/factory" %&gt;
 					&lt;%file template=manager_factory_config.template		filename = "&lt;%root.global.serviceGroupName%&gt;ManagerFactoryConfig.xml"	destDir = "&lt;%root.global.outputPath%&gt;/factory" %&gt;
 				&lt;%endcontext%&gt;
 			&lt;%endFirst%&gt;
 		&lt;%endIf%&gt;
-	&lt;%endFor%&gt;</code></pre>
+	&lt;%endFor%&gt;</b></code></pre>
  */
 public class OuterContext extends Tag_Base {
 

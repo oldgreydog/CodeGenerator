@@ -29,7 +29,7 @@ import coreutil.logging.*;
 
 
 /**
- * This is the object passed in the evaluation context that is used by <code><B>text</B></code> tags to write out to the current file or text buffer.
+ * This is the object passed in the evaluation context that is used by <code><b>text</b></code> tags to write out to the current file or text buffer.
  */
 public class Cursor {
 

@@ -30,19 +30,29 @@ import coreutil.logging.*;
 
 
 /**
-Takes any value from the config that has underscores or dashes such as "aa_Bb_cC", "AA_bB_Cc", "aa-Bb-cC" or "AA-bB-Cc" and
-outputs it in camel case "AaBbCc".  The input value can be any mix of upper and lower case.
+<p>This tag takes a value from the config that has internal delimiters such as "aa_Bb_cC", "AA_bB_Cc", "aa-Bb-cC" or "AA-bB-Cc" and
+outputs it in camel case "AaBbCc" or like this "Aa Bb Cc" if you specify an optional output separator like a space.  The input
+value can be any mix of upper and lower case.</p>
 
-For example, if you name a database table CONTACT_METHOD in the config, then you can use this tag to convert it to camel case to create a
-class name such as "ContactMethod".  You can also use this tag's output as the input for the {@link FirstLetterToLowerCase}
-tag and use it to create variable names such as "t_contactMethod" for instances of the same class.
+<p>For example, if you name a database table CONTACT_METHOD in the config, then you can use this tag to convert it to camel case to create a
+class name such as "ContactMethod".  You can also use this tag's output as the input for another tag such as {@link FirstLetterToLowerCase}
+tag and use it to create variable names such as "t_contactMethod" for instances of the same class.</p>
 
-<p>Example use of this tag:</p>
+<h3>Usage example</h3>
 
-<pre><code>&lt;%camelCase value = &lt;%className%&gt; optionalSeparator = " " %&gt;</code></pre>
+<pre><code><b>&lt;%camelCase value = &lt;%className%&gt; optionalInputSeparator = "-" optionalOutputSeparator = " " %&gt;</b></code></pre>
 
-<p>Note that the attribute [optionalSeparator] is just that: optional.  It lets you create camel-cased output with a space or other
-characters between the words so that, for example, it can be used for a UI label such as "Contact Method".</p>
+<h3>Attribute descriptions</h3>
+
+<p>Note that any attribute with starting with the word [optional] is just that: optional.</p>
+
+<p><code><b>optionalInputSeparator</b></code>: [default: "_" (under-score)]  It lets you create camel-cased output with a space or other
+characters between the words so that, for example, it can be used for a UI label such as "Contact Method".  Also note that if the
+separator value contains whitespace(s), you must enclose it in double quotes.</p>
+
+<p><code><b>optionalOutputSeparator</b></code>:  This lets you create camel-cased output with a space or other characters between the words so that, for example,
+it can be used for a UI label such as "Contact Method".  Also note that if the separator value contains whitespace(s), you must enclose it
+in double quotes.</p>
 
 */
 public class CamelCase extends Tag_Base {

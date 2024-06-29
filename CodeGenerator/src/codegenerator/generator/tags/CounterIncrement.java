@@ -28,11 +28,21 @@ import codegenerator.generator.utils.*;
 
 
 /**
-	This tag gives you more control over how counter values change.  It is required if you are using free-standing <code>counterVariable</code>
-	tag because that tag doesn't auto-increment the way that a <code>forEach</code> counter does.
+<p>Increments the target counter.  You can use this with either {@link ForEach} or {@link CounterVariable} counters.
+It is required if you are using free-standing <code><b>counterVariable</b></code> tag because that tag doesn't
+auto-increment the way that a <code><b>forEach</b></code> internal counter does.</p>
 
-	<p>Look at the documentation for {@link CounterVariable} for an example of usage.  You can use this with <code>counterVariable</code>
-	counters and named <code>forEach</code> counters.</p>
+<p>Look at the documentation for {@link CounterVariable} for a full example of usage.  You can use this with <code><b>counterVariable</b></code>
+counters and named <code><b>forEach</b></code> counters.</p>
+
+<h3>Usage example</h3>
+
+<p><pre>	<code><b>&lt;%++counter optionalCounterName = tableCounter %&gt;</b></code></pre></p>
+
+<h3>Attribute descriptions</h3>
+
+<p><code><b>optionalCounterName</b></code>:  Optionally specify a named enclosing {@link ForEach} or {@link CounterVariable} to increment a counter value other than the closest
+enclosing {@link ForEach}.</p>
 */
 public class CounterIncrement extends Tag_Base {
 

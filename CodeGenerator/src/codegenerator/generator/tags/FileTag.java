@@ -35,41 +35,55 @@ import codegenerator.generator.utils.*;
 
 
 /**
-	This tag has two modes for getting its "contents":  use the attribute [template] or, if that attribute is not present, parse the contents following the
-	<code>file</code> tag until it finds the matching <code>endfile</code> tag.  As I worked on the ArchTemplates project, it became obvious that there were
-	cases where I needed to generate only one or two files but I didn't want to have to create a "top" template files to contain the <code>file</code> tags
-	just for, say, one file.  Making the [template] attribute optional and adding the optional <code>endfile</code> tag let me make those single-file generation
-	scenarios without needing the superfluous "top" file to "wrap" it.
+<p>Reads in the specified template and evaluates it to the file output in the destination directory.</p>
 
-	If you use the [template] attribute, this parses the indicated template file and, on evaluation, writes the output from that template to a file with the
-	given [filename] to the [destDir] directory.
+<p>This tag has two modes for getting its "contents":  use the attribute [template] or, if that attribute is not present, parse the contents following the
+<code>file</code> tag until it finds the matching <code>endfile</code> tag.  As I worked on the ArchTemplates project, it became obvious that there were
+cases where I needed to generate only one or two files but I didn't want to have to create a "top" template file to contain the <code>file</code> tags
+just for one file.  Making the <code><b>template</b></code> attribute optional and adding the optional <code>endfile</code> tag let me make those single-file generation
+scenarios without needing the superfluous "top" file to "wrap" it.</p>
 
-	<p>Here's an example of this version of the tag:</p>
+<p>If you use the <code><b>template</b></code> attribute, this parses the indicated template file and, on evaluation, writes the output from that template to a file with the
+given <code><b>filename</b></code> to the <code><b>destDir</b></code> directory.</p>
 
-	<p><pre><code>&lt;%file template = templates/cached_templates/marshalling/marshalling_interface.template filename = "&lt;%className%&gt;Marshalling.java" destDir = "&lt;%root.global.outputPath%&gt;/marshalling" optionalUseTempFile = "false" optionalContextName = "parentTable"  optionalMakeFileExecutable = true %&gt;</code></pre></p>
+<h3>Usage example</h3>
 
-	<p>As the example shows, you can use tags that evaluate to strings in the values of the attributes.  The quotes are optional unless you have spaces in the file and/or path name.</p>
+<p><pre><code><b>&lt;%file template = templates/cached_templates/marshalling/marshalling_interface.template filename = "&lt;%className%&gt;Marshalling.java" destDir = "&lt;%root.global.outputPath%&gt;/marshalling" optionalUseTempFile = "false" optionalContextName = "parentTable"  optionalMakeFileExecutable = true %&gt;</b></code></pre></p>
 
-	<p>optionalUseTempFile is an optional boolean attribute to indicate that generation should go to a temp file so that if an error occurs, then the original file and any custom code it contains will not be lost.  If the generation completes successfully, then the original file will be deleted and the temp file renamed with the specified filename.</p>
+<p>As the example shows, you can use tags that evaluate to strings in the values of the attributes.  The quotes are optional unless you have spaces in the file and/or path name.</p>
 
-	<p>optionalMakeFileExecutable is an optional boolean attribute to indicate that once the file has been copied then it needs to be marked as executable.  This will probably be used mostly with batch files, for example.</p>
+<p>This is the same example but without the <code><b>template</b></code> attribute and with single content tag and the matching <code>endfile</code> at the end of the contents</p>
 
-	<p>This is the same example but without the [template] attribute and with single content tag and the matching <code>endfile</code> at the end of the contents</p>
+<p><pre><code><b>&lt;%file filename = "&lt;%className%&gt;Marshalling.java" destDir = "&lt;%root.global.outputPath%&gt;/marshalling" optionalUseTempFile = "false" optionalContextName = "parentTable"%&gt;
+	&lt;%text%&gt;
+		Hello, world!
+	&lt;%endtext%&gt;
+&lt;%endfile%&gt;</b></code></pre></p>
 
-	<p><pre><code>&lt;%file filename = "&lt;%className%&gt;Marshalling.java" destDir = "&lt;%root.global.outputPath%&gt;/marshalling" optionalUseTempFile = "false" optionalContextName = "parentTable"%&gt;
-		&lt;%text%&gt;
-			Hello, world!
-		&lt;%endtext%&gt;
-	&lt;%endfile%&gt;</code></pre></p>
+<h3>Attribute descriptions</h3>
 
-	<p>Note that it is now possible to nest this file tag inside another file template.  To that ends, the optional
-	attribute <code>optionalContextName</code> is used if you need to have the	nested file tag execute inside an outer context
-	instead of the local context it is defined in.  The value you give this attribute will be the <code>contextName</code>
-	you gave to the <code>outerContext</code> tag that encloses the nested instance of the <code>file</code> tag.</p>
+<p><code><b>template</b></code>:  the full file path of the template file that is to be read in as the template for the output of this file tag.</p>
 
-	<p>Refer to the files in the <code>Examples/codegenerator</code> folders to better understand its usage.</p>
+<p><code><b>filename</b></code>:  the name that will be given to the file created by this tag. If this tag is inside a <code><b>forEach</b></code> tag,
+then it should have at least one <code>config value</code> in it to make the file name unique.</p>
 
-	<p>NOTE: I changed the class name from FileBlock to FileTag instead of just File since file is a java class and it was simpler to just use a non-clashing name.</p>
+<p><code><b>destDir</b></code>:  the destination directory path where the file will be generated with the specified <code><b>filename</b></code>.</p>
+
+<p><code><b>optionalUseTempFile</b></code>: [values: <code><b>true</b></code>|<code><b>false</b></code>, default: true]  an optional boolean attribute to indicate that generation should
+go to a temp file so that if an error occurs, then the original file and any custom code it contains will not be lost.  If the generation
+completes successfully, then the original file will be deleted and the temp file renamed with the specified filename.</p>
+
+<p><code><b>optionalMakeFileExecutable</b></code>: [values: <code><b>true</b></code>|<code><b>false</b></code>, default: false]  an optional boolean attribute to indicate that once the
+file has been copied then it needs to be marked as executable.  This will probably be used mostly with batch files, for example.</p>
+
+<p><code><b>optionalContextName</b></code>: it is now possible to nest this file tag inside another file template.  To that ends, the optional
+attribute <code><b>optionalContextName</b></code> is used if you need to have the	nested file tag execute inside an outer context
+instead of the local context it is defined in.  The value you give this attribute will be the <code>contextName</code>
+you gave to the <code>outerContext</code> tag that encloses the nested instance of the <code>file</code> tag.</p>
+
+<p>Refer to the files in the <code><b>Examples/codegenerator</b></code> folders to better understand its usage.</p>
+
+<p>NOTE: I changed the class name from FileBlock to FileTag instead of just File since file is a java class and it was simpler to just use a non-clashing name.</p>
  */
 public class FileTag extends Tag_Base {
 
@@ -80,8 +94,8 @@ public class FileTag extends Tag_Base {
 	static private final String		ATTRIBUTE_FILENAME					= "filename";
 	static private final String		ATTRIBUTE_DEST_DIR					= "destDir";
 	static private final String		ATTRIBUTE_OPTIONAL_USE_TEMP_FILE	= "optionalUseTempFile";	// A boolean to indicate that generation should go to a temp file so that if an error occurs, then the original file and any custom code it contains will not be lost.
-	static private final String		ATTRIBUTE_OPTIONAL_CONTEXT_NAME		= "optionalContextName";
 	static private final String		ATTRIBUTE_OPTIONAL_MAKE_EXECUTABLE	= "optionalMakeFileExecutable";
+	static private final String		ATTRIBUTE_OPTIONAL_CONTEXT_NAME		= "optionalContextName";
 
 
 	// Static members

@@ -22,22 +22,23 @@ package codegenerator.generator.tags;
 
 
 
-import java.io.*;
-
 import codegenerator.generator.utils.*;
 import coreutil.logging.*;
 
 
 
 /**
-	Loads the type conversion config file into the DataTypeManager so that it is available for any typeConversion
-	tags in the template(s).  This will typically be used in the root template file.
+<p>Loads the type conversion config file into the DataTypeManager so that it is available for any typeConversion
+tags in the template(s).  This will typically be used in the root template file.</p>
 
-	<p>Example use of this tag:</p>
+<h3>Usage example</h3>
 
-	<pre><code>&lt;%typeConvertLoadFile file = "DataType_Conversion_Java_to_Java.xml" %&gt;</code></pre>
+<pre><code><b>&lt;%typeConvertLoadFile file = "DataType_Conversion_Java_to_Java.xml" %&gt;</b></code></pre>
 
- */
+ <h3>Attribute descriptions</h3>
+
+<p><code><b>file</b></code>:  the file path of the file to be loaded.</p>
+*/
 public class TypeConvertLoadFile extends Tag_Base {
 
 	static public final String		TAG_NAME			= "typeConvertLoadFile";
