@@ -1,5 +1,5 @@
 /*
-	Copyright 2020 Wes Kaylor
+	Copyright 2016 Wes Kaylor
 
 	This file is part of CodeGenerator.
 
@@ -104,13 +104,13 @@ public class Variable extends Tag_Base {
 
 		TagAttributeParser t_nodeAttribute = p_tagParser.GetNamedAttribute(ATTRIBUTE_NAME);
 		if (t_nodeAttribute == null) {
-			Logger.LogError("Variable.Init() did not find the [" + ATTRIBUTE_NAME + "] attribute that is required for variable tags at line number [" + m_lineNumber + "].");
+			Logger.LogError("Variable.Init() did not find the [" + ATTRIBUTE_NAME + "] attribute that is required for [" + TAG_NAME + "] tags at line number [" + m_lineNumber + "].");
 			return false;
 		}
 
 		m_variableName = t_nodeAttribute.GetAttributeValueAsString();
-		if (m_variableName == null) {
-			Logger.LogError("Variable.Init() did not get the value from attribute that is required for variable tags at line number [" + m_lineNumber + "].");
+		if ((m_variableName == null) || m_variableName.isBlank()) {
+			Logger.LogError("Variable.Init() did not get the value for the [" + ATTRIBUTE_NAME + "] attribute that is required for [" + TAG_NAME + "] tags at line number [" + m_lineNumber + "].");
 			return false;
 		}
 
@@ -118,13 +118,13 @@ public class Variable extends Tag_Base {
 
 		t_nodeAttribute = p_tagParser.GetNamedAttribute(ATTRIBUTE_EVAL_MODE);
 		if (t_nodeAttribute == null) {
-			Logger.LogError("Variable.Init() did not find the [" + ATTRIBUTE_EVAL_MODE + "] attribute that is required for variable tags at line number [" + m_lineNumber + "].");
+			Logger.LogError("Variable.Init() did not find the [" + ATTRIBUTE_EVAL_MODE + "] attribute that is required for [" + TAG_NAME + "] tags at line number [" + m_lineNumber + "].");
 			return false;
 		}
 
 		String t_evalMode = t_nodeAttribute.GetAttributeValueAsString();
-		if (t_evalMode == null) {
-			Logger.LogError("Variable.Init() did not get the value from attribute [" + ATTRIBUTE_EVAL_MODE + "] that is required for variable tags at line number [" + m_lineNumber + "].");
+		if ((t_evalMode == null) || t_evalMode.isBlank()) {
+			Logger.LogError("Variable.Init() did not get the value from attribute [" + ATTRIBUTE_EVAL_MODE + "] that is required for [" + TAG_NAME + "] tags at line number [" + m_lineNumber + "].");
 			return false;
 		}
 
@@ -140,8 +140,13 @@ public class Variable extends Tag_Base {
 
 		// The "contextname" attribute is optional, so it's fine if it doesn't exist.
 		t_nodeAttribute = p_tagParser.GetNamedAttribute(ATTRIBUTE_OPTIONAL_CONTEXT_NAME);
-		if (t_nodeAttribute != null)
+		if (t_nodeAttribute != null) {
 			m_contextName = t_nodeAttribute.GetAttributeValueAsString();
+			if ((m_contextName == null) || m_contextName.isBlank()) {
+				Logger.LogError("Variable.Init() did not get the value from attribute [" + ATTRIBUTE_OPTIONAL_CONTEXT_NAME + "] that is optional for [" + TAG_NAME + "] tags at line number [" + m_lineNumber + "].");
+				return false;
+			}
+		}
 
 
 		return true;
