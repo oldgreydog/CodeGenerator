@@ -104,6 +104,7 @@ public class CodeGenerator {
 			Logger.LogInfo("Config values parse (millisec): "	+ (t_endConfigValuesParse	- t_endTemplateParse));
 			Logger.LogInfo("Generation time (millisec):     "	+ (t_endGenerate			- t_startGenerate));
 			Logger.LogInfo("Generated file count:           "	+ FileTag.GetFileCount());
+			Logger.LogInfo("Copied file count:              "	+ CopyFile.GetFileCopyCount());
 
 			return true;
 		}

@@ -22,6 +22,7 @@ package codegenerator.generator.tags;
 
 import java.nio.file.*;
 import java.nio.file.attribute.*;
+import java.util.concurrent.locks.*;
 
 import codegenerator.generator.utils.*;
 import coreutil.logging.*;
@@ -47,11 +48,48 @@ could have been used with a template whose content was completely wrapped in a <
  */
 public class CopyFile extends Tag_Base {
 
+	// Static members
 	static public final String		TAG_NAME							= "copyfile";
 
 	static private final String		ATTRIBUTE_SOURCE_FILE_PATH			= "sourceFilePath";
 	static private final String		ATTRIBUTE_TARGET_DIRECTORY_PATH		= "targetDirectory";
 	static private final String		ATTRIBUTE_OPTIONAL_MAKE_EXECUTABLE	= "optionalMakeFileExecutable";
+
+
+	// This locks was only really necessary when I was trying to multi-thread the file tags.  Now that I've backed that out and gone back to single-threading for the time being, this isn't necessary but I'll leave it in anyway.
+	static private final ReentrantLock	s_countLock				= new ReentrantLock();
+	static private 		 int			s_fileCopyCount			= 0;	// Simple way to count the number of files generated.
+
+
+	//===========================================
+	static public void IncrementFileCopyCount() {
+		try {
+			s_countLock.lock();
+
+			++s_fileCopyCount;
+		}
+		finally {
+			s_countLock.unlock();
+		}
+	}
+
+
+	//===========================================
+	/**
+	 * This should only be called after all of the file threads have been completed, but we'll lock it just in case.
+	 *
+	 * @return
+	 */
+	static public int GetFileCopyCount() {
+		try {
+			s_countLock.lock();
+
+			return s_fileCopyCount;
+		}
+		finally {
+			s_countLock.unlock();
+		}
+	}
 
 
 	// Data members
@@ -199,6 +237,8 @@ public class CopyFile extends Tag_Base {
 			Logger.LogException("CopyFile.Evaluate() failed with error: ", t_error);
 			return false;
 		}
+
+		IncrementFileCopyCount();	// We'll count the number of files that are copies so that we get a better picture of how much was done.
 
 		return true;
 	}
