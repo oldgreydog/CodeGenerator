@@ -1,5 +1,5 @@
 /*
-Copyright 2020 Wes Kaylor
+Copyright 2016 Wes Kaylor
 
 This file is part of CodeGenerator.
 
@@ -29,7 +29,7 @@ import coreutil.logging.*;
 /**
 	This is a simple wrapper class that lets you easily run the code generator from the command line.
 
-	<p>Usage:</p> <pre><code>java -cp .:coreutil.jar:code_generator.jar CodeGenerator_Main &lt;configFilename&gt; &lt;templateFilename&gt; &lt;variablesFilename&gt;</b></code></pre>
+	<p>Usage:</p> <pre><code>java -cp .:coreutil.jar:code_generator.jar CodeGenerator_Main &lt;configFilename&gt; &lt;templateFilename&gt; &lt;variablesFilename&gt;</code></pre>
 */
 public class CodeGenerator_Main {
 

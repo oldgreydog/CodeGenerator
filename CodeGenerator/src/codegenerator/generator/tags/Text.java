@@ -1,5 +1,5 @@
 /*
-	Copyright 2020 Wes Kaylor
+	Copyright 2016 Wes Kaylor
 
 	This file is part of CodeGenerator.
 
@@ -336,10 +336,6 @@ public class Text extends Tag_Base {
 	//*********************************
 	/**
 	 * This will probably only ever be used where there are attribute values that contain variable tags that need to be evaluated.
-	 * @param p_currentNode
-	 * @param p_rootNode
-	 * @param p_iterationCount
-	 * @return
 	 */
 	public String EvaluateToString(EvaluationContext p_evaluationContext)
 	{

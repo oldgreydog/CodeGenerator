@@ -1,5 +1,5 @@
 /*
-Copyright 2020 Wes Kaylor
+Copyright 2016 Wes Kaylor
 
 This file is part of CodeGenerator.
 
@@ -49,7 +49,7 @@ public abstract class If_Boolean extends Tag_Base {
 	 *
 	 * <p>The <code><b>and</b></code> returns either "true" or "false" strings.  Since it is used as a tag attribute, it must have the form:</p>
 	 *
-	 *	<p><code><b>&lt;%and  [two or more boolean attributes] %&gt; = [true|false]</code></p>
+	 *	<p><code><b>&lt;%and  [two or more boolean attributes] %&gt; = [true|false]</b></code></p>
 	 *
 	 * <p>Refer to {@link IfElse} for more info on how to use the <code><b>and</b></code> tag in an <code><b>if</b></code> tag.</p>
 	 */
@@ -103,7 +103,7 @@ public abstract class If_Boolean extends Tag_Base {
 	 *
 	 * <p>The <code><b>or</b></code> returns either "true" or "false" strings.  Since it is used as a tag attribute, it must have the form:</p>
 	 *
-	 *	<p><code><b>&lt;%or  [two or more boolean attributes] %&gt; = [true|false]</code></p>
+	 *	<p><code><b>&lt;%or  [two or more boolean attributes] %&gt; = [true|false]</b></code></p>
 	 *
 	 * <p>Refer to {@link IfElse} for more info on how to use the <code><b>or</b></code> tag in an <code><b>if</b></code> tag.</p>
 	 */
@@ -157,7 +157,7 @@ public abstract class If_Boolean extends Tag_Base {
 	 *
 	 * <p>The <code><b>not</b></code> returns either "true" or "false" strings.  Since it is used as a tag attribute, it must have the form:</p>
 	 *
-	 *	<p><code><b>&lt;%or  [one boolean attribute] %&gt; = [true|false]</code></p>
+	 *	<p><code><b>&lt;%or  [one boolean attribute] %&gt; = [true|false]</b></code></p>
 	 *
 	 * <p>Refer to {@link IfElse} for more info on how to use the <code><b>not</b></code> tag in an <code><b>if</b></code> tag.</p>
 	 */
