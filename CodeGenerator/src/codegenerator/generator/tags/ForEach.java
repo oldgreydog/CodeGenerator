@@ -331,21 +331,42 @@ public class ForEach extends Tag_Base {
 
 			p_evaluationContext.PushLoopCounter(t_iterationCount);	// This PushLoopCounter() has to be bookended with a matching PopCurrentLoopCounter() below!
 
-			for (ConfigNode t_nextConfigNode: t_currentNode.GetChildNodeList()) {
-				// For each child config node of the name t_nodeName, we will re-evaluate all of our child tags.
-				if (t_nextConfigNode.GetName().compareToIgnoreCase(m_nodeName) == 0) {
-					t_iterationCount.IncrementCounter();	// Now that I've changed LoopCounter to default to 0 so that it works correctly with CounterVariable, then we need to increment it here at the start of the if() instead of the end of the if().
-					p_evaluationContext.PushNewCurrentNode(t_nextConfigNode);
+			if (m_configType == CONFIG_TYPE.NODE) {
+				for (ConfigNode t_nextConfigNode: t_currentNode.GetChildNodeList()) {
+					// For each child config node of the name t_nodeName, we will re-evaluate all of our child tags.
+					if (t_nextConfigNode.GetName().compareToIgnoreCase(m_nodeName) == 0) {
+						t_iterationCount.IncrementCounter();	// Now that I've changed LoopCounter to default to 0 so that it works correctly with CounterVariable, then we need to increment it here at the start of the if() instead of the end of the if().
+						p_evaluationContext.PushNewCurrentNode(t_nextConfigNode);
 
-					for (Tag_Base t_nextTag: m_tagList) {
-						if (!t_nextTag.Evaluate(p_evaluationContext)) {
-							p_evaluationContext.PopCurrentNode();
-							p_evaluationContext.PopCurrentLoopCounter();
-							return false;
+						for (Tag_Base t_nextTag: m_tagList) {
+							if (!t_nextTag.Evaluate(p_evaluationContext)) {
+								p_evaluationContext.PopCurrentNode();
+								p_evaluationContext.PopCurrentLoopCounter();
+								return false;
+							}
 						}
-					}
 
-					p_evaluationContext.PopCurrentNode();
+						p_evaluationContext.PopCurrentNode();
+					}
+				}
+			}
+			else if (m_configType == CONFIG_TYPE.VALUE) {
+				for (coreutil.config.ConfigValue t_nextConfigValue: t_currentNode.GetChildValueList()) {
+					// For each child config node of the name t_nodeName, we will re-evaluate all of our child tags.
+					if (t_nextConfigValue.GetName().compareToIgnoreCase(m_nodeName) == 0) {
+						t_iterationCount.IncrementCounter();	// Now that I've changed LoopCounter to default to 0 so that it works correctly with CounterVariable, then we need to increment it here at the start of the if() instead of the end of the if().
+						p_evaluationContext.SetCurrentValue(t_nextConfigValue);
+
+						for (Tag_Base t_nextTag: m_tagList) {
+							if (!t_nextTag.Evaluate(p_evaluationContext)) {
+								p_evaluationContext.ClearCurrentValue();
+								p_evaluationContext.PopCurrentLoopCounter();
+								return false;
+							}
+						}
+
+						p_evaluationContext.ClearCurrentValue();
+					}
 				}
 			}
 

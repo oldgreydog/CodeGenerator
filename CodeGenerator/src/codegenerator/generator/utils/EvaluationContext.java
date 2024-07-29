@@ -39,6 +39,7 @@ public class EvaluationContext {
 
 	// Data members
 	private final	LinkedList<ConfigNode>			m_currentNodeStack		= new LinkedList<>();
+	private			ConfigValue						m_currentValue			= null;					// When I separated how the ConfigManager code handled Nodes and Values, I had to add this current value member so that ForEach loops that were iterating over values instead of nodes would have a way to pass that into the EvaluationContext.
 	private			ConfigNode						m_rootNode;
 	private final	LinkedList<Cursor> 				m_writerStack			= new LinkedList<>();
 	private final	LinkedList<LoopCounter>			m_iterationCounterStack	= new LinkedList<>();	// There are rare cases (i.e. FirstElse) where we need to grab a named counter from the current counter and set it as the temporary counter for the evaluation of the tag.
@@ -69,6 +70,7 @@ public class EvaluationContext {
 //	public EvaluationContext(EvaluationContext	p_otherEvaluationContext)
 //	{
 //		m_currentNodeStack.addAll(p_otherEvaluationContext.m_currentNodeStack);
+//		m_currentValue		= p_otherEvaluationContext.m_currentValue;
 //
 //		m_rootNode			= p_otherEvaluationContext.m_rootNode;
 //		//m_writerStack		= ;		// This copy constructor should never be called in a context where we don't create a new Cursor, so we'll skip this member here.
@@ -119,6 +121,24 @@ public class EvaluationContext {
 		catch (Throwable t_error) {
 			Logger.LogException("EvaluationContext.PopCurrentNode() failed with error: ", t_error);
 		}
+	}
+
+
+	//*********************************
+	public void SetCurrentValue(ConfigValue p_newConfigValue) {
+		m_currentValue = p_newConfigValue;
+	}
+
+
+	//*********************************
+	public ConfigValue GetCurrentValue() {
+		return m_currentValue;
+	}
+
+
+	//*********************************
+	public void ClearCurrentValue() {
+		m_currentValue = null;
 	}
 
 

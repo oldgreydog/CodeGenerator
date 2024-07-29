@@ -276,8 +276,8 @@ public class IfElse extends Tag_Base {
 		{
 			// An else will not test for existence of a child node nor will it have a m_configVariable or m_compareValue so it is always TRUE;
 			if (!m_testExists &&
-				((m_attributeName == null) ||
-				 (m_attributeValue   == null)))
+				((m_attributeName	== null) ||
+				 (m_attributeValue	== null)))
 			{
 				return true;
 			}
@@ -306,7 +306,9 @@ public class IfElse extends Tag_Base {
 						t_righthandValue = t_righthandValue.replace("^", "");
 					}
 
-					if (t_nextConfigNode.GetNode(t_righthandValue) != null)
+					// Now that nodes and values are separate inside the ConfigManager, we have to check separately for values if there is no node by the target name.
+					if ((t_nextConfigNode.GetNode(t_righthandValue) != null) ||
+						(t_nextConfigNode.GetValue(t_righthandValue) != null))
 						return true;
 
 					return false;

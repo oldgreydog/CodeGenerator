@@ -86,89 +86,78 @@ public class DataTypeManager {
 			String										t_targetTypeParts[];
 
 			for (ConfigNode t_nextChildNode: t_dataTypeMaps.GetChildNodeList()) {
-				if (!t_nextChildNode.IsValue()) {
-					if (t_nextChildNode.GetName().equals(CONFIG_NODE_TYPE_MAP)) {
-						t_targetLanguageName = t_nextChildNode.GetNodeValue(CONFIG_VALUE_TARGET_LANGUAGE);
-						if ((t_targetLanguageName == null) || t_targetLanguageName.isEmpty()) {
-							Logger.LogError("DataTypeManager.LoadConfigFile() did not find the config value [" + CONFIG_VALUE_TARGET_LANGUAGE + "].");
-							return false;
-						}
-
-						t_targetLanguageMap = s_typeMap.get(t_targetLanguageName);
-						if (t_targetLanguageMap == null) {	// I changed this to allow more than one file to be loaded for the same language.  I don't know why I did it the other way the first time.
-							t_targetLanguageMap = new TreeMap<String, TreeMap<String, String>>();
-							s_typeMap.put(t_targetLanguageName, t_targetLanguageMap);
-						}
-
-						t_targetTypeFieldDelimiter = t_nextChildNode.GetNodeValue(CONFIG_VALUE_TARGET_TYPE_FIELD_DELIMITER);
-						if ((t_targetTypeFieldDelimiter == null) || t_targetTypeFieldDelimiter.isEmpty()) {
-							Logger.LogError("DataTypeManager.LoadConfigFile() did not find the config value [" + CONFIG_VALUE_TARGET_TYPE_FIELD_DELIMITER + "].");
-							return false;
-						}
-
-						for (ConfigNode t_nextSourceTypeNode: t_nextChildNode.GetChildNodeList()) {
-							if (t_nextSourceTypeNode.IsValue()) {
-								//Logger.LogWarning("DataTypeManager.LoadConfigFile() found an unknown config value [" + t_nextSourceTypeNode.GetName() + "].");
-								continue;
-							}
-							else if (!t_nextSourceTypeNode.GetName().equalsIgnoreCase(CONFIG_NODE_TYPE)) {
-								Logger.LogWarning("DataTypeManager.LoadConfigFile() found an unknown config node [" + t_nextSourceTypeNode.GetName() + "].");
-								continue;
-							}
-
-							t_sourceTypeMap	= null;
-							t_sourceType	= null;
-							for (ConfigNode t_nextTypeField: t_nextSourceTypeNode.GetChildNodeList()) {
-								if (t_nextTypeField.GetName().equalsIgnoreCase(CONFIG_VALUE_SOURCE_TYPE)) {
-									t_sourceType = ((ConfigValue)t_nextTypeField).GetValue();
-
-									if ((t_sourceType == null) || t_sourceType.isBlank()) {
-										Logger.LogError("DataTypeManager.LoadConfigFile() found a [" + CONFIG_VALUE_SOURCE_TYPE + "] entry that doesn't have a value.");
-										return false;
-									}
-
-									if (t_targetLanguageMap.containsKey(t_sourceType)) {
-										Logger.LogError("DataTypeManager.LoadConfigFile() - the type map for target language [" + t_targetLanguageMap + "] already contains source type [" + t_sourceType + "].");
-										return false;
-									}
-
-									if (t_sourceTypeMap == null)	// Doing this this way allows us to have more than one sourcetype value in types that can use the same target values (i.e. in SQL, decimal and numeric).
-										t_sourceTypeMap = new TreeMap<String, String>();
-
-									t_targetLanguageMap.put(t_sourceType, t_sourceTypeMap);
-									continue;
-								}
-								else if (t_nextTypeField.GetName().equalsIgnoreCase(CONFIG_VALUE_TARGET_TYPE)) {
-									if (t_sourceType == null) {
-										Logger.LogError("DataTypeManager.LoadConfigFile() found a [" + CONFIG_VALUE_TARGET_TYPE + "] entry before a [" + CONFIG_VALUE_SOURCE_TYPE + "] entry was found.");
-										return false;
-									}
-
-									t_targetTypeParts = ((ConfigValue)t_nextTypeField).GetValue().split(t_targetTypeFieldDelimiter);
-									if (t_targetTypeParts.length < 2) {
-										Logger.LogError("DataTypeManager.LoadConfigFile() - the target type value [" + t_targetTypeParts[0] + "] for source type [" + t_sourceType + "] must have at least two fields in it.");
-										return false;
-									}
-
-									if (t_sourceTypeMap.containsKey(t_targetTypeParts[0])) {
-										Logger.LogError("DataTypeManager.LoadConfigFile() - the source type [" + t_sourceType + "] already contains target type entry [" + t_targetTypeParts[0] + "].");
-										return false;
-									}
-
-
-									t_sourceTypeMap.put(t_targetTypeParts[0], t_targetTypeParts[1]);
-									continue;
-								}
-							}
-						}
-					}
-					else {
-						Logger.LogError("DataTypeManager.LoadConfigFile() does handle config values named [" + t_nextChildNode.GetName() + "].");
+				if (t_nextChildNode.GetName().equals(CONFIG_NODE_TYPE_MAP)) {
+					t_targetLanguageName = t_nextChildNode.GetValue(CONFIG_VALUE_TARGET_LANGUAGE).GetStringValue();
+					if ((t_targetLanguageName == null) || t_targetLanguageName.isBlank()) {
+						Logger.LogError("DataTypeManager.LoadConfigFile() did not find the config value [" + CONFIG_VALUE_TARGET_LANGUAGE + "].");
 						return false;
+					}
+
+					t_targetLanguageMap = s_typeMap.get(t_targetLanguageName);
+					if (t_targetLanguageMap == null) {	// I changed this to allow more than one file to be loaded for the same language.  I don't know why I did it the other way the first time.
+						t_targetLanguageMap = new TreeMap<String, TreeMap<String, String>>();
+						s_typeMap.put(t_targetLanguageName, t_targetLanguageMap);
+					}
+
+					t_targetTypeFieldDelimiter = t_nextChildNode.GetValue(CONFIG_VALUE_TARGET_TYPE_FIELD_DELIMITER).GetStringValue();
+					if ((t_targetTypeFieldDelimiter == null) || t_targetTypeFieldDelimiter.isBlank()) {
+						Logger.LogError("DataTypeManager.LoadConfigFile() did not find the config value [" + CONFIG_VALUE_TARGET_TYPE_FIELD_DELIMITER + "].");
+						return false;
+					}
+
+					for (ConfigNode t_nextTypeNode: t_nextChildNode.GetChildNodeList()) {
+						if (!t_nextTypeNode.GetName().equalsIgnoreCase(CONFIG_NODE_TYPE)) {
+							Logger.LogWarning("DataTypeManager.LoadConfigFile() found an unknown config node [" + t_nextTypeNode.GetName() + "].");
+							continue;
+						}
+
+						t_sourceTypeMap	= null;
+						t_sourceType	= null;
+						for (ConfigValue t_nextTypeField: t_nextTypeNode.GetChildValueList()) {
+							if (t_nextTypeField.GetName().equalsIgnoreCase(CONFIG_VALUE_SOURCE_TYPE)) {
+								t_sourceType = t_nextTypeField.GetStringValue();
+								if ((t_sourceType == null) || t_sourceType.isBlank()) {
+									Logger.LogError("DataTypeManager.LoadConfigFile() found a [" + CONFIG_VALUE_SOURCE_TYPE + "] entry that doesn't have a value.");
+									return false;
+								}
+
+								if (t_targetLanguageMap.containsKey(t_sourceType)) {
+									Logger.LogError("DataTypeManager.LoadConfigFile() - the type map for target language [" + t_targetLanguageMap + "] already contains source type [" + t_sourceType + "].");
+									return false;
+								}
+
+								if (t_sourceTypeMap == null)	// Doing this this way allows us to have more than one sourcetype value in types that can use the same target values (i.e. in SQL, decimal and numeric).
+									t_sourceTypeMap = new TreeMap<String, String>();
+
+								t_targetLanguageMap.put(t_sourceType, t_sourceTypeMap);
+								continue;
+							}
+							else if (t_nextTypeField.GetName().equalsIgnoreCase(CONFIG_VALUE_TARGET_TYPE)) {
+								if (t_sourceType == null) {
+									Logger.LogError("DataTypeManager.LoadConfigFile() found a [" + CONFIG_VALUE_TARGET_TYPE + "] entry before a [" + CONFIG_VALUE_SOURCE_TYPE + "] entry was found.");
+									return false;
+								}
+
+								t_targetTypeParts = t_nextTypeField.GetStringValue().split(t_targetTypeFieldDelimiter);
+								if (t_targetTypeParts.length < 2) {
+									Logger.LogError("DataTypeManager.LoadConfigFile() - the target type value [" + t_targetTypeParts[0] + "] for source type [" + t_sourceType + "] must have at least two fields in it.");
+									return false;
+								}
+
+								if (t_sourceTypeMap.containsKey(t_targetTypeParts[0])) {
+									Logger.LogError("DataTypeManager.LoadConfigFile() - the source type [" + t_sourceType + "] already contains target type entry [" + t_targetTypeParts[0] + "].");
+									return false;
+								}
+
+
+								t_sourceTypeMap.put(t_targetTypeParts[0], t_targetTypeParts[1]);
+								continue;
+							}
+						}
 					}
 				}
 				else {
-					Logger.LogError("DataTypeManager.LoadConfigFile() does handle config nodes named [" + t_nextChildNode.GetName() + "].");
+					Logger.LogError("DataTypeManager.LoadConfigFile() does not handle config values named [" + t_nextChildNode.GetName() + "].");
 					return false;
 				}
 			}

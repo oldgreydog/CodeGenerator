@@ -175,8 +175,24 @@ public class ConfigValue extends Tag_Base {
 
 	{
 		try {
+			// Now that ForEach can loop over values as well as nodes and I changed how ConfigManager handles nodes and values, we need to check to see if we are currently pointing to a value instead of a node and handle it here if it's a value.
+			String						t_valueName		= m_valueName;
+			String						t_value;
+			coreutil.config.ConfigValue	t_currentValue	= p_evaluationContext.GetCurrentValue();
+			if ((t_currentValue != null) && (t_valueName.equalsIgnoreCase(t_currentValue.GetName()))) {
+				t_value = t_currentValue.GetStringValue();
+				if (t_value == null) {
+					Logger.LogError("ConfigValue.Evaluate() is being used in a ForEach(VALUE) loop for the value named [" + m_valueName + "] defined in line [" + m_lineNumber + "] but received a NULL for its string value.");
+					return false;
+				}
+
+				p_evaluationContext.GetCursor().Write(t_value);
+				return true;
+			}
+
+
+			// If we aren't iterating over values, then we fall back to handling nodes.
 			ConfigNode	t_currentNode	= p_evaluationContext.GetCurrentNode();
-			String		t_valueName		= m_valueName;
 			if (t_valueName.startsWith("root.")) {
 				t_currentNode	= p_evaluationContext.GetRootNode();
 				t_valueName		= t_valueName.replace("root.", "");	// Remove the "root." reference so that the value name will work correctly below.
@@ -198,23 +214,15 @@ public class ConfigValue extends Tag_Base {
 				return false;
 			}
 
-			// While the error message gives some clue what's going on here, I think a little extra explanation is in order.  The only way that t_currentNode can ever point to a leaf "value" instead of a tree node is that we are inside of a ForEach(VALUE) loop so the only value we can find is the one that we're pointing at.
-			// The only thing that can alter that is parent reference(s) (i.e. ^valuename), but that is already handled above, so this if() still holds true.
-			String t_value;
-			if (t_currentNode.IsValue()) {
-				if (!t_valueName.equalsIgnoreCase(t_currentNode.GetName())) {
-					Logger.LogError("ConfigValue.Evaluate() is being used in a ForEach(VALUE) loop for the value named [" + m_valueName + "] defined in line [" + m_lineNumber + "] but found the value named [" + t_currentNode.GetName() + "] instead.");
-					return false;
-				}
-
-				t_value = ((coreutil.config.ConfigValue)t_currentNode).GetValue();
-			}
-			else {
-				t_value = t_currentNode.GetNodeValue(t_valueName);
+			coreutil.config.ConfigValue t_targetValue = t_currentNode.GetValue(t_valueName);
+			if (t_targetValue == null) {
+				Logger.LogError("ConfigValue.Evaluate() could not find the value named [" + m_valueName + "] defined in line [" + m_lineNumber + "].");
+				return false;
 			}
 
+			t_value = t_targetValue.GetStringValue();
 			if (t_value == null) {
-				Logger.LogError("ConfigValue.Evaluate() could not find the value named [" + m_valueName + "] defined in line [" + m_lineNumber + "] in either the current or root config nodes.");
+				Logger.LogError("ConfigValue.Evaluate() found the value named [" + m_valueName + "] defined in line [" + m_lineNumber + "] but recieved a NULL for its string value.");
 				return false;
 			}
 
