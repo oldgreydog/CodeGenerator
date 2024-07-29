@@ -220,6 +220,7 @@ public class EvaluationContext {
 
 	//*********************************
 	public void AddCounterVariable(String p_counterName, LoopCounter p_counter) {
+		p_counter.SetOptionalCounterName(p_counterName);	// We'll set this optional counter name just in case some code somewhere tries to us it.
 		m_counterVariableMap.put(p_counterName, p_counter);
 	}
 
@@ -239,13 +240,7 @@ public class EvaluationContext {
 				return t_nextCounter;
 		}
 
-		for (LoopCounter t_nextCounter: m_counterVariableMap.values()) {
-			t_optionalCounterName = t_nextCounter.GetOptionalCounterName();
-			if ((t_optionalCounterName != null) && t_optionalCounterName.equalsIgnoreCase(p_optionalCounterName))
-				return t_nextCounter;
-		}
-
-		return null;	// No counter with that name was found.
+		return m_counterVariableMap.get(p_optionalCounterName);		// If no foreach iteration counter with that name was found, then we'll check for a CounterVariable instance.  This returning NULL if none is found is the correct behavior for this function.
 	}
 
 
