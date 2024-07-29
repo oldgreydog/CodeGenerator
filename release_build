@@ -1,5 +1,5 @@
 
-# This script builds the project and then creates zip file that is the working release build put out on the GitHub page.
+# This script builds the project and then creates a zip file that is the working release build put out on the GitHub page.
 
 # Remove any existing jars so that we get a clean build.
 rm lib/code_generator.jar
@@ -8,6 +8,10 @@ rm lib/code_generator.jar
 # Build the code generator java code.
 source java_build clean
 source java_build
+if [ $? != 0 ] ; then
+	printf "Error: CodeGenerator build failed.\n"
+	exit $?
+fi
 
 
 
@@ -20,7 +24,6 @@ mkdir zip/code_generator/logs
 
 
 cp -prL Examples/*				zip/code_generator/examples
-cp -pL  ../CoreUtils/lib/*.*	zip/code_generator/lib
 cp -pL  lib/*.*					zip/code_generator/lib
 cp -pL  CodeGeneratorConfig.xml zip/code_generator
 cp -pL  generate				zip/code_generator
@@ -41,13 +44,9 @@ popd
 # Clean everything up.
 rm -fr zip
 
-rm lib/*.jar
+rm lib/code_generator.jar
 
 
-# Clean up CoreUtils
-pushd ../CoreUtils
-source java_build clean
-popd
 
 # Finally, clean this build dir.
 source java_build clean

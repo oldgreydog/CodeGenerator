@@ -8,5 +8,9 @@ rm lib/code_generator.jar
 # Build the code generator java code.
 source java_build clean
 source java_build
+if [ $? != 0 ] ; then
+	printf "Error: CodeGenerator build failed.\n"
+	exit $?
+fi
 
 

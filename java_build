@@ -5,4 +5,9 @@
 echo
 
 ant $@
+if [ $? != 0 ] ; then
+	printf "Error: CodeGenerator build failed.\n"
+	exit $?
+fi
+
 
