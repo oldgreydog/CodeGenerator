@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project default="javadoc">
+    <target name="javadoc">
+        <javadoc access="protected" additionalparam=" -overview &quot;/home/kaylor/dev/projects/sandboxes/CodeGenerator/CodeGenerator/src/overview.html&quot; -sourcetab 4" author="true" classpath="../../lib/coreutil.jar" destdir="../doc" nodeprecated="false" nodeprecatedlist="false" noindex="false" nonavbar="false" notree="false" source="17" sourcefiles="codegenerator/generator/tags/CamelCase.java" sourcepath="." splitindex="true" use="true" version="false">
+            <link href="file:/home/kaylor/dev/projects/sandboxes/CodeGenerator/CodeGenerator/doc/"/>
+        </javadoc>
+        <copy file="Figure_1.svg" todir="../doc"/>
+    </target>
+</project>

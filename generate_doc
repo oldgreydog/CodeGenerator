@@ -1,0 +1,33 @@
+
+
+pushd CodeGenerator/src
+ant -buildfile javadoc.xml
+popd
+
+
+# Fix the inexplicably un-set tabs in the javadoc html files.
+pushd CodeGenerator/doc
+sed -i 's/<li>Package<\/li>/<li><a href="allpackages-index.html">Package<\/a><\/li>/g' *.html
+sed -i 's/<li>Class<\/li>/<li><a href="allclasses-index.html">Class<\/a><\/li>/g' *.html
+
+pushd index-files
+sed -i 's/<li>Package<\/li>/<li><a href="..\/allpackages-index.html">Package<\/a><\/li>/g' *.html
+sed -i 's/<li>Class<\/li>/<li><a href="..\/allclasses-index.html">Class<\/a><\/li>/g' *.html
+
+popd
+popd
+
+
+# The doc folder should be completely populated at this point so we are now ready to create the zip file from it.
+
+# Delete the old zip file if it exists
+rm code_generator_doc.zip
+
+pushd CodeGenerator
+
+zip -r ../code_generator_doc.zip doc
+
+# Clean everything up.
+rm -fr doc
+
+popd
