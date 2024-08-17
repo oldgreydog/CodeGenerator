@@ -4,6 +4,46 @@ To run the code generator using the contents of the code_generator.zip file, ext
 
 
 
+
+1.7
+
+	This is a little larger update.  I've been working on a new project that I hope will show how to create a template library that lets you generate code with a wide
+	range of technologies to more quickly build systems and do so in any number of programming languages.  I will be releasing the alpha pass at that project along with
+	this release at oldgreydog/ArchTemplates.
+
+
+	Change summary:
+		a) Added a new CopyFile tag.
+		b) Changed ForEach tag to be able to iterate over config file values as well as nodes.
+		c) Added a utility class called OptionalEvalValue for general handling of tag attributes that themselves contain embedded tags.
+		d) Fixed counter handling.
+		e) Changed DataTypeManager file loading so that it allows loading of more than one file of the same language type.
+		f) Changed naming in the code for things that used "node" to using "tag".
+		g) Added a new optional input separator attribute to CamelCase so that it would be more broadly usable.  Also changed the name of the old attribute to otionalOutputSeparator.
+		h) Simplified the handling of named counters in the EvaluationContext.
+		i) Reworked a lot of the javadoc documentation, partly to try to make it more uniform.  Also added a script and ant build config file to enable building a zip file of the
+			javadoc output at the command line so that it doesn't have to be done inside Eclipse anymore.
+
+
+	Detailed change notes:
+		a) The new template library project needed the ability to just copy a file without the need for "loading" it and running it through the code generation phase.
+		b) That new project also had an instance where I needed to be able to iterate over the actual values under a particular node in the config file so that I could
+			output their value in a template.  I added a new attribute to the ForEach tag called "value" that can be used instead of "node" to indicate that you want it
+			to iterate over the values in the current node instead of the child nodes.
+		c) The new project also required that I use nested tags inside of tag attributes where I had never used them before.  In the past, I had handled that on a case-
+			by-case basis in the code, but I realized it was time to just create a new class that I could use everywhere I needed to have attributes that could themselves
+			contain tags that needed to be evaluated in the Evaluate() phase.
+		d) In a previous release, I thought I had changed counter handling to correctly handle cases where, for example, a FirstElse tag was contained in an If tag and
+			therefore didn't always see every counter change.  Unfortunately, I had only "fixed" the ForEach tag and not the FirstElse tag.  I think(?) I've got it
+			straightened up now.
+		e) I realized one day as I was looking at the code that I had set up the DataTypeManager to load and retain files based on the programming language ID but that I
+			hadn't correctly set it up to allow more than one file to be loaded per language ID.  That should be fixed now.
+		h) The way I originally evolved the named counter handling in the EvaluationContext wound up with two different mechanisms that were added at separate times and
+			I didn't look closely enough to realize that I didn't need both.  I dumped one mechanism and cleaned up the other to do what I needed and I think it came out
+			much better.
+
+
+
 1.6.2
 
 	A really minor update.
@@ -86,7 +126,7 @@ To run the code generator using the contents of the code_generator.zip file, ext
 			custom code block key names (i.e. "Includes").  I usually include some config value in the name (i.e. "<%className$>Includes") so that every
 			custom code block in the file has a key name that is unique to that file.  But I recently created a new template set where I didn't do that,
 			so each generated file has (mostly) the same custom code key names.  That was fine with the first set of files I generated with those templates
-			because since they were generated at the same time, there were no existing files that were read before them to polute the custom code manager's
+			because since they were generated at the same time, there were no existing files that were read before them to pollute the custom code manager's
 			cache.  But when I finally added a new definition to the config to generate new files, the generator was now going through existing files before
 			it got to creating the new ones.  That meant that the contents of the last existing file scanned were still in the custome code manager.  The
 			custom code manager has always cleared its cache as the first thing it does before scanning an EXISTING file, but when the next file being generated
