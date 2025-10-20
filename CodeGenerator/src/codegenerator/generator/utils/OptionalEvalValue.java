@@ -39,7 +39,7 @@ public class OptionalEvalValue {
 
 
 	//*********************************
-	public String GetValue() {
+	public String GetConstValue() {
 		if (m_constValue != null)
 			return m_constValue;
 
