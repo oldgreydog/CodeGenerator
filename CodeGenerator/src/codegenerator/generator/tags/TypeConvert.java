@@ -34,7 +34,7 @@ correct output required for a particular config value.</p>
 
 <h3>Usage example</h3>
 
-<pre><code><b>&lt;%typeConvert targetLanguage = "java" sourceType = &lt;%type%&gt; groupID = "builtin" %&gt;</b></code></pre>
+<pre><code><b>&lt;%typeConvert targetLanguage = "java" sourceType = &lt;%type%&gt; targetType = "builtin" %&gt;</b></code></pre>
 
 <p>A very common use case for this tag is where you have a template set that will output DDL for
 creating a database instance and the matching data access classes for one or more languages.  To do
@@ -61,8 +61,8 @@ file to discuss it's features.</p>
 				&lt;Value name="targetLanguage"&gt;java&lt;/Value&gt;
 				&lt;Value name="targetTypeFieldDelimiter"&gt;:&lt;/Value&gt;
 
-				&lt;!--	The targetType field is defined as:	&lt;groupID(i.e. builtin,object)&gt;:&lt;type&gt;	--&gt;
-				&lt;!--	The "groupID" subfield allows you to have as many mappings as you need for a particular type, including, for example, specific functions needed to read and write that value to the database.	--&gt;
+				&lt;!--	The targetType field is defined as:	&lt;targetType(i.e. builtin,object)&gt;:&lt;type&gt;	--&gt;
+				&lt;!--	The "targetType" subfield allows you to have as many mappings as you need for a particular type, including, for example, specific functions needed to read and write that value to the database.	--&gt;
 				&lt;Node name="type"&gt;
 					&lt;Value name="sourceType"	&gt;int&lt;/Value&gt;
 
@@ -127,7 +127,7 @@ to get a better grip on this usage is in the <code><b>Examples/codegenerator/dat
 directories.</p>
 
 <p>The <code><b>targetType</b></code> values are in two parts divided by a field delimiter.  The first field
-is the <code><b>groupID</b></code>.  The <code><b>groupID</b></code> is used in the <code><b>typeConvert</b></code> tag
+is the <code><b>targetType</b></code>.  The <code><b>targetType</b></code> is used in the <code><b>typeConvert</b></code> tag
 to define which of the <code><b>targetType</b></code> mappings to use at that location in the template.
 That means you aren't limited to data types for conversions.  You can include anything that you
 need for the templates that are type-dependent including function names like getters/setters that
@@ -136,7 +136,7 @@ are found in the example above.</p>
 
 <p>Now we have all of the elements needed for the tag.  Once again, here's the tag example from above:</p>
 
-<pre><code><b>&lt;%typeConvert targetLanguage = "java" sourceType = &lt;%type%&gt; groupID = "builtin" %&gt;</b></code></pre>
+<pre><code><b>&lt;%typeConvert targetLanguage = "java" sourceType = &lt;%type%&gt; targetType = "builtin" %&gt;</b></code></pre>
 
 <h3>Attribute descriptions</h3>
 
@@ -145,12 +145,12 @@ are found in the example above.</p>
 <p><code><b>sourceType</b></code>:  defines which value from the config values to use to find the desired
 <code><b>sourceType</b></code> from the map.</p>
 
-<p><code><b>groupID</b></code>:  defines which of the <code><b>targetType</b></code> mappings to
+<p><code><b>targetType</b></code>:  defines which of the <code><b>targetType</b></code> mappings to
 use for that <code><b>sourceType</b></code>.</p>
 
 <p>So given the file segment above, let's say that the <code><b>&lt;%type%&gt;</b></code> config value for the current
 config node returns <code><b>tinyint</b></code>.  Then this example would get the <code><b>targetType</b></code> with the
-groupID of <code><b>builtin</b></code> which is <code><b>int</b></code>.</p>
+targetType of <code><b>builtin</b></code> which is <code><b>int</b></code>.</p>
  */
 public class TypeConvert extends Tag_Base {
 
@@ -158,13 +158,13 @@ public class TypeConvert extends Tag_Base {
 
 	static private final String		ATTRIBUTE_TARGET_LANGUAGE		= "targetLanguage";
 	static private final String		ATTRIBUTE_SOURCE_TYPE			= "sourceType";
-	static private final String		ATTRIBUTE_GROUP_ID				= "groupID";
+	static private final String		ATTRIBUTE_TARGET_TYPE			= "targetType";
 
 
 	// Data members
 	private	String		m_targetLanguage	= null;
 	private	Tag_Base	m_sourceType		= null;
-	private	String		m_groupID			= null;
+	private	String		m_targetType		= null;
 
 
 	//*********************************
@@ -213,15 +213,15 @@ public class TypeConvert extends Tag_Base {
 
 
 			// The group ID should be a string constant.
-			t_nodeAttribute = p_tagParser.GetNamedAttribute(ATTRIBUTE_GROUP_ID);
+			t_nodeAttribute = p_tagParser.GetNamedAttribute(ATTRIBUTE_TARGET_TYPE);
 			if (t_nodeAttribute == null) {
-				Logger.LogError("TypeConvert.Init() did not find the [" + ATTRIBUTE_GROUP_ID + "] attribute that is required for TypeConvert tags at line number [" + p_tagParser.GetLineNumber() + "].");
+				Logger.LogError("TypeConvert.Init() did not find the [" + ATTRIBUTE_TARGET_TYPE + "] attribute that is required for TypeConvert tags at line number [" + p_tagParser.GetLineNumber() + "].");
 				return false;
 			}
 
-			m_groupID = t_nodeAttribute.GetAttributeValueAsString();
-			if (m_groupID == null) {
-				Logger.LogError("TypeConvert.Init() did not get the value from attribute [" + ATTRIBUTE_GROUP_ID + "] that is required for TypeConvert tags at line number [" + p_tagParser.GetLineNumber() + "].");
+			m_targetType = t_nodeAttribute.GetAttributeValueAsString();
+			if (m_targetType == null) {
+				Logger.LogError("TypeConvert.Init() did not get the value from attribute [" + ATTRIBUTE_TARGET_TYPE + "] that is required for TypeConvert tags at line number [" + p_tagParser.GetLineNumber() + "].");
 				return false;
 			}
 
@@ -265,13 +265,15 @@ public class TypeConvert extends Tag_Base {
 				return false;
 			}
 
-			String t_convertedType = DataTypeManager.GetTypeConversion(m_targetLanguage, t_sourceTypeValue, m_groupID);
+			String t_convertedType = DataTypeManager.GetTypeConversion(m_targetLanguage, t_sourceTypeValue, m_targetType);
 
 			if ((t_convertedType != null) && !t_convertedType.isEmpty())
 				p_evaluationContext.GetCursor().Write(t_convertedType);
-			else
-				p_evaluationContext.GetCursor().Write("");
-				//p_evaluationContext.GetCursor().Write("No type conversion was found for language [" + t_targetLanguageValue + "] sourceType [" + t_sourceValue + "] groupID [" + t_groupIDValue + "].");
+			else {
+				//return false;
+				// p_evaluationContext.GetCursor().Write("");
+				p_evaluationContext.GetCursor().Write("No type conversion was found for language [" + m_targetLanguage + "] sourceType [" + t_sourceTypeValue + "] targetType [" + m_targetType + "].");
+			}
 		}
 		catch (Throwable t_error) {
 			Logger.LogException("TypeConvert.Evaluate() failed with error: ", t_error);

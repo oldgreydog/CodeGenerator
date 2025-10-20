@@ -42,6 +42,114 @@ import coreutil.logging.*;
  */
 public class DataTypeManager {
 
+	//ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ
+	static private class SourceType {
+
+		// Data members:
+		private String						m_name;
+		private TreeMap<String, String>		m_targetTypes	= new TreeMap<>();
+
+		//*****************************
+		SourceType(String p_name) {
+			m_name = p_name;
+		}
+
+		//*****************************
+		String GetName() {
+			return m_name;
+		}
+
+		//*****************************
+		boolean SetTargetType(String p_targetType, String p_value) {
+			if ((p_targetType == null) || p_targetType.isBlank()) {
+				Logger.LogError("SourceType.SetTargetType() received an invalid target type [" + CONFIG_NODE_DATA_TYPE_MAPS + "].");
+				return false;
+			}
+
+			if (m_targetTypes.containsKey(p_targetType)) {
+				Logger.LogError("SourceType.SetTargetType(): source type [" + m_name + "] already contains the target type [" + p_targetType + "].");
+				return false;
+			}
+
+			m_targetTypes.put(p_targetType, p_value);
+			return true;
+		}
+
+		//*****************************
+		String GetTargetTypeValue(String p_targetType) {
+			if ((p_targetType == null) || p_targetType.isBlank()) {
+				Logger.LogError("SourceType.GetTargetTypeValue() received an invalid target type [" + CONFIG_NODE_DATA_TYPE_MAPS + "].");
+				return null;
+			}
+
+			return m_targetTypes.get(p_targetType);
+		}
+	}
+
+	//ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ
+	static private class Language {
+
+		// Data members:
+		private TreeMap<String, SourceType>	m_sourceTypeMap		= new TreeMap<>();	// Capturing the length of the longest value in each target type lets us customize tab offsets to get the correct output alignment every(?) time.
+		private TreeMap<String, Integer>	m_typeMaxSizeMap	= new TreeMap<>();	// Capturing the length of the longest value in each target type lets us customize tab offsets to get the correct output alignment every(?) time.
+
+		//*****************************
+		boolean AddSourceType(SourceType p_sourceType) {
+			if (p_sourceType == null) {
+				Logger.LogError("Language.AddSourceType() received a NULL source type.");
+				return false;
+			}
+
+			if (m_sourceTypeMap.containsKey(p_sourceType.GetName())) {
+				Logger.LogError("Language.AddSourceType() already has a source type with name [" + p_sourceType.GetName() + "].");
+				return false;
+			}
+
+			m_sourceTypeMap.put(p_sourceType.GetName(), p_sourceType);
+			return true;
+		}
+
+		//*****************************
+		SourceType GetSourceType(String p_sourceTypeName) {
+			if ((p_sourceTypeName == null) || p_sourceTypeName.isBlank()) {
+				Logger.LogError("Language.AddSourceType() received a NULL source type.");
+				return null;
+			}
+
+			return m_sourceTypeMap.get(p_sourceTypeName);
+		}
+
+		//*****************************
+		boolean SetTargetTypeMaxSize(String p_targetTypeName, int p_targetValueSize) {
+			if ((p_targetTypeName == null) || p_targetTypeName.isBlank()) {
+				Logger.LogError("Language.SetTargetTypeMaxSize() received an invalid target type [" + p_targetTypeName + "].");
+				return false;
+			}
+
+			if (m_typeMaxSizeMap.containsKey(p_targetTypeName)) {
+				int t_maxValueLength = m_typeMaxSizeMap.get(p_targetTypeName);
+				if (p_targetValueSize > t_maxValueLength)
+					m_typeMaxSizeMap.put(p_targetTypeName, p_targetValueSize);
+			}
+			else
+				m_typeMaxSizeMap.put(p_targetTypeName, p_targetValueSize);
+
+			return true;
+		}
+
+		//*****************************
+		int GetTargetTypeMaxSize(String p_targetTypeName) {
+			if ((p_targetTypeName == null) || p_targetTypeName.isBlank()) {
+				Logger.LogError("Language.GetTargetTypeValue() received an invalid target type [" + p_targetTypeName + "].");
+				return 0;
+			}
+
+			return m_typeMaxSizeMap.get(p_targetTypeName);
+		}
+	}
+
+
+
 	// Type map config names
 	static private final String		CONFIG_NODE_DATA_TYPE_MAPS					= "dataTypeMaps";
 	static private final String		CONFIG_NODE_TYPE_MAP						= "typeMap";
@@ -53,7 +161,7 @@ public class DataTypeManager {
 	static private final String		CONFIG_VALUE_TARGET_TYPE					= "targetType";
 
 	// Static members
-	static private TreeMap<String, TreeMap<String, TreeMap<String, String>>>		s_typeMap	= new TreeMap<String, TreeMap<String, TreeMap<String, String>>>();
+	static private TreeMap<String, Language>	s_languageMap	= new TreeMap<>();
 
 
 	//===========================================
@@ -78,12 +186,12 @@ public class DataTypeManager {
 				return false;
 			}
 
-			TreeMap<String, TreeMap<String, String>>	t_targetLanguageMap;
-			TreeMap<String, String>						t_sourceTypeMap				= null;
-			String										t_targetLanguageName;
-			String										t_targetTypeFieldDelimiter;
-			String										t_sourceType;
-			String										t_targetTypeParts[];
+			Language		t_targetLanguageMap			= null;
+			SourceType		t_sourceType				= null;
+			String			t_targetLanguageName;
+			String			t_targetTypeFieldDelimiter;
+			String			t_sourceTypeName;
+			String			t_targetTypeParts[];
 
 			for (ConfigNode t_nextChildNode: t_dataTypeMaps.GetChildNodeList()) {
 				if (t_nextChildNode.GetName().equals(CONFIG_NODE_TYPE_MAP)) {
@@ -93,10 +201,10 @@ public class DataTypeManager {
 						return false;
 					}
 
-					t_targetLanguageMap = s_typeMap.get(t_targetLanguageName);
+					t_targetLanguageMap = s_languageMap.get(t_targetLanguageName);
 					if (t_targetLanguageMap == null) {	// I changed this to allow more than one file to be loaded for the same language.  I don't know why I did it the other way the first time.
-						t_targetLanguageMap = new TreeMap<String, TreeMap<String, String>>();
-						s_typeMap.put(t_targetLanguageName, t_targetLanguageMap);
+						t_targetLanguageMap = new Language();
+						s_languageMap.put(t_targetLanguageName, t_targetLanguageMap);
 					}
 
 					t_targetTypeFieldDelimiter = t_nextChildNode.GetValue(CONFIG_VALUE_TARGET_TYPE_FIELD_DELIMITER).GetStringValue();
@@ -111,46 +219,48 @@ public class DataTypeManager {
 							continue;
 						}
 
-						t_sourceTypeMap	= null;
-						t_sourceType	= null;
+						t_sourceType		= null;
+						t_sourceTypeName	= null;
 						for (ConfigValue t_nextTypeField: t_nextTypeNode.GetChildValueList()) {
 							if (t_nextTypeField.GetName().equalsIgnoreCase(CONFIG_VALUE_SOURCE_TYPE)) {
-								t_sourceType = t_nextTypeField.GetStringValue();
-								if ((t_sourceType == null) || t_sourceType.isBlank()) {
+								t_sourceTypeName = t_nextTypeField.GetStringValue();
+								if ((t_sourceTypeName == null) || t_sourceTypeName.isBlank()) {
 									Logger.LogError("DataTypeManager.LoadConfigFile() found a [" + CONFIG_VALUE_SOURCE_TYPE + "] entry that doesn't have a value.");
 									return false;
 								}
 
-								if (t_targetLanguageMap.containsKey(t_sourceType)) {
-									Logger.LogError("DataTypeManager.LoadConfigFile() - the type map for target language [" + t_targetLanguageMap + "] already contains source type [" + t_sourceType + "].");
+								if (t_sourceType == null)
+									t_sourceType = new SourceType(t_sourceTypeName);
+
+								if (!t_targetLanguageMap.AddSourceType(t_sourceType)) {
+									Logger.LogError("DataTypeManager.LoadConfigFile() - the target language [" + t_targetLanguageName + "] failed to add source type [" + t_sourceTypeName + "].");
 									return false;
 								}
 
-								if (t_sourceTypeMap == null)	// Doing this this way allows us to have more than one sourcetype value in types that can use the same target values (i.e. in SQL, decimal and numeric).
-									t_sourceTypeMap = new TreeMap<String, String>();
-
-								t_targetLanguageMap.put(t_sourceType, t_sourceTypeMap);
 								continue;
 							}
 							else if (t_nextTypeField.GetName().equalsIgnoreCase(CONFIG_VALUE_TARGET_TYPE)) {
-								if (t_sourceType == null) {
+								if (t_sourceTypeName == null) {
 									Logger.LogError("DataTypeManager.LoadConfigFile() found a [" + CONFIG_VALUE_TARGET_TYPE + "] entry before a [" + CONFIG_VALUE_SOURCE_TYPE + "] entry was found.");
 									return false;
 								}
 
 								t_targetTypeParts = t_nextTypeField.GetStringValue().split(t_targetTypeFieldDelimiter);
 								if (t_targetTypeParts.length < 2) {
-									Logger.LogError("DataTypeManager.LoadConfigFile() - the target type value [" + t_targetTypeParts[0] + "] for source type [" + t_sourceType + "] must have at least two fields in it.");
+									Logger.LogError("DataTypeManager.LoadConfigFile() - the target type value [" + t_targetTypeParts[0] + "] for source type [" + t_sourceTypeName + "] must have at least two fields in it.");
 									return false;
 								}
 
-								if (t_sourceTypeMap.containsKey(t_targetTypeParts[0])) {
-									Logger.LogError("DataTypeManager.LoadConfigFile() - the source type [" + t_sourceType + "] already contains target type entry [" + t_targetTypeParts[0] + "].");
+								if (!t_sourceType.SetTargetType(t_targetTypeParts[0], t_targetTypeParts[1])) {
+									Logger.LogError("DataTypeManager.LoadConfigFile() - the source type [" + t_sourceTypeName + "] failed to add target type entry [" + t_targetTypeParts[0] + "].");
 									return false;
 								}
 
+								if (!t_targetLanguageMap.SetTargetTypeMaxSize(t_targetTypeParts[0], t_targetTypeParts[1].length())) {
+									Logger.LogError("DataTypeManager.LoadConfigFile() - the language [" + t_targetLanguageName + "] failed to set the max size for target type entry [" + t_targetTypeParts[0] + "].");
+									return false;
+								}
 
-								t_sourceTypeMap.put(t_targetTypeParts[0], t_targetTypeParts[1]);
 								continue;
 							}
 						}
@@ -174,19 +284,19 @@ public class DataTypeManager {
 	//===========================================
 	static public String GetTypeConversion(String p_targetLanguage, String p_sourceType, String p_targetType) {
 		try {
-			TreeMap<String, TreeMap<String, String>> t_targetLanguage = s_typeMap.get(p_targetLanguage);
+			Language t_targetLanguage = s_languageMap.get(p_targetLanguage);
 			if (t_targetLanguage == null) {
-				Logger.LogError("DataTypeManager.GetTypeConversion() failed to find a source type map for the language [" + p_targetLanguage + "].");
+				Logger.LogError("DataTypeManager.GetTypeConversion() failed to find the language [" + p_targetLanguage + "].");
 				return null;
 			}
 
-			TreeMap<String, String> t_sourceType = t_targetLanguage.get(p_sourceType);
+			SourceType t_sourceType = t_targetLanguage.GetSourceType(p_sourceType);
 			if (t_sourceType == null) {
-				Logger.LogError("DataTypeManager.GetTypeConversion() failed to find a type group map for the source type [" + p_sourceType + "].");
+				Logger.LogError("DataTypeManager.GetTypeConversion() failed to find the source type [" + p_sourceType + "].");
 				return null;
 			}
 
-			return t_sourceType.get(p_targetType);	// It's fine if this returns NULL if there is no p_targetType for this source type.
+			return t_sourceType.GetTargetTypeValue(p_targetType);	// It's fine if this returns NULL if there is no p_targetType for this source type.
 		}
 		catch (Throwable t_error) {
 			Logger.LogException("DataTypeManager.GetTypeConversion() failed with error: ", t_error);
