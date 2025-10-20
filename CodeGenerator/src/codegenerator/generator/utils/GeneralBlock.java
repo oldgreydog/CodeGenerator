@@ -71,18 +71,20 @@ public class GeneralBlock extends Tag_Base {
 			p_tokenizer.EatWhiteSpace();
 
 			// A general block will parse child tags until it finds a tag that isn't a command.  That tag should be the closing tag for the parent block.
-			Token				t_nextToken;
-			TagParser			t_tagParser;
+			Token		t_nextToken;
+			TagParser	t_tagParser;
 			Tag_Base	t_newBlock;
+			int			t_currentLineNumber = m_lineNumber;
 			while ((t_nextToken = p_tokenizer.GetNextToken()) != null) {
 				if (t_nextToken.m_tokenType == Token.TOKEN_TYPE_CLOSING_DELIMITER) {
-					Logger.LogError("GeneralBlock.Parse() found a token of type [" + t_nextToken.GetTokenTypeName() + "] at line [" + p_tokenizer.GetLineCount() + "].");
+					Logger.LogError("GeneralBlock.Parse() found a token of type [" + t_nextToken.GetTokenTypeName() + "] at line [" + t_currentLineNumber + "].");
 					return false;
 				}
 				else if (t_nextToken.m_tokenType == Token.TOKEN_TYPE_OPENING_DELIMITER) {
 					t_tagParser = new TagParser();
+					t_currentLineNumber = p_tokenizer.GetLineCount();
 					if (!t_tagParser.Parse(p_tokenizer)) {
-						Logger.LogError("GeneralBlock.Parse() failed to parse the tag at line [" + p_tokenizer.GetLineCount() + "].");
+						Logger.LogError("GeneralBlock.Parse() failed to parse the tag at line [" + t_currentLineNumber + "].");
 						return false;
 					}
 
@@ -94,19 +96,19 @@ public class GeneralBlock extends Tag_Base {
 					}
 
 					if (!t_newBlock.Init(t_tagParser)) {
-						Logger.LogError("GeneralBlock.Parse() failed attempting to initialize the tag [" + t_newBlock.GetName() + "] at line [" + p_tokenizer.GetLineCount() + "].");
+						Logger.LogError("GeneralBlock.Parse() failed attempting to initialize the tag [" + t_newBlock.GetName() + "] at line [" + t_currentLineNumber + "].");
 						return false;
 					}
 
 					if (!t_newBlock.Parse(p_tokenizer)) {
-						Logger.LogError("GeneralBlock.Parse() failed attempting to parse the tag [" + t_newBlock.GetName() + "] at line [" + p_tokenizer.GetLineCount() + "].");
+						Logger.LogError("GeneralBlock.Parse() failed attempting to parse the tag [" + t_newBlock.GetName() + "] at line [" + t_currentLineNumber + "].");
 						return false;
 					}
 
 					AddChildTag(t_newBlock);
 				}
 //				else {
-//					Logger.LogError("GeneralBlock.Parse() found a token of type [" + t_nextToken.GetTokenTypeName() + "] when it was expecting a WORD for the attribute name at line [" + p_tokenizer.GetLineCount() + "].");
+//					Logger.LogError("GeneralBlock.Parse() found a token of type [" + t_nextToken.GetTokenTypeName() + "] when it was expecting a WORD for the attribute name at line [" + t_currentLineNumber + "].");
 //					return false;
 //				}
 			}
