@@ -193,4 +193,27 @@ public class DataTypeManager {
 			return null;
 		}
 	}
+
+
+	//===========================================
+	static public int GetTypeMaxSize(String p_targetLanguage, String p_targetType) {
+		try {
+			Language t_targetLanguage = s_languageMap.get(p_targetLanguage);
+			if (t_targetLanguage == null) {
+				Logger.LogError("DataTypeManager.GetTypeMaxSize() failed to find the language [" + p_targetLanguage + "].");
+				return 0;
+			}
+
+			// This is a String and not an int because the value will be be output as a string from the TypeMaxSize tag for comparison in a tag attribute.
+			int t_maxLength = t_targetLanguage.GetTargetTypeMaxSize(p_targetType);
+			if (t_maxLength == 0)
+				return 0;		// If the target type doesn't exist, we'll just return "0".  It's not critical if the offset is screwed up since the template output will be invalid anyway without the type itself.
+
+			return t_maxLength;
+		}
+		catch (Throwable t_error) {
+			Logger.LogException("DataTypeManager.GetTypeMaxSize() failed with error: ", t_error);
+			return 0;
+		}
+	}
 }
