@@ -97,7 +97,7 @@ public class Include extends Tag_Base {
 		try {
 			File t_templateFile = new File(p_fileName);
 			if (!t_templateFile.exists()) {
-				Logger.LogFatal("Include.ParseFile() could not open the template file [" + m_templateFileName + "] at line number [" + m_lineNumber + "].");
+				Logger.LogFatal("Include.ParseFile() could not open the template file [" + p_fileName + "] at line number [" + m_lineNumber + "].");
 				return false;
 			}
 

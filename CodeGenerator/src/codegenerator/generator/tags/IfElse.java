@@ -253,7 +253,7 @@ public class IfElse extends Tag_Base {
 				}
 
 				m_attributeValue	= p_tagAttributeParser.GetAttributeValue();
-				m_lineNumber	= p_tagAttributeParser.GetLineNumber();
+				m_lineNumber		= p_tagAttributeParser.GetLineNumber();
 
 				return true;
 			}

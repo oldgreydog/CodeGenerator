@@ -116,7 +116,7 @@ public class TypeConvertLoadFile extends Tag_Base {
 			}
 
 			if (!DataTypeManager.LoadConfigFile(t_filePath)) {
-				Logger.LogError("TypeConvertLoadFile.Evaluate() failed to load the file [" + m_filePath +"] into the DataTypeManager at line number [" + m_lineNumber + "].");
+				Logger.LogError("TypeConvertLoadFile.Evaluate() failed to load the file [" + t_filePath +"] into the DataTypeManager at line number [" + m_lineNumber + "].");
 				return false;
 			}
 
