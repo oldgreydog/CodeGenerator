@@ -64,7 +64,8 @@ public class TagFactory {
 		m_tags.put(Text.TAG_NAME.toLowerCase(),						new Text());
 		m_tags.put(TypeConvert.TAG_NAME.toLowerCase(),				new TypeConvert());
 		m_tags.put(TypeConvertLoadFile.TAG_NAME.toLowerCase(),		new TypeConvertLoadFile());
-		m_tags.put(Variable.TAG_NAME.toLowerCase(),					new Variable());
+		m_tags.put(TypeMaxSize.TAG_NAME.toLowerCase(),				new TypeMaxSize());
+		m_tags.put(Function.TAG_NAME.toLowerCase(),					new Function());
 	}
 
 

@@ -51,7 +51,7 @@ the value the marker gets has nothing to do with its column position in the temp
 	&lt;%endtext%&gt;
 		&lt;%endfirst%&gt;
 
-		&lt;%text%&gt;&lt;%tabStop stopType = marker %&gt;&lt;%variable name = parameterType evalmode = evaluate %&gt;	&lt;%tabStop stopType = marker offset = 12 %&gt;p_&lt;%firstLetterToLowerCase value = &lt;%name%&gt;%&gt;&lt;%endtext%&gt;
+		&lt;%text%&gt;&lt;%tabStop stopType = marker %&gt;&lt;%function name = parameterType evalmode = evaluate %&gt;	&lt;%tabStop stopType = marker offset = 12 %&gt;p_&lt;%firstLetterToLowerCase value = &lt;%name%&gt;%&gt;&lt;%endtext%&gt;
 	&lt;%endfor%&gt;
 </b></code></pre>
 
@@ -62,11 +62,11 @@ are shown in the example above and would output a java constructor that looks li
 if the parameters shown below will line up in every browser, but they would in the output file):</p>
 
 <pre><code><b>    public Company(int       p_companyID,
-				   String    p_name,
-				   String    p_warehouseName,
-				   Integer   p_parentCompanyID,
-				   boolean   p_isActive,
-				   String    p_locale)
+                   String    p_name,
+                   String    p_warehouseName,
+                   Integer   p_parentCompanyID,
+                   boolean   p_isActive,
+                   String    p_locale)
 </b></code></pre>
 
 <p>No matter how long the class name is, the parameter's data types would always line up on the first column after the "("

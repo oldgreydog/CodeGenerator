@@ -35,7 +35,7 @@ import codegenerator.generator.utils.*;
 
 <h3>Usage example</h3>
 
-<pre>	<code><b>&lt;%include template = templates/marshalling/marshalling_interface_variables.template %&gt;</b></code></pre>
+<pre>	<code><b>&lt;%include template = templates/marshalling/marshalling_interface_functions.template %&gt;</b></code></pre>
 
 <h3>Attribute descriptions</h3>
 

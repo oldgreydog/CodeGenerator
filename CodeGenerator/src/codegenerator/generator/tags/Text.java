@@ -67,15 +67,15 @@ help the comments stand out, but you can do your comments any way you like.</p>
 	tabMarker
 	tabStop
 	typeConvert
-	variable</b></code></pre>
+	function</b></code></pre>
 
 <p>Note that the defining common characteristic of all of these tags is that they are single, free-standing tags.
 In other words, they don't have any intermediate or ending tags and, therefore, do not have child tags as content.
 Any other tag type will cause the parse to fail.  This is enforced by the code because every tag class marks itself
 as being safe for use in text or not.</p>
 
-<p><i>However</i>, <code><b>variable</b></code> is a loophole to this rule since a <code><b>variable</b></code>'s
-definition can include an arbitrary number of single and multi-part tags.  But since <code><b>variable</b></code>
+<p><i>However</i>, <code><b>function</b></code> is a loophole to this rule since a <code><b>function</b></code>'s
+definition can include an arbitrary number of single and multi-part tags.  But since <code><b>function</b></code>
 is a single tag where it is evaluated, it is still safe to be used inside a <code><b>text</b></code> tag block.</p>
  */
 public class Text extends Tag_Base {
@@ -335,7 +335,7 @@ public class Text extends Tag_Base {
 
 	//*********************************
 	/**
-	 * This will probably only ever be used where there are attribute values that contain variable tags that need to be evaluated.
+	 * This will probably only ever be used where there are attribute values that contain config variable tags that need to be evaluated.
 	 */
 	public String EvaluateToString(EvaluationContext p_evaluationContext)
 	{

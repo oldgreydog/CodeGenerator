@@ -58,7 +58,7 @@ import codegenerator.generator.utils.TemplateTokenizer.*;
 	and/or/not	</b>(i.e. for if statements)<b>
 	outerContextEval
 	typeConvert
-	variable</b></code></pre>
+	function</b></code></pre>
  */
 public class TagAttributeParser {
 
