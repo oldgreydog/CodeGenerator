@@ -25,7 +25,7 @@ public class <%className%> {
 <%endtext%>
 
 <%foreach node=column%>
-	<%text%>	protected	<%typeConvert targetLanguage = "java" sourceType = <%type%> groupID = "object" %>	<%tabStop stopType = "stop" offset = "28" %>m_<%firstLetterToLowerCase value = <%name%>%>;
+	<%text%>	protected	<%typeConvert targetLanguage = "java" sourceType = <%type%> targetType = "object" %><%tabStop stopType = "stop" offset = <%typeMaxSize targetLanguage = "java" targetType = "object"%> %>	m_<%firstLetterToLowerCase value = <%name%>%>;
 <%endtext%>
 <%endfor%>
 
@@ -48,7 +48,7 @@ public class <%className%> {
 <%endtext%>
 	<%endfirst%>
 
-	<%text%><%tabStop stopType = "marker" %><%typeConvert targetLanguage = "java" sourceType = <%type%> groupID = "object" %>	<%tabStop stopType = "marker" offset = "12" %>p_<%firstLetterToLowerCase value = <%name%>%><%endtext%>
+	<%text%><%tabStop stopType = "marker" %><%typeConvert targetLanguage = "java" sourceType = <%type%> targetType = "object" %><%tabStop stopType = "marker" offset = <%typeMaxSize targetLanguage = "java" targetType = "object"%> %>	p_<%firstLetterToLowerCase value = <%name%>%><%endtext%>
 <%endfor%>
 
 <%text%>)
@@ -86,21 +86,21 @@ public class <%className%> {
 		try {
 <%endtext%>
 
-	<%if  <%typeConvert targetLanguage = "java" sourceType = <%type%> groupID = "object" %> = String%>
+	<%if  <%typeConvert targetLanguage = "java" sourceType = <%type%> targetType = "object" %> = String%>
 		<%text%>			if (p_<%firstLetterToLowerCase value = <%name%>%>.length() > <%valueMaxSize%>) {
 				Logger.LogError("<%^className%>.Validate<%name%>() : the value [" + p_<%firstLetterToLowerCase value = <%name%>%> + "] is too large for the column [<%sqlName%>] which has a max size of [<%valueMaxSize%>].");
 				p_errorMessagesReturn.append("<%^className%>.<%name%> has a max size of [<%valueMaxSize%>].");
 				return false;
 			}
 <%endtext%>
-	<%elseif  <%typeConvert targetLanguage = "java" sourceType = <%type%> groupID = "object" %> = Calendar%>
+	<%elseif  <%typeConvert targetLanguage = "java" sourceType = <%type%> targetType = "object" %> = Calendar%>
 		<%text%>			// A Calendar value should be correct out of the widget.
 <%endtext%>
-	<%elseif  <%typeConvert targetLanguage = "java" sourceType = <%type%> groupID = "object" %> = byte[]%>
+	<%elseif  <%typeConvert targetLanguage = "java" sourceType = <%type%> targetType = "object" %> = byte[]%>
 		<%text%>			// No validation can be done for a byte array.
 <%endtext%>
 	<%else%>
-		<%text%>			<%typeConvert targetLanguage = "java" sourceType = <%type%> groupID = "object" %> t_testValue = <%typeConvert targetLanguage = "java" sourceType = <%type%> groupID = "objectParseFunc" %>(p_<%firstLetterToLowerCase value = <%name%>%>);
+		<%text%>			<%typeConvert targetLanguage = "java" sourceType = <%type%> targetType = "object" %> t_testValue = <%typeConvert targetLanguage = "java" sourceType = <%type%> targetType = "objectParseFunc" %>(p_<%firstLetterToLowerCase value = <%name%>%>);
 <%endtext%>
 	<%endif%>
 <%text%>
@@ -117,10 +117,10 @@ public class <%className%> {
 
 
 	//*********************************
-	public boolean Set<%name%>(<%typeConvert targetLanguage = "java" sourceType = <%type%> groupID = "object" %> p_<%firstLetterToLowerCase value = <%name%>%>) {
+	public boolean Set<%name%>(<%typeConvert targetLanguage = "java" sourceType = <%type%> targetType = "object" %> p_<%firstLetterToLowerCase value = <%name%>%>) {
 <%endtext%>
 
-	<%if  <%typeConvert targetLanguage = "java" sourceType = <%type%> groupID = "object" %> = String%>
+	<%if  <%typeConvert targetLanguage = "java" sourceType = <%type%> targetType = "object" %> = String%>
 		<%text%>		if (p_<%firstLetterToLowerCase value = <%name%>%> != null) {
 <%endtext%>
 		<%if <%isNullable%> = false%>
@@ -171,7 +171,7 @@ public class <%className%> {
 <%endtext%>
 		<%endif%>
 
-		<%if  <%typeConvert targetLanguage = "java" sourceType = <%type%> groupID = "object" %> = Calendar%>
+		<%if  <%typeConvert targetLanguage = "java" sourceType = <%type%> targetType = "object" %> = Calendar%>
 			<%text%>		m_<%firstLetterToLowerCase value = <%name%>%> = (Calendar)p_<%firstLetterToLowerCase value = <%name%>%>.clone();
 <%endtext%>
 		<%else%>
@@ -191,9 +191,9 @@ public class <%className%> {
 	public <%endtext%>
 
 	<%if <%isNullable%> = true%>
-		<%text%><%typeConvert targetLanguage = "java" sourceType = <%type%> groupID = "object" %><%endtext%>
+		<%text%><%typeConvert targetLanguage = "java" sourceType = <%type%> targetType = "object" %><%endtext%>
 	<%else%>
-		<%text%><%typeConvert targetLanguage = "java" sourceType = <%type%> groupID = "builtin" %><%endtext%>
+		<%text%><%typeConvert targetLanguage = "java" sourceType = <%type%> targetType = "builtin" %><%endtext%>
 	<%endif%>
 
 	<%text%> Get<%name%>() {
@@ -217,7 +217,7 @@ public class <%className%> {
 <%endtext%>
 
 <%foreach node=column%>
-	<%if  <%typeConvert targetLanguage = "java" sourceType = <%type%> groupID = "object" %> = Calendar%>
+	<%if  <%typeConvert targetLanguage = "java" sourceType = <%type%> targetType = "object" %> = Calendar%>
 		<%text%>		t_result.append("<%sqlName%> :	<%tabStop stopType = "stop" offset = "52" %>" + ((m_<%firstLetterToLowerCase value = <%name%>%> != null) ? StringUtilities.FormatDateTime(m_<%firstLetterToLowerCase value = <%name%>%>, "-", false) : "") + "\n");
 <%endtext%>
 	<%else%>

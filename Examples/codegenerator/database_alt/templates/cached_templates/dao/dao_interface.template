@@ -23,7 +23,7 @@ public interface <%className%>DAO {
 
 <%foreach node=column%>
 	<%if <%isPrimaryKey%> = true%>
-		<%text%>	public <%^className%> Load<%^className%>For<%name%>(<%typeConvert targetLanguage = "java" sourceType = <%type%> groupID = "object" %> p_<%firstLetterToLowerCase value = <%name%>%>, Connection p_dbConnection);
+		<%text%>	public <%^className%> Load<%^className%>For<%name%>(<%typeConvert targetLanguage = "java" sourceType = <%type%> targetType = "object" %> p_<%firstLetterToLowerCase value = <%name%>%>, Connection p_dbConnection);
 <%endtext%>
 	<%endif%>
 <%endfor%>
@@ -32,7 +32,7 @@ public interface <%className%>DAO {
 <%endtext%>
 
 <%foreach node=foreignKey%>
-	<%text%>	public LinkedList<<%^className%>> LoadAll<%^className%>For<%name%>(<%typeConvert targetLanguage = "java" sourceType = <%type%> groupID = "object" %> p_<%firstLetterToLowerCase value = <%name%>%>, Connection p_dbConnection);
+	<%text%>	public LinkedList<<%^className%>> LoadAll<%^className%>For<%name%>(<%typeConvert targetLanguage = "java" sourceType = <%type%> targetType = "object" %> p_<%firstLetterToLowerCase value = <%name%>%>, Connection p_dbConnection);
 <%endtext%>
 <%endfor%>
 

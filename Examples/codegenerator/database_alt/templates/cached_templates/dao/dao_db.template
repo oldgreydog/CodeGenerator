@@ -64,7 +64,7 @@ public class <%className%>DAO_DB implements <%className%>DAO {
 
 	//*********************************
 	@Override
-	public <%^className%> Load<%^className%>For<%name%>(<%typeConvert targetLanguage = "java" sourceType = <%type%> groupID = "object" %> p_<%firstLetterToLowerCase value = <%name%>%>, Connection p_dbConnection)
+	public <%^className%> Load<%^className%>For<%name%>(<%typeConvert targetLanguage = "java" sourceType = <%type%> targetType = "object" %> p_<%firstLetterToLowerCase value = <%name%>%>, Connection p_dbConnection)
 	{
 		StringBuilder t_sql = new StringBuilder();
 		t_sql.append("SELECT " + <%^className%>.GetColumnList());
@@ -76,16 +76,16 @@ public class <%className%>DAO_DB implements <%className%>DAO {
 			t_preparedStatement = p_dbConnection.prepareStatement(t_sql.toString());
 <%endtext%>
 
-		<%if <%typeConvert targetLanguage = "java" sourceType = <%type%> groupID = "object" %> = Calendar%>
+		<%if <%typeConvert targetLanguage = "java" sourceType = <%type%> targetType = "object" %> = Calendar%>
 			<%text%>			t_preparedStatement.setTimestamp(1, new java.sql.Timestamp(p_<%firstLetterToLowerCase value = <%name%>%>.getTimeInMillis()));
 <%endtext%>
-		<%elseif <%typeConvert targetLanguage = "java" sourceType = <%type%> groupID = "object" %> = byte[]%>
+		<%elseif <%typeConvert targetLanguage = "java" sourceType = <%type%> targetType = "object" %> = byte[]%>
 			<%text%>
 			ByteArrayInputStream t_imageStream	= new ByteArrayInputStream(p_<%firstLetterToLowerCase value = <%name%>%>);
 			t_preparedStatement.setBinaryStream(1, t_imageStream, p_<%firstLetterToLowerCase value = <%name%>%>.length);
 <%endtext%>
 		<%else%>
-			<%text%>			t_preparedStatement.<%typeConvert targetLanguage = "java" sourceType = <%type%> groupID = "prepStmntSetFunc" %>(1, p_<%firstLetterToLowerCase value = <%name%>%>);
+			<%text%>			t_preparedStatement.<%typeConvert targetLanguage = "java" sourceType = <%type%> targetType = "prepStmntSetFunc" %>(1, p_<%firstLetterToLowerCase value = <%name%>%>);
 <%endtext%>
 		<%endif%>
 
@@ -119,7 +119,7 @@ public class <%className%>DAO_DB implements <%className%>DAO {
 
 	//*********************************
 	@Override
-	public LinkedList<<%^className%>> LoadAll<%^className%>For<%name%>(<%typeConvert targetLanguage = "java" sourceType = <%type%> groupID = "object" %> p_<%firstLetterToLowerCase value = <%name%>%>, Connection p_dbConnection)
+	public LinkedList<<%^className%>> LoadAll<%^className%>For<%name%>(<%typeConvert targetLanguage = "java" sourceType = <%type%> targetType = "object" %> p_<%firstLetterToLowerCase value = <%name%>%>, Connection p_dbConnection)
 	{
 		StringBuilder t_sql = new StringBuilder();
 		t_sql.append("SELECT " + <%^className%>.GetColumnList());
@@ -131,16 +131,16 @@ public class <%className%>DAO_DB implements <%className%>DAO {
 			t_preparedStatement = p_dbConnection.prepareStatement(t_sql.toString());
 <%endtext%>
 
-	<%if <%typeConvert targetLanguage = "java" sourceType = <%type%> groupID = "object" %> = Calendar%>
+	<%if <%typeConvert targetLanguage = "java" sourceType = <%type%> targetType = "object" %> = Calendar%>
 		<%text%>			t_preparedStatement.setTimestamp(1, new java.sql.Timestamp(p_<%firstLetterToLowerCase value = <%name%>%>.getTimeInMillis()));
 <%endtext%>
-	<%elseif  <%typeConvert targetLanguage = "java" sourceType = <%type%> groupID = "object" %> = byte[]%>
+	<%elseif  <%typeConvert targetLanguage = "java" sourceType = <%type%> targetType = "object" %> = byte[]%>
 		<%text%>
 			ByteArrayInputStream t_imageStream	= new ByteArrayInputStream(p_<%firstLetterToLowerCase value = <%name%>%>);
 			t_preparedStatement.setBinaryStream(1, t_imageStream, p_<%firstLetterToLowerCase value = <%name%>%>.length);
 <%endtext%>
 	<%else%>
-		<%text%>			t_preparedStatement.<%typeConvert targetLanguage = "java" sourceType = <%type%> groupID = "prepStmntSetFunc" %>(1, p_<%firstLetterToLowerCase value = <%name%>%>);
+		<%text%>			t_preparedStatement.<%typeConvert targetLanguage = "java" sourceType = <%type%> targetType = "prepStmntSetFunc" %>(1, p_<%firstLetterToLowerCase value = <%name%>%>);
 <%endtext%>
 	<%endif%>
 
@@ -190,7 +190,7 @@ public class <%className%>DAO_DB implements <%className%>DAO {
 <%endtext%>
 
 <%foreach node=column%>
-	<%if <%typeConvert targetLanguage = "java" sourceType = <%type%> groupID = "object" %> = Calendar%>
+	<%if <%typeConvert targetLanguage = "java" sourceType = <%type%> targetType = "object" %> = Calendar%>
 		<%text%>				t_dbDateTime = t_result.getTimestamp(t_index++);
 				if (t_dbDateTime != null) {
 					t_date = Calendar.getInstance();
@@ -203,7 +203,7 @@ public class <%className%>DAO_DB implements <%className%>DAO {
 
 <%endtext%>
 	<%else%>
-		<%text%>				t_new<%^className%>.Set<%name%>(t_result.<%typeConvert targetLanguage = "java" sourceType = <%type%> groupID = "resultSetGetFunc" %>(t_index++));
+		<%text%>				t_new<%^className%>.Set<%name%>(t_result.<%typeConvert targetLanguage = "java" sourceType = <%type%> targetType = "resultSetGetFunc" %>(t_index++));
 <%endtext%>
 	<%endif%>
 
@@ -265,15 +265,15 @@ public class <%className%>DAO_DB implements <%className%>DAO {
 	<%if <%isNullable%> = true%>
 		<%text%>
 			if (p_new<%^className%>.Get<%name%>() == null)
-				t_preparedStatement.setNull(t_index++, Types.<%typeConvert targetLanguage = "java" sourceType = <%type%> groupID = "prepStmntSetNullConst" %>);
+				t_preparedStatement.setNull(t_index++, Types.<%typeConvert targetLanguage = "java" sourceType = <%type%> targetType = "prepStmntSetNullConst" %>);
 			else
 	<%endtext%>
 	<%endif%>
 
-	<%if  <%typeConvert targetLanguage = "java" sourceType = <%type%> groupID = "object" %> = Calendar%>
+	<%if  <%typeConvert targetLanguage = "java" sourceType = <%type%> targetType = "object" %> = Calendar%>
 		<%text%>			t_preparedStatement.setTimestamp(t_index++, new java.sql.Timestamp(p_new<%^className%>.Get<%name%>().getTimeInMillis()));
 <%endtext%>
-	<%elseif <%typeConvert targetLanguage = "java" sourceType = <%type%> groupID = "object" %> = byte[]%>
+	<%elseif <%typeConvert targetLanguage = "java" sourceType = <%type%> targetType = "object" %> = byte[]%>
 		<%text%>			{	// I had to put these two lines in a block just in case this was a nullable field and the generator put and if-else above them.
 				ByteArrayInputStream t_imageStream	= new ByteArrayInputStream(p_new<%^className%>.Get<%name%>());
 				t_preparedStatement.setBinaryStream(t_index++, t_imageStream, p_new<%^className%>.Get<%name%>().length);
@@ -283,10 +283,10 @@ public class <%className%>DAO_DB implements <%className%>DAO {
 	<%else%>
 
 		<%if <%isPrimaryKey%> = true%>
-			<%text%>			t_preparedStatement.<%typeConvert targetLanguage = "java" sourceType = <%type%> groupID = "prepStmntSetFunc" %>(t_index++, (<%typeConvert targetLanguage = "java" sourceType = <%type%> groupID = "builtin" %>)t_nextID);
+			<%text%>			t_preparedStatement.<%typeConvert targetLanguage = "java" sourceType = <%type%> targetType = "prepStmntSetFunc" %>(t_index++, (<%typeConvert targetLanguage = "java" sourceType = <%type%> targetType = "builtin" %>)t_nextID);
 <%endtext%>
 		<%else%>
-			<%text%>			t_preparedStatement.<%typeConvert targetLanguage = "java" sourceType = <%type%> groupID = "prepStmntSetFunc" %>(t_index++, p_new<%^className%>.Get<%name%>());
+			<%text%>			t_preparedStatement.<%typeConvert targetLanguage = "java" sourceType = <%type%> targetType = "prepStmntSetFunc" %>(t_index++, p_new<%^className%>.Get<%name%>());
 <%endtext%>
 		<%endif%>
 
@@ -303,7 +303,7 @@ public class <%className%>DAO_DB implements <%className%>DAO {
 <%foreach node=column%>
 	<%if <%isPrimaryKey%> = true%>
 		<%text%>
-			p_new<%^className%>.Set<%name%>((<%typeConvert targetLanguage = "java" sourceType = <%type%> groupID = "builtin" %>)t_nextID);
+			p_new<%^className%>.Set<%name%>((<%typeConvert targetLanguage = "java" sourceType = <%type%> targetType = "builtin" %>)t_nextID);
 <%endtext%>
 	<%endif%>
 <%endfor%>
@@ -380,15 +380,15 @@ public class <%className%>DAO_DB implements <%className%>DAO {
 		<%if <%isNullable%> = true%>
 			<%text%>
 			if (p_target<%^className%>.Get<%name%>() == null)
-				t_preparedStatement.setNull(t_index++, Types.<%typeConvert targetLanguage = "java" sourceType = <%type%> groupID = "prepStmntSetNullConst" %>);
+				t_preparedStatement.setNull(t_index++, Types.<%typeConvert targetLanguage = "java" sourceType = <%type%> targetType = "prepStmntSetNullConst" %>);
 			else
 	<%endtext%>
 		<%endif%>
 
-		<%if  <%typeConvert targetLanguage = "java" sourceType = <%type%> groupID = "object" %> = Calendar%>
+		<%if  <%typeConvert targetLanguage = "java" sourceType = <%type%> targetType = "object" %> = Calendar%>
 			<%text%>			t_preparedStatement.setTimestamp(t_index++, new java.sql.Timestamp(p_target<%^className%>.Get<%name%>().getTimeInMillis()));
 <%endtext%>
-		<%elseif <%typeConvert targetLanguage = "java" sourceType = <%type%> groupID = "object" %> = byte[]%>
+		<%elseif <%typeConvert targetLanguage = "java" sourceType = <%type%> targetType = "object" %> = byte[]%>
 			<%text%>			{	// I had to put these two lines in a block just in case this was a nullable field and the generator put and if-else above them.
 				ByteArrayInputStream t_imageStream	= new ByteArrayInputStream(p_target<%^className%>.Get<%name%>());
 				t_preparedStatement.setBinaryStream(t_index++, t_imageStream, p_target<%^className%>.Get<%name%>().length);
@@ -396,7 +396,7 @@ public class <%className%>DAO_DB implements <%className%>DAO {
 <%endtext%>
 		<%else%>
 
-			<%text%>			t_preparedStatement.<%typeConvert targetLanguage = "java" sourceType = <%type%> groupID = "prepStmntSetFunc" %>(t_index++, p_target<%^className%>.Get<%name%>());
+			<%text%>			t_preparedStatement.<%typeConvert targetLanguage = "java" sourceType = <%type%> targetType = "prepStmntSetFunc" %>(t_index++, p_target<%^className%>.Get<%name%>());
 <%endtext%>
 
 		<%endif%>
@@ -415,10 +415,10 @@ public class <%className%>DAO_DB implements <%className%>DAO {
 
 <%foreach node=column%>
 	<%if <%isPrimaryKey%> = true%>
-		<%if <%typeConvert targetLanguage = "java" sourceType = <%type%> groupID = "object" %> = Calendar%>
+		<%if <%typeConvert targetLanguage = "java" sourceType = <%type%> targetType = "object" %> = Calendar%>
 			<%text%>			t_preparedStatement.setTimestamp(t_index++, new java.sql.Timestamp(p_target<%^className%>.Get<%name%>().getTimeInMillis()));
 <%endtext%>
-		<%elseif <%typeConvert targetLanguage = "java" sourceType = <%type%> groupID = "object" %> = byte[]%>
+		<%elseif <%typeConvert targetLanguage = "java" sourceType = <%type%> targetType = "object" %> = byte[]%>
 			<%text%>			{	// I had to put these two lines in a block just in case this was a nullable field and the generator put and if-else above them.
 				ByteArrayInputStream t_imageStream	= new ByteArrayInputStream(p_target<%^className%>.Get<%name%>());
 				t_preparedStatement.setBinaryStream(t_index++, t_imageStream, p_target<%^className%>.Get<%name%>().length);
@@ -426,7 +426,7 @@ public class <%className%>DAO_DB implements <%className%>DAO {
 <%endtext%>
 		<%else%>
 
-			<%text%>			t_preparedStatement.<%typeConvert targetLanguage = "java" sourceType = <%type%> groupID = "prepStmntSetFunc" %>(t_index++, p_target<%^className%>.Get<%name%>());
+			<%text%>			t_preparedStatement.<%typeConvert targetLanguage = "java" sourceType = <%type%> targetType = "prepStmntSetFunc" %>(t_index++, p_target<%^className%>.Get<%name%>());
 <%endtext%>
 
 		<%endif%>
@@ -485,10 +485,10 @@ public class <%className%>DAO_DB implements <%className%>DAO {
 
 <%foreach node=column%>
 	<%if <%isPrimaryKey%> = true%>
-		<%if <%typeConvert targetLanguage = "java" sourceType = <%type%> groupID = "object" %> = Calendar%>
+		<%if <%typeConvert targetLanguage = "java" sourceType = <%type%> targetType = "object" %> = Calendar%>
 			<%text%>			t_preparedStatement.setTimestamp(t_index++, new java.sql.Timestamp(p_target<%^className%>.Get<%name%>().getTimeInMillis()));
 <%endtext%>
-		<%elseif <%typeConvert targetLanguage = "java" sourceType = <%type%> groupID = "object" %> = byte[]%>
+		<%elseif <%typeConvert targetLanguage = "java" sourceType = <%type%> targetType = "object" %> = byte[]%>
 			<%text%>			{	// I had to put these two lines in a block just in case this was a nullable field and the generator put and if-else above them.
 				ByteArrayInputStream t_imageStream	= new ByteArrayInputStream(p_target<%^className%>.Get<%name%>());
 				t_preparedStatement.setBinaryStream(t_index++, t_imageStream, p_target<%^className%>.Get<%name%>().length);
@@ -496,7 +496,7 @@ public class <%className%>DAO_DB implements <%className%>DAO {
 <%endtext%>
 		<%else%>
 
-			<%text%>			t_preparedStatement.<%typeConvert targetLanguage = "java" sourceType = <%type%> groupID = "prepStmntSetFunc" %>(t_index++, p_target<%^className%>.Get<%name%>());
+			<%text%>			t_preparedStatement.<%typeConvert targetLanguage = "java" sourceType = <%type%> targetType = "prepStmntSetFunc" %>(t_index++, p_target<%^className%>.Get<%name%>());
 <%endtext%>
 
 		<%endif%>

@@ -193,7 +193,7 @@ public class <%className%>DAO_Cache extends CacheDAO implements <%className%>DAO
 	}<%endtext%>
 
 
-<%variable name = "primaryKeyNames" evalmode = "set" %>
+<%function name = "primaryKeyNames" evalmode = "set" %>
 
 	<%foreach node=column%>
 
@@ -205,10 +205,10 @@ public class <%className%>DAO_Cache extends CacheDAO implements <%className%>DAO
 
 	<%endfor%>
 
-<%endvariable%>
+<%endFunction%>
 
 
-<%variable name = "primaryKeyParameters" evalmode = "set" %>
+<%function name = "primaryKeyParameters" evalmode = "set" %>
 
 	<%foreach node=column%>
 
@@ -219,13 +219,13 @@ public class <%className%>DAO_Cache extends CacheDAO implements <%className%>DAO
 				<%text%>, <%endtext%>
 			<%endfirst%>
 
-			<%text%><%typeConvert targetLanguage = "java" sourceType = <%type%> groupID = "object" %> p_<%firstLetterToLowerCase value = <%name%>%><%endtext%>
+			<%text%><%typeConvert targetLanguage = "java" sourceType = <%type%> targetType = "object" %> p_<%firstLetterToLowerCase value = <%name%>%><%endtext%>
 
 		<%endif%>
 
 	<%endfor%>
 
-<%endvariable%>
+<%endFunction%>
 
 
 <%text%>
@@ -233,7 +233,7 @@ public class <%className%>DAO_Cache extends CacheDAO implements <%className%>DAO
 
 	//*********************************
 	@Override
-	public <%className%> Load<%className%>For<%variable name = "primaryKeyNames" evalmode = "evaluate" %>(<%variable name = "primaryKeyParameters" evalmode = "evaluate" %>, Connection p_dbConnection)
+	public <%className%> Load<%className%>For<%function name = "primaryKeyNames" evalmode = "evaluate" %>(<%function name = "primaryKeyParameters" evalmode = "evaluate" %>, Connection p_dbConnection)
 	{
 		try {
 			CacheLockManager.AcquireSingleTableLock();	// This is a read-lock under the covers.  It protects us if a multi-table cache transaction is started that acquires the write-lock at that level.  Otherwise, this should fly through the vast majority of the time.
@@ -241,17 +241,17 @@ public class <%className%>DAO_Cache extends CacheDAO implements <%className%>DAO
 
 			// To simplify the code, I put the all of the write locking code in LoadCache() so we just call it every time we are about to read from the cache and let it decide if we need to reload it.
 			if (!LoadCache(p_dbConnection)) {
-				Logger.LogError("<%className%>DAO_Cache.Load<%className%>For<%variable name = "primaryKeyNames" evalmode = "evaluate" %>() failed to load the cache.");
+				Logger.LogError("<%className%>DAO_Cache.Load<%className%>For<%function name = "primaryKeyNames" evalmode = "evaluate" %>() failed to load the cache.");
 				return null;
 			}
 
 			<%className%> t_result = null;
-			<%customCode key="Load<%className%>For<%variable name = "primaryKeyNames" evalmode = "evaluate" %>" openingCommentCharacters="//"%>
+			<%customCode key="Load<%className%>For<%function name = "primaryKeyNames" evalmode = "evaluate" %>" openingCommentCharacters="//"%>
 
 			return t_result;
 		}
 		catch (Exception t_error) {
-			Logger.LogException("<%className%>DAO_Cache.Load<%className%>For<%variable name = "primaryKeyNames" evalmode = "evaluate" %>() failed with error: ", t_error);
+			Logger.LogException("<%className%>DAO_Cache.Load<%className%>For<%function name = "primaryKeyNames" evalmode = "evaluate" %>() failed with error: ", t_error);
 			return null;
 		}
 		finally {
@@ -268,7 +268,7 @@ public class <%className%>DAO_Cache extends CacheDAO implements <%className%>DAO
 
 	//*********************************
 	@Override
-	public LinkedList<<%^className%>> LoadAll<%^className%>For<%name%>(<%typeConvert targetLanguage = "java" sourceType = <%type%> groupID = "object" %> p_<%firstLetterToLowerCase value = <%name%>%>, Connection p_dbConnection)
+	public LinkedList<<%^className%>> LoadAll<%^className%>For<%name%>(<%typeConvert targetLanguage = "java" sourceType = <%type%> targetType = "object" %> p_<%firstLetterToLowerCase value = <%name%>%>, Connection p_dbConnection)
 	{
 		try {
 			CacheLockManager.AcquireSingleTableLock();	// This is a read-lock under the covers.  It protects us if a multi-table cache transaction is started that acquires the write-lock at that level.  Otherwise, this should fly through the vast majority of the time.
