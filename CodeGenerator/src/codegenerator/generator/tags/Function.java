@@ -37,32 +37,32 @@ up and simplified.</p>
 
 <h3>Usage example</h3>
 
-<pre><code><b>&lt;%variable name = "primeNames" evalmode = "set" %&gt;
+<pre><code><b>&lt;%function name = "primeNames" evalmode = "set" %&gt;
 ...
-&lt;%endVariable%&gt;</b></code></pre>
+&lt;%endFunction%&gt;</b></code></pre>
 
-<p>When used with <code><b>evalmode</b></code> set to "set", it will parse the contents to the <code><b>&lt;%endVariable%&gt;</b></code>
-tag and save them for the variable name.</p>
+<p>When used with <code><b>evalmode</b></code> set to "set", it will parse the contents to the <code><b>&lt;%endFunction%&gt;</b></code>
+tag and save them for the function name.</p>
 
-<pre><code><b>&lt;%variable name = "primeNames" evalmode = "evaluate" optionalContextName = "outer1" %&gt;</b></code></pre>
+<pre><code><b>&lt;%function name = "primeNames" evalmode = "evaluate" optionalContextName = "outer1" %&gt;</b></code></pre>
 
-<p>When used with <code><b>evalmode</b></code> set to <code><b>evaluate</b></code>, it will evaluate the template block set for that variable name at that location.
+<p>When used with <code><b>evalmode</b></code> set to <code><b>evaluate</b></code>, it will evaluate the template block set for that function name at that location.
 Obviously, all of the config value references inside the  must also be valid for that location.</p>
 
 <h3>Attribute descriptions</h3>
 
-<p><code><b>name</b></code>:  the name that identifies a particular <code><b>variable</b></code> instance.</p>
+<p><code><b>name</b></code>:  the name that identifies a particular <code><b>function</b></code> instance.</p>
 
 <p><code><b>evalmode</b></code>: [values: <code><b>set</b></code>|<code><b>evaluate</b></code>, no default: a value must be set]  </p>
 
 <p><code><b>optionalContextName</b></code>:  this is an optional attribute.  Now that outer contexts exist, I had to add this so that
-variables could be made to work even inside inner contexts when the variable's definition uses values from the outer context.
+functions could be made to work even inside inner contexts when the function's definition uses values from the outer context.
 
 */
-public class Variable extends Tag_Base {
+public class Function extends Tag_Base {
 
-	static public final String		TAG_NAME							= "variable";
-	static public final String		TAG_END_NAME						= "endVariable";
+	static public final String		TAG_NAME							= "function";
+	static public final String		TAG_END_NAME						= "endFunction";
 
 	static private final String		ATTRIBUTE_NAME						= "name";
 	static private final String		ATTRIBUTE_EVAL_MODE					= "evalMode";
@@ -77,17 +77,17 @@ public class Variable extends Tag_Base {
 
 
 	// Static members
-	static protected final TreeMap<String, Tag_Base>		m_variableMap	= new TreeMap<>();
+	static protected final TreeMap<String, Tag_Base>		m_functionMap	= new TreeMap<>();
 
 
 	// Data members
-	private String		m_variableName	= null;
+	private String		m_functionName	= null;
 	private int			m_evalMode		= EVAL_MODE_VALUE_UNDEFINED;	// This is the name of the config node that will be the temporary "root" node for each iteration of the loop.  For example, if this is == "class", then when we enter Evaluate(), we will run through the loop once for each "class" child node we find on the passed-in p_currentNode.
-	private	String		m_contextName	= null;					// The optional outer context in which to evaluate this variable.
+	private	String		m_contextName	= null;					// The optional outer context in which to evaluate this function.
 
 
 	//*********************************
-	public Variable() {
+	public Function() {
 		super(TAG_NAME);
 		m_isSafeForText			= true;
 		m_isSafeForAttributes	= true;
@@ -96,8 +96,8 @@ public class Variable extends Tag_Base {
 
 	//*********************************
 	@Override
-	public Variable GetInstance() {
-		return new Variable();
+	public Function GetInstance() {
+		return new Function();
 	}
 
 
@@ -105,19 +105,19 @@ public class Variable extends Tag_Base {
 	@Override
 	public boolean Init(TagParser p_tagParser) {
 		if (!super.Init(p_tagParser)) {
-			Logger.LogError("Variable.Init() failed in the parent Init().");
+			Logger.LogError("Function.Init() failed in the parent Init().");
 			return false;
 		}
 
 		TagAttributeParser t_nodeAttribute = p_tagParser.GetNamedAttribute(ATTRIBUTE_NAME);
 		if (t_nodeAttribute == null) {
-			Logger.LogError("Variable.Init() did not find the [" + ATTRIBUTE_NAME + "] attribute that is required for [" + TAG_NAME + "] tags at line number [" + m_lineNumber + "].");
+			Logger.LogError("Function.Init() did not find the [" + ATTRIBUTE_NAME + "] attribute that is required for [" + TAG_NAME + "] tags at line number [" + m_lineNumber + "].");
 			return false;
 		}
 
-		m_variableName = t_nodeAttribute.GetAttributeValueAsString();
-		if ((m_variableName == null) || m_variableName.isBlank()) {
-			Logger.LogError("Variable.Init() did not get the value for the [" + ATTRIBUTE_NAME + "] attribute that is required for [" + TAG_NAME + "] tags at line number [" + m_lineNumber + "].");
+		m_functionName = t_nodeAttribute.GetAttributeValueAsString();
+		if ((m_functionName == null) || m_functionName.isBlank()) {
+			Logger.LogError("Function.Init() did not get the value for the [" + ATTRIBUTE_NAME + "] attribute that is required for [" + TAG_NAME + "] tags at line number [" + m_lineNumber + "].");
 			return false;
 		}
 
@@ -125,13 +125,13 @@ public class Variable extends Tag_Base {
 
 		t_nodeAttribute = p_tagParser.GetNamedAttribute(ATTRIBUTE_EVAL_MODE);
 		if (t_nodeAttribute == null) {
-			Logger.LogError("Variable.Init() did not find the [" + ATTRIBUTE_EVAL_MODE + "] attribute that is required for [" + TAG_NAME + "] tags at line number [" + m_lineNumber + "].");
+			Logger.LogError("Function.Init() did not find the [" + ATTRIBUTE_EVAL_MODE + "] attribute that is required for [" + TAG_NAME + "] tags at line number [" + m_lineNumber + "].");
 			return false;
 		}
 
 		String t_evalMode = t_nodeAttribute.GetAttributeValueAsString();
 		if ((t_evalMode == null) || t_evalMode.isBlank()) {
-			Logger.LogError("Variable.Init() did not get the value from attribute [" + ATTRIBUTE_EVAL_MODE + "] that is required for [" + TAG_NAME + "] tags at line number [" + m_lineNumber + "].");
+			Logger.LogError("Function.Init() did not get the value from attribute [" + ATTRIBUTE_EVAL_MODE + "] that is required for [" + TAG_NAME + "] tags at line number [" + m_lineNumber + "].");
 			return false;
 		}
 
@@ -140,7 +140,7 @@ public class Variable extends Tag_Base {
 		else if (t_evalMode.equalsIgnoreCase(EVAL_MODE_LABEL_EVALUATE))
 			m_evalMode = EVAL_MODE_VALUE_EVALUATE;
 		else {
-			Logger.LogError("Variable.Init() received and invalid evalmode value [" + t_evalMode + "].");
+			Logger.LogError("Function.Init() received and invalid evalmode value [" + t_evalMode + "].");
 			return false;
 		}
 
@@ -150,7 +150,7 @@ public class Variable extends Tag_Base {
 		if (t_nodeAttribute != null) {
 			m_contextName = t_nodeAttribute.GetAttributeValueAsString();
 			if ((m_contextName == null) || m_contextName.isBlank()) {
-				Logger.LogError("Variable.Init() did not get the value from attribute [" + ATTRIBUTE_OPTIONAL_CONTEXT_NAME + "] that is optional for [" + TAG_NAME + "] tags at line number [" + m_lineNumber + "].");
+				Logger.LogError("Function.Init() did not get the value from attribute [" + ATTRIBUTE_OPTIONAL_CONTEXT_NAME + "] that is optional for [" + TAG_NAME + "] tags at line number [" + m_lineNumber + "].");
 				return false;
 			}
 		}
@@ -164,28 +164,28 @@ public class Variable extends Tag_Base {
 	@Override
 	public boolean Parse(TemplateTokenizer p_tokenizer) {
 		try {
-			// We only parse the variable tag in "set" mode.  Otherwise, there is nothing after the opening tag.
+			// We only parse the function tag in "set" mode.  Otherwise, there is nothing after the opening tag.
 			if (m_evalMode != EVAL_MODE_VALUE_SET)
 				return true;
 
 			GeneralBlock t_generalBlock	= new GeneralBlock();
 			if (!t_generalBlock.Parse(p_tokenizer)) {
-				Logger.LogError("Variable.Parse() general block parser failed in the block starting at [" + m_lineNumber + "].");
+				Logger.LogError("Function.Parse() general block parser failed in the block starting at [" + m_lineNumber + "].");
 				return false;
 			}
 
 			String t_endingTagName = t_generalBlock.GetUnknownTag().GetTagName();
 			if (!t_endingTagName.equalsIgnoreCase(TAG_END_NAME)) {
-				Logger.LogError("Variable.Parse() general block ended on a tag named [" + t_endingTagName + "] at line [" + p_tokenizer.GetLineCount() + "] in the tag starting at [" + m_lineNumber + "].  The closing tag [" + TAG_END_NAME + "] was expected.");
+				Logger.LogError("Function.Parse() general block ended on a tag named [" + t_endingTagName + "] at line [" + p_tokenizer.GetLineCount() + "] in the tag starting at [" + m_lineNumber + "].  The closing tag [" + TAG_END_NAME + "] was expected.");
 				return false;
 			}
 
-			m_variableMap.put(m_variableName, t_generalBlock);
+			m_functionMap.put(m_functionName, t_generalBlock);
 
 			return true;
 		}
 		catch (Throwable t_error) {
-			Logger.LogException("Variable.Parse() failed with error at line [" + p_tokenizer.GetLineCount() + "] in the tag starting at [" + m_lineNumber + "]: ", t_error);
+			Logger.LogException("Function.Parse() failed with error at line [" + p_tokenizer.GetLineCount() + "] in the tag starting at [" + m_lineNumber + "]: ", t_error);
 			return false;
 		}
 	}
@@ -199,18 +199,18 @@ public class Variable extends Tag_Base {
 			if (m_evalMode == EVAL_MODE_VALUE_SET)		// Don't do anything for instances that are "set"s.  Those are never "evaluated".
 				return true;
 			else if (m_evalMode == EVAL_MODE_VALUE_EVALUATE) {
-				Tag_Base t_evalBlock = m_variableMap.get(m_variableName);
+				Tag_Base t_evalBlock = m_functionMap.get(m_functionName);
 				if (t_evalBlock == null) {
-					Logger.LogError("Variable.Evaluate() did not find a evaluation tag for variable [" + m_variableName + "] at line [" + m_lineNumber + "].");
+					Logger.LogError("Function.Evaluate() did not find a evaluation tag for function [" + m_functionName + "] at line [" + m_lineNumber + "].");
 					return false;
 				}
 
-				// The addition of outer contexts means that if you use a variable inside an inner context, you may need to point it to the outer context to get the correct values in the evaluation of the variable.
+				// The addition of outer contexts means that if you use a function inside an inner context, you may need to point it to the outer context to get the correct values in the evaluation of the function.
 				ConfigNode t_currentNode = p_evaluationContext.GetCurrentNode();
 				if (m_contextName != null) {
 					t_currentNode = p_evaluationContext.GetOuterContextManager().GetOuterContext(m_contextName);
 					if (t_currentNode == null) {
-						Logger.LogError("Variable.Evaluate() failed to find the outer context [" + m_contextName + "] for the evaluation mode at line [" + m_lineNumber + "].");
+						Logger.LogError("Function.Evaluate() failed to find the outer context [" + m_contextName + "] for the evaluation mode at line [" + m_lineNumber + "].");
 						return false;
 					}
 				}
@@ -225,12 +225,12 @@ public class Variable extends Tag_Base {
 				p_evaluationContext.PopCurrentNode();
 			}
 			else {
-				Logger.LogError("Variable.Evaluate() found an invalid value [" + m_evalMode + "] for the evaluation mode at line [" + m_lineNumber + "].");
+				Logger.LogError("Function.Evaluate() found an invalid value [" + m_evalMode + "] for the evaluation mode at line [" + m_lineNumber + "].");
 				return false;
 			}
 		}
 		catch (Throwable t_error) {
-			Logger.LogException("Variable.Evaluate() failed with error at line [" + m_lineNumber + "]: ", t_error);
+			Logger.LogException("Function.Evaluate() failed with error at line [" + m_lineNumber + "]: ", t_error);
 			return false;
 		}
 
@@ -244,10 +244,10 @@ public class Variable extends Tag_Base {
 		StringBuilder t_dump = new StringBuilder();
 
 		t_dump.append(p_tabs + "Tag name        :  " + m_name			+ "\n");
-		t_dump.append(p_tabs + "Variable name   :  " + m_variableName	+ "\n");
+		t_dump.append(p_tabs + "Variable name   :  " + m_functionName	+ "\n");
 		t_dump.append(p_tabs + "Evaluation mode :  " + m_evalMode		+ "\n");
 
-		t_dump.append("\n\n" + m_variableMap.get(m_variableName).Dump(p_tabs + "\t"));
+		t_dump.append("\n\n" + m_functionMap.get(m_functionName).Dump(p_tabs + "\t"));
 
 		return t_dump.toString();
 	}
