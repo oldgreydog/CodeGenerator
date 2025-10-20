@@ -21,6 +21,10 @@ along with CodeGenerator.  If not, see <http://www.gnu.org/licenses/>.
 package codegenerator.generator.utils;
 
 
+import  java.util.*;
+
+import coreutil.logging.Logger;
+
 
 public class TabSettingsManager {
 
@@ -31,9 +35,10 @@ public class TabSettingsManager {
 
 	// Static members
 	// !!!!NOTE!!!! Since the generator is strictly single threaded, these static class members do not require locking around them in this code.
-	private int		m_tabSize				= -1;
-	private int		m_outputType			= OUTPUT_TYPE_UNDEFINED;
-	private int		m_markerColumnNumber	= -1;
+	private int							m_tabSize				= -1;
+	private int							m_outputType			= OUTPUT_TYPE_UNDEFINED;
+	private int							m_markerColumnNumber	= -1;
+	private TreeMap<String, Integer>	m_namedMarkerMap		= new TreeMap<String, Integer>();
 
 
 	//*********************************
@@ -68,14 +73,63 @@ public class TabSettingsManager {
 
 
 	//*********************************
-	public void SetMarker(int p_markerColumnNumber) {
+	public boolean SetMarker(int p_markerColumnNumber) {
+		if (p_markerColumnNumber <= 0) {
+			Logger.LogError("TabSettingsManager.SetMarker() received an invalid column number [" + Integer.toString(p_markerColumnNumber) + "].");
+			return false;
+		}
+
 		m_markerColumnNumber = p_markerColumnNumber;
+		return true;
 	}
 
 
 	//*********************************
 	public int GetMarker() {
 		return m_markerColumnNumber;
+	}
+
+
+	//*********************************
+	public boolean SetNamedMarker(String p_markerName, int p_markerColumnNumber) {
+		if (p_markerName == null) {
+			Logger.LogError("TabSettingsManager.SetNamedMarker() received NULL marker name.");
+			return false;
+		}
+
+		if (p_markerColumnNumber <= 0) {
+			Logger.LogError("TabSettingsManager.SetNamedMarker() received an invalid column number [" + Integer.toString(p_markerColumnNumber) + "].");
+			return false;
+		}
+
+		String t_markerName = p_markerName.trim();
+		if (t_markerName.isEmpty()) {
+			Logger.LogError("TabSettingsManager.SetNamedMarker() received empty marker name.");
+			return false;
+		}
+
+		m_namedMarkerMap.put(t_markerName, p_markerColumnNumber);
+		return true;
+	}
+
+
+	//*********************************
+	public int GetNamedMarker(String p_markerName) {
+		if (p_markerName == null) {
+			Logger.LogError("TabSettingsManager.GetNamedMarker() received NULL marker name.");
+			return -1;
+		}
+
+		String t_markerName = p_markerName.trim();
+		if (t_markerName.isEmpty()) {
+			Logger.LogError("TabSettingsManager.GetNamedMarker() received empty marker name.");
+			return -1;
+		}
+
+		if (!m_namedMarkerMap.containsKey(p_markerName))
+			return -1;
+
+		return m_namedMarkerMap.get(p_markerName);
 	}
 
 

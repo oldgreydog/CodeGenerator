@@ -38,6 +38,8 @@ import coreutil.logging.*;
 
 <pre>	<code><b>&lt;%tabStop stopType = "marker" %&gt;</b></code></pre>
 
+<pre>	<code><b>&lt;%tabStop stopType = "marker" optionalMarkerName = "&lt;%className%&gt;1stMark" %&gt;</b></code></pre>
+
 <h3>Attribute descriptions</h3>
 
 <p><code><b>stopType</b></code>: [values: <code><b>stop</b></code>|<code><b>marker</b></code>, no default: a value must be set]</p>
@@ -53,6 +55,10 @@ used to add an extra offset to the arbitrary marker value to create multiple col
 <p><code><b>offset</b></code>: an integer value defining either the offset from the beginning of the line (required for <code><b>stopType = "stop"</b></code>)
 or the offset to be added the last <code><b>tabMarker</b></code> position (optional for <code><b>stopType = "marker"</b></code>).</p>
 
+<p><code><b>optionalMarkerName</b></code>: lets you create as many named <code><b>tabMarker</b></code>s as you want now.  This gives you
+way more alignment control than the base <code><b>tabMarker</b></code> by itself (which still works the old way if they aren't named).
+Note it only works when <code><b>stopType = "marker"</b></code>).</p>
+
 <p><code><b>!!!NOTE!!!</b></code>  If the text already written to the current line passes where the tab stop is calculated to be,
 then this code will not add ANY whitespace at all!  Because of that, I highly recommend that you always precede
 the use of this tag with a tab or space so that if the current line of generated text has already passed the
@@ -62,22 +68,25 @@ the generation of invalid code.</p>
  */
 public class TabStop extends Tag_Base {
 
-	static public final String		TAG_NAME					= "tabStop";
+	static public final String		TAG_NAME						= "tabStop";
 
-	static private final String		ATTRIBUTE_STOP_TYPE			= "stopType";
-	static private final String		ATTRIBUTE_OFFSET			= "offset";
+	static private final String		ATTRIBUTE_STOP_TYPE				= "stopType";
+	static private final String		ATTRIBUTE_OFFSET				= "offset";
+	static public final String		ATTRIBUTE_OPTIONAL_MARKER_NAME	= "optionalMarkerName";
 
-	static private final String		STOP_TYPE_LABEL_STOP		= "stop";
-	static private final String		STOP_TYPE_LABEL_MARKER		= "marker";
+	static private final String		STOP_TYPE_LABEL_STOP			= "stop";
+	static private final String		STOP_TYPE_LABEL_MARKER			= "marker";
 
-	static private final int		STOP_TYPE_UNDEFINED			= -1;
-	static private final int		STOP_TYPE_STOP				= 1;
-	static private final int		STOP_TYPE_MARKER			= 2;
+	static private final int		STOP_TYPE_UNDEFINED				= -1;
+	static private final int		STOP_TYPE_STOP					= 1;
+	static private final int		STOP_TYPE_MARKER				= 2;
 
 
 	// Data members
-	private	int		m_stopType			= STOP_TYPE_UNDEFINED;
-	private	int		m_offset			= -1;
+	private	int					m_stopType				= STOP_TYPE_UNDEFINED;
+	private	OptionalEvalValue	m_offsetAttributeValue	= null;
+	private	int					m_offset				= -1;
+	private	String				m_optionalMarkerName	= null;
 
 
 	//*********************************
@@ -126,13 +135,24 @@ public class TabStop extends Tag_Base {
 			}
 
 			if (t_nodeAttribute != null) {
-				String t_offsetValue = t_nodeAttribute.GetAttributeValueAsString();
-				if (t_offsetValue == null) {
-					Logger.LogError("TabStop.Evaluate() failed to get the [" + ATTRIBUTE_OFFSET + "] value at line number [" + m_lineNumber + "].");
+				GeneralBlock t_valueBlock = t_nodeAttribute.GetAttributeValue();
+				if ((t_valueBlock == null) || !t_valueBlock.HasContentTags()) {
+					Logger.LogError("TabStop.Init() failed to get the [" + ATTRIBUTE_OFFSET + "] value at line number [" + m_lineNumber + "].");
 					return false;
 				}
 
-				m_offset = Integer.parseInt(t_offsetValue.toString());
+				m_offsetAttributeValue = new OptionalEvalValue(t_valueBlock);
+			}
+
+			if (m_stopType == STOP_TYPE_MARKER) {
+				t_nodeAttribute = p_tagParser.GetNamedAttribute(ATTRIBUTE_OPTIONAL_MARKER_NAME);
+				if (t_nodeAttribute != null) {
+					m_optionalMarkerName = t_nodeAttribute.GetAttributeValueAsString();
+					if ((m_optionalMarkerName == null) || m_optionalMarkerName.isBlank()) {
+						Logger.LogError("TabMarker.Init() did not get the value from the optional attribute [" + ATTRIBUTE_OPTIONAL_MARKER_NAME + "] at line number [" + m_lineNumber + "].");
+						return false;
+					}
+				}
 			}
 
 			return true;
@@ -171,6 +191,17 @@ public class TabStop extends Tag_Base {
 				return false;
 			}
 
+			// The offset, if it was defined, may or may not be constant and since we can't know, we'll just have to evaluate it every time.  For example, someone may decide to put a value width into the config values and that would require evaluation every time.  On the other hand, if the offset is set with the TypeMaxSize tag, then it will be constant for that instance of TabStop and re-evaluating this tag would be unnecessary replication.  Can't know that, though...
+			if ((m_offset == -1) && (m_offsetAttributeValue != null)) {
+				String t_offsetAttributeValue = m_offsetAttributeValue.Evaluate(p_evaluationContext);
+				if ((t_offsetAttributeValue == null) || t_offsetAttributeValue.isBlank()) {
+					Logger.LogError("TabStop.Evaluate() failed to evaluate the offset value at line number [" + m_lineNumber + "].");
+					return false;
+				}
+
+				m_offset = Integer.parseInt(t_offsetAttributeValue);
+			}
+
 			int t_stopOffset = -1;
 			if (m_stopType == STOP_TYPE_STOP) {
 				t_stopOffset = m_offset;
@@ -180,9 +211,14 @@ public class TabStop extends Tag_Base {
 					t_stopOffset = ((t_stopOffset / t_tabsize) + 1) * t_tabsize;
 			}
 			else {
-				t_stopOffset = t_tabSettingsManager.GetMarker();
+				if (m_optionalMarkerName != null)
+					t_stopOffset = t_tabSettingsManager.GetNamedMarker(m_optionalMarkerName);
+				else
+					t_stopOffset = t_tabSettingsManager.GetMarker();
+
+
 				if (t_stopOffset < 0) {
-					Logger.LogError("TabStop.Evaluate() - the tab marker was not set for this tab stop.");
+					Logger.LogError("TabStop.Evaluate() - the tab marker was not set for this tab stop at line number [" + m_lineNumber + "].");
 					return false;
 				}
 
@@ -238,7 +274,7 @@ public class TabStop extends Tag_Base {
 			}
 		}
 		catch (Throwable t_error) {
-			Logger.LogException("TabStop.Evaluate() failed with error: ", t_error);
+			Logger.LogException("TabStop.Evaluate() failed with error at line number [" + m_lineNumber + "]: ", t_error);
 			return false;
 		}
 
